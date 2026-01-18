@@ -17,7 +17,7 @@ class HomeAssistantClient(
     private val port: Int,
     private val token: String
 ) {
-    private val messageId = AtomicInteger(1)
+    val messageId = AtomicInteger(1)
 
     // Encapsulated HttpClient configuration
     private val client = HttpClient(CIO) {
@@ -34,17 +34,53 @@ class HomeAssistantClient(
 
     val areas = runBlocking { fetchAreas() }.associateBy { it.id }
     val devices = runBlocking { fetchDevices() }.associateBy { it.id }
-    val entities = runBlocking { fetchEntities() }.associateBy { it.id }
-    val entityStates = runBlocking { fetchEntityStates() }.associateBy { it.id }
+    val entities: Map<String, HAEntity>
 
+    init {
+        entities = runBlocking {
+            println("*** fetching entity states ******")
+            val entityStates = fetchEntityStates().associateBy { it.id }
+            println("*** fetching entities ******")
+            val rawEntities = fetchJson("config/entity_registry/list")
+            buildMap<String, HAEntity> {
+                for (rawEntity in rawEntities.jsonArray) {
+                    val id = rawEntity.jsonObject["entity_id"]?.jsonPrimitive?.contentOrNull
+                    if (id != null) {
+                        val state = entityStates[id]
+                        if (state != null) {
+                            put(id, HAEntity(this@HomeAssistantClient, rawEntity.jsonObject, state))
+                        }
+                    }
+                }
+            }
+        }
 
-    /**
-     * Generic helper to fetch lists (Devices or Entities)
-     */
-    private suspend inline fun fetchJson(commandType: String): JsonElement = coroutineScope {
-        val deferred = CompletableDeferred<JsonElement>()
+        println("*** subscribing ******")
+        Thread {
+            runBlocking {
+                subscribeEntityStates {
+                    for ((id, update) in it.jsonObject.entries) {
+                        val entity = entities[id]
+                        if (entity != null) {
+                            entity.state = entity.state.update(update.jsonObject)
+                        }
+                    }
+                }
+            }
+        }.start()
+    }
 
+    private suspend fun fetchJson(commandType: String, keepListening: Boolean = false, callback: (JsonElement) -> Unit) {
+        val cmd = buildJsonObject {
+            put("id", messageId.getAndIncrement())
+            put("type", commandType)
+        }
+        sendJson(json.encodeToString(cmd), keepListening, callback = callback)
+    }
+
+    suspend fun sendJson(command: String, keepListening: Boolean = false, callback: ((JsonElement) -> Unit)? = null) {
         client.webSocket(method = HttpMethod.Get, host = host, port = port, path = "/api/websocket") {
+
             for (frame in incoming) {
                 if (frame !is Frame.Text) continue
 
@@ -53,28 +89,52 @@ class HomeAssistantClient(
                 when (response.get("type")?.jsonPrimitive?.content) {
                     "auth_required" -> sendAuth()
                     "auth_ok" -> {
-                        val cmd = buildJsonObject {
-                            put("id", messageId.getAndIncrement())
-                            put("type", commandType)
+                        send(Frame.Text(command))
+                        if (callback == null) {
+                            close()
                         }
-                        send(Frame.Text(json.encodeToString(cmd)))
+                    }
+                    "event" -> {
+                        val result = response.get("event")!!
+                        //println("fetched result: $result")
+                        if (callback != null) {
+                            callback(result)
+                        }
                     }
                     "result" -> {
                         if (response.get("success")?.jsonPrimitive?.booleanOrNull == true) {
                             val result = response.get("result")!!
                             //println("fetched result: $result")
-                            deferred.complete(result)
+                            if (callback != null) {
+                                callback(result)
+                                if (!keepListening) {
+                                    close()
+                                }
+
+                            }
                         } else {
-                            deferred.completeExceptionally(Exception("HA Command Failed: $commandType"))
+                            close()
+                            throw RuntimeException("HA Command Failed: $command; response: $response")
                         }
-                        close()
                     }
                     "auth_invalid" -> {
-                        deferred.completeExceptionally(Exception("Authentication failed"))
                         close()
+                        throw RuntimeException("Authentication failed")
                     }
                 }
             }
+        }
+    }
+
+
+
+    /**
+     * Generic helper to fetch lists (Devices or Entities)
+     */
+    private suspend fun fetchJson(commandType: String): JsonElement = coroutineScope {
+        val deferred = CompletableDeferred<JsonElement>()
+        fetchJson(commandType) {
+            deferred.complete(it)
         }
         deferred.await()
     }
@@ -83,9 +143,19 @@ class HomeAssistantClient(
 
     suspend fun fetchDevices() = fetchJson("config/device_registry/list").jsonArray.map { HADevice(this, it.jsonObject) }
 
-    suspend fun fetchEntities() = fetchJson("config/entity_registry/list").jsonArray.map { HAEntity(this, it.jsonObject) }
+    suspend fun fetchEntityStates() = fetchJson("get_states").jsonArray.map { HAEntityState(it.jsonObject) }
 
-    suspend fun fetchEntityStates() = fetchJson("get_states").jsonArray.map { HAEntityState(this, it.jsonObject) }
+    suspend fun subscribeEntityStates(callback: (JsonObject) -> Unit) =
+        fetchJson("subscribe_entities", keepListening = true) {
+            if (it is JsonObject) {
+                val c = it["c"]?.jsonObject
+                if (c != null) {
+                    callback(c)
+                    return@fetchJson
+                }
+            }
+            println("Entity update doesn't contain 'c' field: ${it.toString().take(1000)}")
+        }
 
     private suspend fun DefaultClientWebSocketSession.sendAuth() {
         val authPayload = """{"type": "auth", "access_token": "$token"}"""

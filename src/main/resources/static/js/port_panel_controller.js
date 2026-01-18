@@ -63,6 +63,16 @@ export function processPortUpdate(name, f) {
         }
     } else {
         let spec = getFactory(f.kind)
+        if (spec == null) {
+            console.log("Factory " + f.kind + " not found.")
+            return
+        }
+        if (spec.kind == "PROPERTY") {
+            let inputElement = document.getElementById("port." + f.name)
+            inputElement.value = f.source
+            return
+        }
+
         let isExpandable = spec.kind == "INPUT_PORT" && typeof f.type != "string"
         let entryElement = document.createElement( "div")
         entryElement.id = "port." + f.name

@@ -6,10 +6,16 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 class HAEntityState(
-    val client: HomeAssistantClient,
+    val id: String,
+    val state: Any?,
     val json: JsonObject
 ) {
+    constructor(json: JsonObject) : this(
+         json["entity_id"]!!.jsonPrimitive.content, json["state"]?.jsonPrimitive?.contentOrNull, json
+    )
 
-    val id: String = json["entity_id"]!!.jsonPrimitive.content
-    val state: Any? = json["state"]?.jsonPrimitive?.contentOrNull
+    fun update(update: JsonObject): HAEntityState {
+        val state = update["+"]?.jsonObject["s"]?.jsonPrimitive?.contentOrNull
+        return HAEntityState(id, state, json)
+    }
 }

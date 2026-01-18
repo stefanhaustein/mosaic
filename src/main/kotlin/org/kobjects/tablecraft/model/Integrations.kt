@@ -10,6 +10,8 @@ class Integrations : Iterable<IntegrationInstance> {
 
     val integrationMap = mutableMapOf<String, IntegrationInstance>()
 
+    operator fun get(id: String): IntegrationInstance? = integrationMap[id]
+
     fun deleteIntegration(name: String, token: ModificationToken) {
         val integration = integrationMap[name]
         if (integration != null) {

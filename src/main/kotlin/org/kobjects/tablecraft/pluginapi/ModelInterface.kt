@@ -22,4 +22,6 @@ interface ModelInterface {
     fun scheduleAsync(interval: Long, initialDelay: Long = 0, task: () -> Boolean)
 
     fun setPortValue(port: InputPortListener, value: Any?)
+
+    fun notifyValueChanged(listener: ValueChangeListener?)
 }

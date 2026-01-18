@@ -62,7 +62,7 @@ abstract class AbstractArtifactSpec(
 
 
     enum class Modifier {
-         NO_SIMULATION, DELETED, SINGLETON
+         NO_SIMULATION, DELETED, SINGLETON, SETTABLE
     }
 }
 

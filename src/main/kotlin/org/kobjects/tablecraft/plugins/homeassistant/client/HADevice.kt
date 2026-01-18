@@ -10,7 +10,7 @@ data class HADevice(
     val json: JsonObject
 ) {
     val id: String = json["id"]!!.jsonPrimitive.content
-    val name: String = (json["name_by_user"] ?: json["name"])!!.jsonPrimitive.content
+    val name: String = json["name_by_user"]?.jsonPrimitive?.contentOrNull ?: json["name"]?.jsonPrimitive?.contentOrNull ?: id
     val manufacturer: String? = json["manufacturer"]?.jsonPrimitive?.contentOrNull
     val model: String? = json["model"]?.jsonPrimitive?.contentOrNull
     val areaId: String? = json["area_id"]?.jsonPrimitive?.contentOrNull

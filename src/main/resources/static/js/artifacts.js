@@ -1,5 +1,5 @@
 import {insertById} from "./lib/dom.js";
-import {camelCase, ensureCategory} from "./lib/utils.js";
+import {camelCase, ensureCategory, post} from "./lib/utils.js";
 import {showIntegrationCreationDialog} from "./integration_editor.js";
 import {confirmDialog} from "./lib/dialogs.js";
 import {currentCell, setCurrentCellFormula} from "./shared_state.js";
@@ -9,8 +9,11 @@ export function updateSpec(parent, idPrefix, spec) {
     let id = idPrefix + spec.name
 
     let createAction = null;
+    let icon = "add_circle"
     switch (spec.kind) {
         case "FUNCTION":
+        case "PROPERTY":
+            icon = "variable_insert"
             createAction = async () => {
                 let value = "=" + spec.name + (spec.params && spec.params.length ? "(" : "")
                 if (currentCell.f == null || currentCell.f == "" || await confirmDialog("Overwrite Current Formula?", currentCell.key + ": '" + currentCell.f + "'")) {
@@ -42,10 +45,11 @@ export function updateSpec(parent, idPrefix, spec) {
     let element = document.createElement("div")
     element.id = idPrefix + spec.name
 
+
     if (createAction) {
         let addButtonElement = document.createElement("img")
-        addButtonElement.src = "/img/add.svg"
-        addButtonElement.style.float = "right"
+        addButtonElement.src = "/img/" + icon + ".svg"
+        addButtonElement.style.float = "left"
         addButtonElement.onclick = createAction
         element.appendChild(addButtonElement)
     }
@@ -64,12 +68,24 @@ export function updateSpec(parent, idPrefix, spec) {
     }
     titleElement.style.marginBottom = "5px"
     titleElement.style.marginTop = "10px"
-    titleElement.style.textIndent = "-10px"
-    titleElement.style.paddingLeft = "10px"
+    titleElement.style.paddingLeft = "20px"
     element.appendChild(titleElement)
 
+    if (spec.kind == "PROPERTY" && spec.modifiers && spec.modifiers.indexOf("SETTABLE") != -1) {
+        let inputElement = document.createElement("input")
+        element.appendChild(inputElement)
+        inputElement.id = "port." + spec.name
+        inputElement.addEventListener("change", () => {
+            post("ports/" + spec.name, {
+                kind: spec.name,
+                name: spec.name,
+                source: inputElement.value
+                })
+        })
+    }
+
     let descriptionElement = document.createElement("div")
-    descriptionElement.style.paddingLeft = "10px"
+    descriptionElement.style.paddingLeft = "20px"
 
     let description = spec.description
     cut = description.indexOf(".")

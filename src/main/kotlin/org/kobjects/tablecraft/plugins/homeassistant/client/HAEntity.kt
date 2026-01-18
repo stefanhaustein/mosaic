@@ -9,7 +9,20 @@ import kotlinx.serialization.json.jsonPrimitive
 data class HAEntity(
     val client: HomeAssistantClient,
     val json: JsonObject,
+    private var state_: HAEntityState
 ) {
+    var state: HAEntityState
+        get() = state_
+        set(value) {
+            val previousState = state_
+            state_ = value
+            for (listener in stateListeners) {
+                listener.entityStateChanged(this, previousState, state)
+            }
+        }
+
+    val stateListeners = mutableListOf<StateChangeListener>()
+
     val id: String = json["entity_id"]!!.jsonPrimitive.content
 
     val kind: Kind
@@ -23,16 +36,21 @@ data class HAEntity(
     val disabledBy = json["disabled_by"]?.jsonPrimitive?.contentOrNull
 
     val friendlyName: String?
-        get() = state?.json?.get("attributes")?.jsonObject?.get("friendly_name")?.jsonPrimitive?.contentOrNull
-
-    val state: HAEntityState?
-        get() = client.entityStates[id]
+        get() = state.json?.get("attributes")?.jsonObject?.get("friendly_name")?.jsonPrimitive?.contentOrNull
 
     val description: String
-        get() = (friendlyName?:"") + ".debug:\n" + Json {prettyPrint = true}.encodeToString(json) +
-                "\n\nstate:" + Json {prettyPrint = true}.encodeToString(state?.json)
+        get() = (friendlyName?:"") + ".debug:\n" + PRETTY_JSON.encodeToString(json) +
+                "\n\nstate:" + PRETTY_JSON.encodeToString(state.json)
 
     override fun toString(): String = id + " - " + category + " - " + json
+
+    fun addListener(listener: StateChangeListener) {
+        stateListeners.add(listener)
+    }
+
+    fun removeListener(listener: StateChangeListener) {
+        stateListeners.remove(listener)
+    }
 
     enum class Kind {
         BUTTON,
@@ -43,5 +61,13 @@ data class HAEntity(
         UPDATE,
 
         UNRECOGNIZED,
+    }
+
+    companion object {
+        val PRETTY_JSON = Json{prettyPrint = true}
+    }
+
+    interface StateChangeListener {
+        fun entityStateChanged(entity: HAEntity, oldState: HAEntityState, newState: HAEntityState)
     }
 }

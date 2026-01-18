@@ -9,7 +9,7 @@ class HAArea(
     val json: JsonObject
 ) {
     val id: String = json["area_id"]!!.jsonPrimitive.content
-    val name: String = json["name"]?.jsonPrimitive?.contentOrNull ?: ""
+    val name: String = json["name"]?.jsonPrimitive?.contentOrNull ?: id
 
     override fun toString() = name
 }

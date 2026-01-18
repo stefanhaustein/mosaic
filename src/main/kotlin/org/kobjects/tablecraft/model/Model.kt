@@ -416,7 +416,7 @@ object Model : ModelInterface {
     }
 
     /** A nullable listener simplifies call sites where the listener is a var and might be null */
-    fun notifyValueChanged(listener: ValueChangeListener?) {
+    override fun notifyValueChanged(listener: ValueChangeListener?) {
         if (listener != null) {
             requestSynchronizedWithToken {
                 listener.notifyValueChanged(it)

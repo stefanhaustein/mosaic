@@ -1,18 +1,20 @@
 package org.kobjects.tablecraft.plugins.homeassistant
 
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.JsonObject
 import org.kobjects.tablecraft.model.expression.EvaluationContext
 import org.kobjects.tablecraft.pluginapi.AbstractArtifactSpec
-import org.kobjects.tablecraft.pluginapi.FunctionInstance
-import org.kobjects.tablecraft.pluginapi.FunctionSpec
 import org.kobjects.tablecraft.pluginapi.IntegrationInstance
 import org.kobjects.tablecraft.pluginapi.IntegrationSpec
 import org.kobjects.tablecraft.pluginapi.ModelInterface
+import org.kobjects.tablecraft.pluginapi.OutputPortInstance
 import org.kobjects.tablecraft.pluginapi.ParameterSpec
+import org.kobjects.tablecraft.pluginapi.PropertySpec
+import org.kobjects.tablecraft.pluginapi.StatefulFunctionInstance
 import org.kobjects.tablecraft.pluginapi.Type
+import org.kobjects.tablecraft.pluginapi.ValueChangeListener
 import org.kobjects.tablecraft.plugins.homeassistant.client.HAEntity
 import org.kobjects.tablecraft.plugins.homeassistant.client.HAEntity.Kind
+import org.kobjects.tablecraft.plugins.homeassistant.client.HAEntityState
 import org.kobjects.tablecraft.plugins.homeassistant.client.HomeAssistantClient
 
 class HomeAssistantIntegration(
@@ -76,7 +78,7 @@ class HomeAssistantIntegration(
         }
     }
 
-    fun entityOperationSpec(entity: HAEntity): FunctionSpec {
+    fun entityOperationSpec(entity: HAEntity): PropertySpec {
         val device = entity.device
         val category = buildString {
             val areaName = device?.area?.toString() ?: "Unnamed Area"
@@ -106,30 +108,73 @@ class HomeAssistantIntegration(
             if (suffix.startsWith("_")) suffix.substring(1) else suffix
         }
 
-
-        return FunctionSpec(
+        return PropertySpec(
             category = category,
             name = name + "." + entity.id.replace(".", "_"),
-            returnType = when (entity.kind) {
+            type = when (entity.kind) {
                 Kind.BINARY_SENSOR -> Type.BOOL
                 Kind.LIGHT -> Type.BOOL
                 Kind.SENSOR -> Type.REAL
                 else -> Type.STRING
             },
             description = entity.description,
-            parameters = listOf(),
             displayName = displayName,
+            setterCreateFn = if (entity.kind != Kind.LIGHT) null else { {
+                EntityOutputPortInstance(this@HomeAssistantIntegration, entity)
+            } }
         ) {
-            EntityFunctionInstance(this@HomeAssistantIntegration, entity.id)
+            EntityFunctionInstance(this@HomeAssistantIntegration, entity)
         }
     }
 
-    class EntityFunctionInstance(val integration: HomeAssistantIntegration, val id: String) : FunctionInstance {
+    class EntityOutputPortInstance(
+        val integration: HomeAssistantIntegration,
+        val entity: HAEntity
+    ) : OutputPortInstance {
+        override fun setValue(value: Any?) {
+            runBlocking {
+                integration.client?.sendJson(
+            """{ "id": ${integration.client?.messageId?.getAndIncrement()}, "type": "call_service",  "domain": "light", "service": "turn_${if(value == true) "on" else "off" }",
+                    "target": { "entity_id": "${entity.id}" } }""")
+            }
+        }
+
+        override fun detach() {
+
+        }
+
+    }
+
+
+    class EntityFunctionInstance(
+        val integration: HomeAssistantIntegration,
+        val entity: HAEntity
+    ) : StatefulFunctionInstance, HAEntity.StateChangeListener {
+        var host: ValueChangeListener? = null
+
         override fun apply(
             context: EvaluationContext,
             params: Map<String, Any?>
         ): Any? {
-            return integration.client?.entityStates[id]?.state
+            return entity.state.state
+        }
+
+        override fun attach(host: ValueChangeListener) {
+            this.host = host
+            entity.addListener(this)
+        }
+
+        override fun detach() {
+            entity.removeListener(this)
+            host = null
+        }
+
+        override fun entityStateChanged(
+            entity: HAEntity,
+            oldState: HAEntityState,
+            newState: HAEntityState
+        ) {
+            integration.model.notifyValueChanged(host)
         }
 
     }

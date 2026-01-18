@@ -16,7 +16,21 @@ export function getAllFactories() {
 }
 
 export function getFactory(name) {
-    return factories[name.toLowerCase()]
+    name = name.toLowerCase()
+    let cut = name.indexOf(".")
+    if (cut == -1) {
+        return functions[name]
+    }
+    let integration = getIntegrationInstance(name.substring(0, cut))
+    if (integration == null) {
+        console.log("integration not found: " + name.substring(0, cut))
+        return null
+    }
+    let op = integration.operations.find((entry) => entry.name == name )
+    if (op == null) {
+        console.log("operation '" + name + "' not found in " + JSON.stringify(integration.operations))
+    }
+    return op
 }
 
 export function getFunction(name) {

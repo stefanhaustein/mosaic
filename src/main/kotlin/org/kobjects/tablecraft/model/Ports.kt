@@ -56,9 +56,15 @@ class Ports : Iterable<PortHolder> {
         if (jsonSpec["deleted"] as Boolean? != true) {
             val kind = jsonSpec["kind"].toString()
 
-            portMap[name]?.detach()
+            val specification = if (kind.contains(".")) {
+                val parts = kind.split(".")
+                val integration = Model.integrations[parts[0]] ?: throw IllegalArgumentException("Integration '${parts[0]}' not found.")
+                integration.operationSpecs.find { it.name == kind } ?: throw IllegalArgumentException("'${parts[1]}' not found in integration $integration.")
+            } else {
+                Model.factories[kind] ?: throw IllegalArgumentException("Unrecognized port type '$kind'")
+            }
 
-            val specification = Model.factories[kind] ?: throw IllegalArgumentException("Unrecognized port type '$kind'")
+            portMap[name]?.detach()
 
             val config = specification.convertConfiguration(
                 jsonSpec["configuration"] as? Map<String, Any> ?: emptyMap()
@@ -67,6 +73,7 @@ class Ports : Iterable<PortHolder> {
             val port = when (specification) {
                 is InputPortSpec -> InputPortHolder(name, specification, config, token.tag)
                 is OutputPortSpec -> OutputPortHolder(name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, token.tag)
+                is PropertySpec -> OutputPortHolder(name, specification.getOutputPortSpec(), config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, token.tag)
                 else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
             }
             portMap[name] = port

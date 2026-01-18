@@ -1,6 +1,6 @@
 package org.kobjects.tablecraft.pluginapi
 
-class FunctionSpec(
+open class FunctionSpec(
     category: String,
     returnType: Type,
     name: String,
@@ -9,10 +9,11 @@ class FunctionSpec(
     modifiers: Set<Modifier> = emptySet(),
     tag: Long = 0,
     displayName: String? = null,
+    kind: OperationKind = OperationKind.FUNCTION,
     val createFn: (configuration: Map<String, Any?>) -> FunctionInstance,
 ) : AbstractArtifactSpec(
     category,
-    OperationKind.FUNCTION,
+    kind,
     returnType,
     name,
     description,
