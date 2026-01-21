@@ -3,7 +3,7 @@ package org.kobjects
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import org.kobjects.tablecraft.server.module
+import org.kobjects.mosaic.server.module
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

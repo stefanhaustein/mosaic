@@ -1,1 +1,1 @@
-rootProject.name = "tablecraft"
+rootProject.name = "mosaic"

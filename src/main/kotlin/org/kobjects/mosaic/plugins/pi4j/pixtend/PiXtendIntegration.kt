@@ -1,0 +1,100 @@
+package org.kobjects.mosaic.plugins.pi4j.pixtend
+
+import com.pi4j.drivers.plc.pixtend.PiXtendDriver
+import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.plugins.pi4j.Pi4jPlugin
+
+class PiXtendIntegration(
+    val pi4j: Pi4jPlugin,
+    kind: String,
+    name: String,
+    tag: Long,
+    var pixtendModel: PiXtendDriver.Model
+
+): IntegrationInstance(kind, name, tag) {
+    var driver: PiXtendDriver? = null
+    var error: Exception? = null
+    val inputPorts = mutableSetOf<PiXtendInputPortInstance>()
+    var invocationId = 0
+
+    init {
+       attach()
+    }
+
+    private fun attach() {
+        if (!pi4j.model.simulationMode) {
+            try {
+                driver = PiXtendDriver(pi4j.pi4j, this@PiXtendIntegration.pixtendModel)
+                error = null
+                pi4j.model.runAsync { syncState(driver!!, ++invocationId) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                error = e
+            }
+        }
+    }
+
+    fun syncState(driver: PiXtendDriver, invocationId: Int) {
+        if (invocationId != this.invocationId) {
+            return
+        }
+        driver.syncState()
+        pi4j.model.applySynchronizedWithToken(
+            callback = { tag, anyChange ->
+                pi4j.model.runAsync {
+                    syncState(driver, invocationId)
+                }
+            }
+        ) {
+            for (inputPort in inputPorts) {
+                inputPort.syncState(it)
+            }
+        }
+    }
+
+
+    companion object {
+        val piXtendModel = Type.ENUM(PiXtendDriver.Model.entries)
+
+        fun spec(pi4j: Pi4jPlugin) = IntegrationSpec(
+            category = "PLC",
+            name = "pixt",
+            description = "PiXtend PLC Integration",
+            parameters = listOf(ParameterSpec("model", piXtendModel, PiXtendDriver.Model.V2S)),
+            modifiers = setOf(AbstractArtifactSpec.Modifier.SINGLETON),
+        ) { kind, name, tag, config ->
+            PiXtendIntegration(pi4j, kind, name, tag, config["model"] as PiXtendDriver.Model)
+        }
+    }
+
+    override val operationSpecs: List<AbstractFactorySpec>
+        get() = listOf(
+            PiXtendAnalogInputPort.spec(this),
+            PiXtendAnalogOutputPort.spec(this),
+            PiXtendDigitalInputPort.spec(this),
+            PiXtendDigitalOutputPort.spec(this),
+            PiXtendGpioDigitalInputPort.spec(this),
+            PiXtendGpioDigitalOutputPort.spec(this),
+            PiXtendRelayPort.spec(this),
+        )
+
+    override val configuration: Map<String, Any?>
+        get() = mapOf("model" to pixtendModel.name)
+
+    override fun detach() {
+        invocationId++
+    }
+
+    override fun notifySimulationModeChanged(token: ModificationToken) {
+        detach()
+        attach()
+    }
+
+    override fun reconfigure(configuration: Map<String, Any?>) {
+        invocationId++
+        this@PiXtendIntegration.pixtendModel = configuration["model"] as PiXtendDriver.Model
+        attach()
+    }
+
+
+}
