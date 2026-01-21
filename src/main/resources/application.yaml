@@ -2,6 +2,6 @@ ktor:
     development: true
     application:
         modules:
-            - org.kobjects.tablecraft.server.ApplicationKt.module
+            - org.kobjects.mosaic.server.ApplicationKt.module
     deployment:
         port: 8080
