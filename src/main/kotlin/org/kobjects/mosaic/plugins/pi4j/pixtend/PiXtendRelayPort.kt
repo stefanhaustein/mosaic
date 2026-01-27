@@ -18,6 +18,7 @@ class PiXtendRelayPort(
 
     companion object {
         fun spec(integration: PiXtendIntegration) = OutputPortSpec(
+            null,
             "PiXtend",
             "pixt.relay",
        //     Type.REAL,

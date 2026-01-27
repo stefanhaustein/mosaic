@@ -1,6 +1,7 @@
 package org.kobjects.mosaic.pluginapi
 
 class PropertySpec (
+    namespace: Namespace?,
     category: String,
     type: Type,
     name: String,
@@ -11,6 +12,7 @@ class PropertySpec (
     val setterCreateFn: (() -> OutputPortInstance)? = null,
     getterCreateFn: () -> FunctionInstance,
 ) : FunctionSpec(
+    namespace,
     category,
     type,
     name,
@@ -25,6 +27,7 @@ class PropertySpec (
     }
 ) {
     fun getOutputPortSpec() = OutputPortSpec(
+        namespace,
         category,
         name = name,
         description = description,

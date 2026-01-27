@@ -35,6 +35,8 @@ class MqttPort(
 
     val operationSpecs: List<AbstractArtifactSpec> = listOf(
         FunctionSpec(
+            null,
+
             "MQTT",
             Type.STRING,
             "$name.subscribe",
@@ -46,6 +48,7 @@ class MqttPort(
             MqttSubscription(this, it)
         },
         FunctionSpec(
+            null,
             "MQTT",
             Type.STRING,
             "$name.publish",

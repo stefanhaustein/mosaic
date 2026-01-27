@@ -10,6 +10,7 @@ class IntegrationSpec(
     displayName: String? = null,
     val createFn: (kind: String, name: String, tag: Long, initialConfiguration: Map<String, Any?>) -> IntegrationInstance,
 ) : AbstractFactorySpec(
+    null,
     category,
     OperationKind.INTEGRATION,
     name,

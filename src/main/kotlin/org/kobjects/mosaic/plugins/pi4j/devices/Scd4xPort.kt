@@ -61,6 +61,7 @@ class Scd4xPort(
         ))
 
         fun spec(plugin: Pi4jPlugin) = InputPortSpec(
+            null,
             category = "Driver",
             "Scd4x",
             TYPE,

@@ -1,6 +1,7 @@
 package org.kobjects.mosaic.pluginapi
 
 abstract class AbstractFactorySpec(
+    namespace: Namespace?,
     category: String,
     kind: OperationKind,
     name: String,
@@ -11,6 +12,7 @@ abstract class AbstractFactorySpec(
     tag: Long,
     displayName: String?,
 ) : AbstractArtifactSpec(
+    namespace,
     category,
     kind,
     type,

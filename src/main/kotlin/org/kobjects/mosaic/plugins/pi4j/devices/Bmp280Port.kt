@@ -58,6 +58,7 @@ class Bmp280Port(
         ))
 
         fun spec(plugin: Pi4jPlugin) = InputPortSpec(
+            null,
             category = "Driver",
             "Bmp280",
             TYPE,

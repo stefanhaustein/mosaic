@@ -109,6 +109,7 @@ class HomeAssistantIntegration(
         }
 
         return PropertySpec(
+            null,
             category = category,
             name = name + "." + entity.id.replace(".", "_"),
             type = when (entity.kind) {

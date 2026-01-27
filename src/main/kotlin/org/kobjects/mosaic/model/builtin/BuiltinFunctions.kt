@@ -5,6 +5,7 @@ import org.kobjects.mosaic.pluginapi.*
 object BuiltinFunctions : Plugin {
     override val operationSpecs = listOf<AbstractArtifactSpec>(
         FunctionSpec(
+            null,
             "Time",
             Type.DATE,
             "now",
@@ -14,6 +15,7 @@ object BuiltinFunctions : Plugin {
         ),
 
         FunctionSpec(
+            null,
             "Math",
             Type.REAL,
             "pi",
@@ -23,6 +25,7 @@ object BuiltinFunctions : Plugin {
         ),
 
         FunctionSpec(
+            null,
             "PLC",
             Type.BOOL,
             "toff",
@@ -37,6 +40,7 @@ object BuiltinFunctions : Plugin {
         ),
 
         FunctionSpec(
+            null,
             "PLC",
 
             Type.BOOL,
@@ -52,6 +56,7 @@ object BuiltinFunctions : Plugin {
         ),
 
         FunctionSpec(
+            null,
             "PLC",
 
             Type.BOOL,
@@ -67,6 +72,7 @@ object BuiltinFunctions : Plugin {
         ),
 
         FunctionSpec(
+            null,
             "PLC",
 
             Type.BOOL,
@@ -80,6 +86,7 @@ object BuiltinFunctions : Plugin {
         ) { FlipflopFunction.createRs() },
 
         FunctionSpec(
+            null,
             "PLC",
             Type.BOOL,
             "sr",
@@ -92,6 +99,7 @@ object BuiltinFunctions : Plugin {
         ) { FlipflopFunction.createSr() },
 
         FunctionSpec(
+            null,
             "PLC",
             Type.STRING,
             "statemachine",
@@ -106,6 +114,7 @@ object BuiltinFunctions : Plugin {
         RestOut.SPEC,
 
         OutputPortSpec(
+            null,
             "GPIO",
             "NamedCells",
             "A named range of cells",

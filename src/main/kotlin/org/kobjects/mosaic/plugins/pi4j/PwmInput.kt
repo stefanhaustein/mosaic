@@ -41,6 +41,7 @@ class PwmInput(
 
     companion object {
         fun spec(plugin: Pi4jPlugin) = InputPortSpec(
+            null,
             category = "GPIO",
             "pwmin",
             Type.REAL,

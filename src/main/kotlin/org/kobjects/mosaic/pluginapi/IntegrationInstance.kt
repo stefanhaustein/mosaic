@@ -6,9 +6,9 @@ import org.kobjects.mosaic.json.toJson
 
 abstract class IntegrationInstance(
     val kind: String,
-    val name: String,
+    override val name: String,
     val tag: Long,
-) {
+) : Namespace {
 
     abstract val operationSpecs: List<AbstractArtifactSpec>
 

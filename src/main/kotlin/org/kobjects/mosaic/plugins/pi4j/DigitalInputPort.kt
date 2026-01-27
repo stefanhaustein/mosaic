@@ -33,6 +33,7 @@ class DigitalInputPort(
 
     companion object {
         fun spec(plugin: Pi4jPlugin) = InputPortSpec(
+            null,
             category = "GPIO",
             "din",
             Type.BOOL,

@@ -51,6 +51,7 @@ class TextLcd(
 
     companion object {
         fun spec(plugin: Pi4jPlugin) = OutputPortSpec(
+            null,
             "Drivers",
             "Lcd",
             "An LCD text display",

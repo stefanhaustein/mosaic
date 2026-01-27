@@ -17,6 +17,7 @@ class PiXtendDigitalInputPort(
 
     companion object {
         fun spec(integration: PiXtendIntegration): InputPortSpec = InputPortSpec(
+            null,
             "PiXtend",
             "pixt.din",
             Type.BOOL,

@@ -4,6 +4,7 @@ import org.kobjects.mosaic.json.ToJson
 import org.kobjects.mosaic.json.quote
 
 abstract class AbstractArtifactSpec(
+    val namespace: Namespace?,
     val category: String,
     val kind: OperationKind,
     val type: Type?,

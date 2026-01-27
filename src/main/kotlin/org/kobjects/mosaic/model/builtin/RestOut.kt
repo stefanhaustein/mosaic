@@ -27,6 +27,7 @@ class RestOut(val path: String) : OutputPortInstance {
 
     companion object {
         val SPEC = OutputPortSpec(
+            null,
             "Network",
             "rest_out",
             """Makes the given value(s) accessible via an JSON object under the '/rest/path' path of this server.""",

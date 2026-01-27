@@ -1,6 +1,7 @@
 package org.kobjects.mosaic.pluginapi
 
 open class FunctionSpec(
+    namespace: Namespace?,
     category: String,
     returnType: Type,
     name: String,
@@ -12,6 +13,7 @@ open class FunctionSpec(
     kind: OperationKind = OperationKind.FUNCTION,
     val createFn: (configuration: Map<String, Any?>) -> FunctionInstance,
 ) : AbstractArtifactSpec(
+    namespace,
     category,
     kind,
     returnType,
