@@ -80,7 +80,7 @@ object TcFormulaParser : PrattParser<TcScanner, ParsingContext, Expression>(
                         if (integration != null) {
                             scanner.consume(".")
                             val qName = lowercase + "." + scanner.consume(TcTokenType.IDENTIFIER).text.lowercase()
-                            val spec = integration.operationSpecs.find { it.name == qName } ?: throw IllegalArgumentException("'$qName' not found in integration '$lowercase'")
+                            val spec = integration.operationSpecs.find { it.fqName == qName } ?: throw IllegalArgumentException("'$qName' not found in integration '$lowercase'")
                             PluginOperationCall.create(context.cell, spec as FunctionSpec, parameterList)
                         } else {
                             val functionSpec = Model.functions[lowercase] as FunctionSpec?

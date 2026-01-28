@@ -109,9 +109,9 @@ class HomeAssistantIntegration(
         }
 
         return PropertySpec(
-            null,
+            this,
             category = category,
-            name = name + "." + entity.id.replace(".", "_"),
+            name = entity.id.replace(".", "_"),
             type = when (entity.kind) {
                 Kind.BINARY_SENSOR -> Type.BOOL
                 Kind.LIGHT -> Type.BOOL

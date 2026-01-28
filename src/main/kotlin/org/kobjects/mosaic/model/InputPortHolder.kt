@@ -90,7 +90,7 @@ class InputPortHolder(
     }
 
     override fun toJson(sb: StringBuilder, forClient: Boolean) {
-        sb.append("""{"name":${name.quote()}, "kind":${specification.name.quote()}, "type":""")
+        sb.append("""{"name":${name.quote()}, "kind":${specification.fqName.quote()}, "type":""")
         specification.type.toJson(sb)
         sb.append(""", "configuration": """)
         configuration.toJson(sb)

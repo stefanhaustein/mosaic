@@ -60,7 +60,7 @@ class Ports : Iterable<PortHolder> {
             val specification = if (kind.contains(".")) {
                 val parts = kind.split(".")
                 val integration = Model.integrations[parts[0]] ?: throw IllegalArgumentException("Integration '${parts[0]}' not found.")
-                integration.operationSpecs.find { it.name == kind } ?: throw IllegalArgumentException("'${parts[1]}' not found in integration $integration.")
+                integration.operationSpecs.find { it.fqName == kind } ?: throw IllegalArgumentException("'${parts[1]}' not found in integration $integration.")
             } else {
                 Model.factories[kind] ?: throw IllegalArgumentException("Unrecognized port type '$kind'")
             }

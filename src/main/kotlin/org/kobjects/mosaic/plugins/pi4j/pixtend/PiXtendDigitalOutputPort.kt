@@ -18,9 +18,9 @@ class PiXtendDigitalOutputPort(
 
     companion object {
         fun spec(integration: PiXtendIntegration) = OutputPortSpec(
-            null,
+            integration,
             "PiXtend",
-            "pixt.dout",
+            "dout",
        //     Type.REAL,
             "PiXtend digital output.",
             listOf(ParameterSpec("index", Type.INT, 0)),

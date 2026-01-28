@@ -22,9 +22,9 @@ class PiXtendGpioDigitalOutputPort(
 
     companion object {
         fun spec(integration: PiXtendIntegration) = OutputPortSpec(
-            null,
+            integration,
             "PiXtend",
-            "pixt.gpio_dout",
+            "gpio_dout",
        //     Type.REAL,
             "PiXtend GPIO configured as digital output.",
             listOf(ParameterSpec("index", Type.INT, 0)),

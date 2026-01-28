@@ -16,6 +16,10 @@ abstract class AbstractArtifactSpec(
     val displayName: String?,
 ) : ToJson {
 
+    val fqName
+        get() = if (namespace != null) namespace.name + "." + name else name
+
+
     fun convertConfiguration(rawConfig: Map<String, Any?>): Map<String, Any?> {
         val result = mutableMapOf<String, Any?>()
         for (paramSpec in parameters) {
@@ -23,10 +27,10 @@ abstract class AbstractArtifactSpec(
             val rawValue = rawConfig[paramName]
             if (rawValue == null || rawValue == Unit) {
                 require (paramSpec.modifiers.contains(ParameterSpec.Modifier.OPTIONAL)) {
-                    "Missing mandatory configuration parameter: $paramName for $name"
+                    "Missing mandatory configuration parameter: $paramName for $fqName"
                 }
             } else if (paramSpec.modifiers.contains(ParameterSpec.Modifier.REFERENCE)) {
-                throw RuntimeException("References NYI (config param $paramName for $name")
+                throw RuntimeException("References NYI (config param $paramName for $fqName")
             } else {
                 result[paramName] = paramSpec.type.valueFromJson(rawValue)
             }
@@ -35,7 +39,7 @@ abstract class AbstractArtifactSpec(
     }
 
     override fun toJson(sb: StringBuilder) {
-        sb.append("""{"name":${name.quote()},"category":${category.quote()},"kind":"$kind",""")
+        sb.append("""{"name":${fqName.quote()},"category":${category.quote()},"kind":"$kind",""")
         if (type != null) {
             sb.append(""""type":${type.toJson()},""")
         }

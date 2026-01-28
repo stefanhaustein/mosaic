@@ -6,7 +6,7 @@ class Functions : Iterable<FunctionSpec> {
     private val functionMap = mutableMapOf<String, FunctionSpec>()
 
     fun add(function: FunctionSpec) {
-        functionMap[function.name.lowercase()] = function
+        functionMap[function.fqName.lowercase()] = function
     }
 
     override fun iterator() = functionMap.values.iterator()
@@ -18,7 +18,7 @@ class Functions : Iterable<FunctionSpec> {
         val sb = StringBuilder()
         for (function in this) {
             if (function.tag > tag) {
-                sb.append(function.name).append(": ")
+                sb.append(function.fqName).append(": ")
                 function.toJson(sb)
                 sb.append('\n')
             }

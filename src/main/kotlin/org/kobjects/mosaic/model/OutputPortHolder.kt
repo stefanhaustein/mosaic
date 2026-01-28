@@ -96,7 +96,7 @@ class OutputPortHolder(
 
 
     override fun toJson(sb: StringBuilder, forClient: Boolean) {
-        sb.append("""{"name":${name.quote()}, "kind":${specification.name.quote()}, "configuration": """)
+        sb.append("""{"name":${name.quote()}, "kind":${specification.fqName.quote()}, "configuration": """)
         configuration.toJson(sb)
         if (forClient) {
             serializeDependencies(sb)

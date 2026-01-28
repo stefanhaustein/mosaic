@@ -21,9 +21,9 @@ class PiXtendAnalogOutputPort(
 
     companion object {
         fun spec(integration: PiXtendIntegration) = OutputPortSpec(
-            null,
+            integration,
             "PiXtend",
-            "pixt.aout",
+            "aout",
        //     Type.REAL,
             "PiXtend analog output.",
             listOf(ParameterSpec("index", Type.INT, 0)),

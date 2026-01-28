@@ -17,9 +17,9 @@ class PiXtendAnalogInputPort(
 
     companion object {
         fun spec(integration: PiXtendIntegration): InputPortSpec = InputPortSpec(
-            null,
+            integration,
             "PiXtend",
-            "pixt.ain",
+            "ain",
             Type.REAL,
             "PiXtend analog input.",
             listOf(ParameterSpec("index", Type.INT, 0)),

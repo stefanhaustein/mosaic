@@ -7,7 +7,7 @@ class Factories : Iterable<AbstractFactorySpec> {
     private val factoryMap = mutableMapOf<String, AbstractFactorySpec>()
 
     fun add(factory: AbstractFactorySpec) {
-        factoryMap[factory.name] = factory
+        factoryMap[factory.fqName] = factory
     }
 
     operator fun get(name: String) = factoryMap[name]
@@ -18,7 +18,7 @@ class Factories : Iterable<AbstractFactorySpec> {
         val sb = StringBuilder()
         for (factory in this) {
             if (factory.tag > tag) {
-                sb.append(factory.name).append(": ")
+                sb.append(factory.fqName).append(": ")
                 factory.toJson(sb)
                 sb.append('\n')
             }
