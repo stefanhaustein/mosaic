@@ -2,13 +2,17 @@ package org.kobjects.mosaic.pluginapi
 
 import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.json.toJson
+import org.kobjects.mosaic.model.Node
 
 
 abstract class IntegrationInstance(
+    // The name of the IntegrationSpec
     val kind: String,
+    // The name of this instance.
     override val name: String,
     val tag: Long,
 ) : Namespace {
+    val nodes = mutableMapOf<String, Node>()
 
     abstract val operationSpecs: List<AbstractArtifactSpec>
 
