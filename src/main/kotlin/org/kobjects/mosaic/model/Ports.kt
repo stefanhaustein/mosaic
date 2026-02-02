@@ -86,7 +86,7 @@ class Ports : Iterable<PortHolder> {
         val definitions = StringBuilder()
         val values = StringBuilder()
         val simulationValues = StringBuilder()
-        for (port in this) {
+        for (port in portMap.values + Model.integrations.flatMap { it.nodes.values }) {
             if (port.tag > tag) {
                 definitions.append(port.name).append(": ")
                 port.toJson(definitions, forClient)

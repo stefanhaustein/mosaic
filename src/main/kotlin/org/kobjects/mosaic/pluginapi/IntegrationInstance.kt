@@ -3,6 +3,7 @@ package org.kobjects.mosaic.pluginapi
 import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.json.toJson
 import org.kobjects.mosaic.model.Node
+import org.kobjects.mosaic.model.PortHolder
 
 
 abstract class IntegrationInstance(
@@ -12,7 +13,7 @@ abstract class IntegrationInstance(
     override val name: String,
     val tag: Long,
 ) : Namespace {
-    val nodes = mutableMapOf<String, Node>()
+    val nodes = mutableMapOf<String, PortHolder>()
 
     abstract val operationSpecs: List<AbstractArtifactSpec>
 
@@ -23,6 +24,11 @@ abstract class IntegrationInstance(
     open fun notifySimulationModeChanged(token: ModificationToken) {
 
     }
+
+    fun portsToJson(sb: StringBuilder, forClient: Boolean) {
+
+    }
+
 
     fun toJson(sb: StringBuilder, forClient: Boolean) {
         sb.append("""{"name":${name.quote()}, "type":${kind.quote()}, "configuration": """)
