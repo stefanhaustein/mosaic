@@ -116,7 +116,7 @@ class HomeAssistantIntegration(
             }
         }
 
-        fun getValue(entity: HAEntity, state: HAEntityState): Any? {
+        fun getValue(entity: HAEntity, state: HAEntityState = entity.state): Any? {
             return when (entity.kind) {
                 Kind.BINARY_SENSOR,
                     Kind.LIGHT -> when (state.state) {
@@ -137,7 +137,7 @@ class HomeAssistantIntegration(
                 ParameterSpec(name = "port", type = Type.INT, defaultValue = 8123),
                 ParameterSpec(name = "token", type = Type.STRING, defaultValue = null),
             ),
-            modifiers = emptySet(),
+            modifiers = setOf(AbstractArtifactSpec.Modifier.UNINSTANTIABLE),
         ) { kind, name, tag, config ->
             HomeAssistantIntegration(
                 model,

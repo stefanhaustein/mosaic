@@ -29,7 +29,7 @@ class HAEntityInputPortInstance(
     }
 
     override val value: Any
-        get() = entity.state.state ?: Unit
+        get() = getValue(entity) ?: Unit
 
     override fun detach() {
        entity.removeListener(this)
