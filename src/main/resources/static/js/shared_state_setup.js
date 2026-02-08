@@ -29,18 +29,3 @@ for (let cell of cells) {
     cell.addEventListener("focus", () => selectCell(cell.id))
 }
 
-
-document.getElementById("simulationMode").addEventListener("change", (event) =>{
-    let checked = event.target.checked
-    for (let port of getAllPorts()) {
-        let name = port.name
-        let simulationValueElement = document.getElementById("port." + name + ".simulationValue")
-        if (simulationValueElement != null) {
-            let valueElement =  document.getElementById("port." + name + ".value")
-            valueElement.style.display = checked ? "none" : "inline"
-            simulationValueElement.style.display = checked ? "inline" : "none"
-        }
-    }
-
-    post("/simulationMode", !!checked)
-})

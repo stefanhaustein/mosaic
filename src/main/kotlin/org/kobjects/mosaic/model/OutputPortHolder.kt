@@ -9,6 +9,8 @@ class OutputPortHolder(
     val specification: OutputPortSpec,
     val configuration: Map<String, Any?>,
     val rawFormula: String,
+    override val displayName: String? = null,
+    override val category: String? = null,
     override val tag: Long
 ) : /*ExpressionNode(),*/Node,  PortHolder {
     var instance: OutputPortInstance? = null
@@ -67,19 +69,14 @@ class OutputPortHolder(
 
         reparse()
 
-        if (!Model.simulationMode || specification.modifiers.contains(AbstractArtifactSpec.Modifier.NO_SIMULATION)) {
+
             try {
                 instance = specification.createFn(configuration)
             } catch (exception: Exception) {
                 error = exception
                 exception.printStackTrace()
             }
-        }
-    }
 
-    override fun notifySimulationModeChanged(token: ModificationToken) {
-        detach()
-        attach(token)
     }
 
     override fun detach() {
@@ -96,7 +93,14 @@ class OutputPortHolder(
 
 
     override fun toJson(sb: StringBuilder, forClient: Boolean) {
-        sb.append("""{"name":${name.quote()}, "kind":${specification.fqName.quote()}, "configuration": """)
+        sb.append("""{"name":${name.quote()}, "kind":${specification.fqName.quote()}""")
+        if (category != null) {
+            sb.append(""", "category": ${category?.quote()}""")
+        }
+        if (displayName != null) {
+            sb.append(""", "displayName": ${displayName?.quote()}""")
+        }
+        sb.append(""", "configuration": """)
         configuration.toJson(sb)
         if (forClient) {
             serializeDependencies(sb)

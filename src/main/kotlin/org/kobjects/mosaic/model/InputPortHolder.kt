@@ -4,10 +4,12 @@ import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.json.toJson
 import org.kobjects.mosaic.pluginapi.*
 
-class InputPortHolder(
+open class InputPortHolder(
     override val name: String,
     val specification: InputPortSpec,
     val configuration: Map<String, Any?>,
+    override val displayName: String? = null,
+    override val category: String? = null,
     override val tag: Long
 
 ) : PortHolder, Node, InputPortListener {
@@ -21,29 +23,17 @@ class InputPortHolder(
     override var value: Any? = null
 
     var portValue: Any? = null
-    var simulationValue: Any? = null
-
-    // We track the simulation value separately, as it sent to the client separately.
-    var simulationValueTag = 0L
-
 
     override fun attach(token: ModificationToken) {
         detach()
 
-        if (!Model.simulationMode) {
             try {
                 instance = specification.createFn(configuration, this)
             } catch (e: Exception) {
                 portValue = e
                 e.printStackTrace()
             }
-        }
-    }
 
-    override fun notifySimulationModeChanged(token: ModificationToken) {
-        detach()
-        attach(token)
-        token.addRefresh(this)
     }
 
     override fun detach() {
@@ -62,17 +52,16 @@ class InputPortHolder(
     // Implements the corresponding value change listener method.
     override fun portValueChanged(token: ModificationToken, newValue: Any?) {
         portValue = newValue
-        if (!Model.simulationMode) {
+
             token.addRefresh(this)
         }
-    }
 
 
     override fun recalculateValue(tag: Long): Boolean {
         if (valueTag == tag) {
             return false
         }
-        val newValue = if (Model.simulationMode) simulationValue else portValue
+        val newValue = portValue
         if (value == newValue) {
             return false
         }
@@ -81,17 +70,16 @@ class InputPortHolder(
         return true
     }
 
-    fun simulationValueChanged(token: ModificationToken, newValue: Any?) {
-        simulationValue = newValue
-        simulationValueTag = token.tag
-        if (Model.simulationMode) {
-            token.addRefresh(this)
-        }
-    }
 
     override fun toJson(sb: StringBuilder, forClient: Boolean) {
         sb.append("""{"name":${name.quote()}, "kind":${specification.fqName.quote()}, "type":""")
         specification.type.toJson(sb)
+        if (category != null) {
+            sb.append(""", "category": ${category?.quote()}""")
+        }
+        if (displayName != null) {
+            sb.append(""", "displayName": ${displayName?.quote()}""")
+        }
         sb.append(""", "configuration": """)
         configuration.toJson(sb)
         if (forClient) {

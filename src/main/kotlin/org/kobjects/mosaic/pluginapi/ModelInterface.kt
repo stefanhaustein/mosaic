@@ -2,7 +2,6 @@ package org.kobjects.mosaic.pluginapi
 
 interface ModelInterface {
 
-    val simulationMode: Boolean
 
     /** The callback is run after the effects of the action are calculated / materialized */
     fun applySynchronizedWithToken(callback: ((modificationTag: Long, anyChanged: Boolean) -> Unit)? = null, action: (ModificationToken) -> Unit)

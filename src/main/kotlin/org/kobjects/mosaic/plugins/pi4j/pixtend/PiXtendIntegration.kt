@@ -22,7 +22,7 @@ class PiXtendIntegration(
     }
 
     private fun attach() {
-        if (!pi4j.model.simulationMode) {
+
             try {
                 driver = PiXtendDriver(pi4j.pi4j, this@PiXtendIntegration.pixtendModel)
                 error = null
@@ -31,7 +31,7 @@ class PiXtendIntegration(
                 e.printStackTrace()
                 error = e
             }
-        }
+
     }
 
     fun syncState(driver: PiXtendDriver, invocationId: Int) {

@@ -48,15 +48,6 @@ fun Application.module() {
             }
             call.respond(HttpStatusCode.OK)
         }
-        post("/simulationMode") {
-            val jsonText = call.receiveText()
-            println("Received JSON: $jsonText")
-            val value = JsonParser.parse(jsonText)
-            Model.applySynchronizedWithToken { token ->
-                Model.setSimulationMode(value as Boolean, token)
-            }
-            call.respond(HttpStatusCode.OK)
-        }
         post("/runMode") {
             val jsonText = call.receiveText()
             println("Received JSON: $jsonText")
@@ -65,16 +56,6 @@ fun Application.module() {
                 Model.setRunMode(value as Boolean, token)
             }
             call.respond(HttpStatusCode.OK)
-        }
-        post("/portSimulation") {
-            val name = call.request.queryParameters["name"]!!
-            val jsonText = call.receiveText()
-            println("Received JSON: $jsonText")
-            val value = JsonParser.parse(jsonText)
-            Model.applySynchronizedWithToken { token ->
-                Model.setSimulationValue(name, value, token)
-            }
-            call.respond(HttpStatusCode.OK, null)
         }
         post("/paste/{target}") {
             val rawTargetRange = call.parameters["target"]!!

@@ -4,7 +4,6 @@ import {getAllPorts, getPortFactory, getPortInstance, model} from "./shared_mode
 import {removeClasses, renderDependencies, renderRangeHighlight} from "./shared_state_internal_renderer.js";
 
 export let portValues = {}
-export let simulationValues = {}
 export let currentCell = null
 export let currentSheet = null
 

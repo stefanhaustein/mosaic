@@ -199,7 +199,7 @@ class EnumInputController extends InputController {
     }
 
     setValue(value) {
-        let s = value.toString()
+        let s = value == null ? "null" : value.toString()
         let found = false
         for (let option of this.inputElement.options) {
             if (option.value == s) {

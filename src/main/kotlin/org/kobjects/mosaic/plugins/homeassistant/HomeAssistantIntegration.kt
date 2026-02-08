@@ -1,21 +1,21 @@
 package org.kobjects.mosaic.plugins.homeassistant
 
-import kotlinx.coroutines.runBlocking
-import org.kobjects.mosaic.model.expression.EvaluationContext
+import org.kobjects.mosaic.model.InputPortHolder
 import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec
+import org.kobjects.mosaic.pluginapi.InputPortInstance
+import org.kobjects.mosaic.pluginapi.InputPortSpec
 import org.kobjects.mosaic.pluginapi.IntegrationInstance
 import org.kobjects.mosaic.pluginapi.IntegrationSpec
 import org.kobjects.mosaic.pluginapi.ModelInterface
-import org.kobjects.mosaic.pluginapi.OutputPortInstance
 import org.kobjects.mosaic.pluginapi.ParameterSpec
 import org.kobjects.mosaic.pluginapi.PropertySpec
-import org.kobjects.mosaic.pluginapi.StatefulFunctionInstance
 import org.kobjects.mosaic.pluginapi.Type
-import org.kobjects.mosaic.pluginapi.ValueChangeListener
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity.Kind
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntityState
 import org.kobjects.mosaic.plugins.homeassistant.client.HomeAssistantClient
+import java.util.Locale
+import java.util.Locale.getDefault
 
 class HomeAssistantIntegration(
     val model: ModelInterface,
@@ -34,10 +34,61 @@ class HomeAssistantIntegration(
 
     private fun attach() {
         client = HomeAssistantClient(host, port, token)
+
+        for (entity in client?.entities?.values ?: emptyList()) {
+            val cut = entity.id.indexOf('.')
+            val kind = entity.id.substring(0, cut)
+            val id =  entity.id.replace('.', '_')
+            val fqName = name + "." + id
+            val spec = InputPortSpec(
+                namespace = this,
+                category = "",
+                name = kind,
+                type = when (kind) {
+                    "light" -> Type.BOOL
+                    else -> Type.BOOL
+                },
+                description = "",
+                emptyList(),
+                tag = tag,
+                createFn = { _, _ ->
+                    throw UnsupportedOperationException()
+                }
+            )
+            val portHolder = InputPortHolder(
+                name = fqName,
+                specification = spec,
+                configuration = emptyMap(),
+                displayName = getDisplayName(entity),
+                category = getCategory(entity),
+                tag = tag)
+
+            portHolder.instance = HAEntityInputPortInstance(entity, portHolder)
+            portHolder.value = entity.state.state == "on"
+
+            nodes.put(id, portHolder)
+        }
+
     }
 
-    override val operationSpecs: List<AbstractArtifactSpec>
-        get() = client?.entities?.values?.filter { it.disabledBy == null }?.map { entityOperationSpec(it) } ?: emptyList()
+    override val operationSpecs = Kind.values().map {
+        val type = getType(it)
+        if (type == null) null else InputPortSpec(
+            namespace = this,
+            category = "",
+            name = it.toString().lowercase(),
+            description = "",
+            type = type,
+            parameters = emptyList(),
+            tag = tag,
+            createFn = { _, _ ->
+                throw UnsupportedOperationException()
+            }
+        )
+    }.filterNotNull()
+
+
+        // emptyList<AbstractArtifactSpec>() // client?.entities?.values?.filter { it.disabledBy == null }?.map { entityOperationSpec(it) } ?: emptyList()
 
     override val configuration: Map<String, Any?>
         get() = mapOf("host" to host, "port" to port, "token" to token)
@@ -51,9 +102,31 @@ class HomeAssistantIntegration(
         this.host = configuration["host"] as String
         this.port = configuration["port"].toString().toDouble().toInt()
         this.token = configuration["token"] as String
+        attach()
     }
 
     companion object {
+
+        fun getType(kind: HAEntity.Kind): Type? {
+            return when (kind) {
+                HAEntity.Kind.LIGHT -> Type.BOOL
+                HAEntity.Kind.BINARY_SENSOR -> Type.BOOL
+                HAEntity.Kind.SENSOR -> Type.REAL
+                else -> null
+            }
+        }
+
+        fun getValue(entity: HAEntity, state: HAEntityState): Any? {
+            return when (entity.kind) {
+                Kind.BINARY_SENSOR,
+                    Kind.LIGHT -> when (state.state) {
+                        "on" -> true
+                       "off" -> false
+                        else -> IllegalStateException(state.state?.toString() ?: "null")
+                    }
+                else -> state
+            }
+        }
 
         fun spec(model: ModelInterface) = IntegrationSpec(
             category = "HomeAutomation",
@@ -78,9 +151,10 @@ class HomeAssistantIntegration(
         }
     }
 
-    fun entityOperationSpec(entity: HAEntity): PropertySpec {
+
+    fun getCategory(entity: HAEntity): String {
         val device = entity.device
-        val category = buildString {
+        return buildString {
             val areaName = device?.area?.toString() ?: "Unnamed Area"
             append(areaName)
             append(".")
@@ -94,12 +168,14 @@ class HomeAssistantIntegration(
                 append("." + entity.category)
             }
         }
+    }
 
+    fun getDisplayName(entity: HAEntity): String {
         val entityId = entity.id
         val cut = entity.id.indexOf('.')
-        val idPrefix = device?.commonEntityIdPrefix ?: ""
+        val idPrefix = entity.device?.commonEntityIdPrefix ?: ""
         val idWithoutType = entityId.substring(cut + 1)
-        val displayName = if (idPrefix.isEmpty() || !idWithoutType.startsWith(idPrefix)) {
+        return if (idPrefix.isEmpty() || !idWithoutType.startsWith(idPrefix)) {
             idWithoutType
         } else if (idWithoutType == idPrefix) {
             entityId.take(cut)
@@ -107,77 +183,7 @@ class HomeAssistantIntegration(
             val suffix = idWithoutType.substring(idPrefix.length)
             if (suffix.startsWith("_")) suffix.substring(1) else suffix
         }
-
-        return PropertySpec(
-            this,
-            category = category,
-            name = entity.id.replace(".", "_"),
-            type = when (entity.kind) {
-                Kind.BINARY_SENSOR -> Type.BOOL
-                Kind.LIGHT -> Type.BOOL
-                Kind.SENSOR -> Type.REAL
-                else -> Type.STRING
-            },
-            description = entity.description,
-            displayName = displayName,
-            setterCreateFn = if (entity.kind != Kind.LIGHT) null else { {
-                EntityOutputPortInstance(this@HomeAssistantIntegration, entity)
-            } }
-        ) {
-            EntityFunctionInstance(this@HomeAssistantIntegration, entity)
-        }
     }
 
-    class EntityOutputPortInstance(
-        val integration: HomeAssistantIntegration,
-        val entity: HAEntity
-    ) : OutputPortInstance {
-        override fun setValue(value: Any?) {
-            runBlocking {
-                integration.client?.sendJson(
-            """{ "id": ${integration.client?.messageId?.getAndIncrement()}, "type": "call_service",  "domain": "light", "service": "turn_${if(value == true) "on" else "off" }",
-                    "target": { "entity_id": "${entity.id}" } }""")
-            }
-        }
-
-        override fun detach() {
-
-        }
-
-    }
-
-
-    class EntityFunctionInstance(
-        val integration: HomeAssistantIntegration,
-        val entity: HAEntity
-    ) : StatefulFunctionInstance, HAEntity.StateChangeListener {
-        var host: ValueChangeListener? = null
-
-        override fun apply(
-            context: EvaluationContext,
-            params: Map<String, Any?>
-        ): Any? {
-            return entity.state.state
-        }
-
-        override fun attach(host: ValueChangeListener) {
-            this.host = host
-            entity.addListener(this)
-        }
-
-        override fun detach() {
-            entity.removeListener(this)
-            host = null
-        }
-
-        override fun entityStateChanged(
-            entity: HAEntity,
-            oldState: HAEntityState,
-            newState: HAEntityState
-        ) {
-            integration.model.notifyValueChanged(host)
-        }
-
-    }
 
 }

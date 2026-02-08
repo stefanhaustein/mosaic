@@ -1,10 +1,8 @@
-import {portValues, showDependencies, simulationValues} from "./shared_state.js";
+import {portValues, showDependencies} from "./shared_state.js";
 import {showPortDialog} from "./port_editor.js";
-import {InputController} from "./forms/input_controller.js";
 import {insertById, setDragHandler} from "./lib/dom.js";
 import {getFactory, getPortInstance, registerPortInstance} from "./shared_model.js";
-import {camelCase, post} from "./lib/utils.js";
-import {FormController} from "./forms/form_builder.js";
+import {ensureCategory} from "./lib/utils.js";
 import {updateSpec} from "./artifacts.js";
 
 
@@ -22,7 +20,7 @@ setDragHandler(document.getElementById("divider"), (dx, dy) => {
 
 
 export function processPortSpec(spec) {
-    let container = spec.kind == "OUTPUT_PORT" ? outputPortSpecListElement : inputPortSpecListElement
+    let container= spec.kind == "OUTPUT_PORT" ? outputPortSpecListElement : inputPortSpecListElement
     if (spec.name == "NamedCells") {
         document.getElementById("addNamedCellsButton").addEventListener("click", () => { showPortDialog(spec) })
         rangeNameElement.addEventListener("click", async () => {
@@ -43,18 +41,6 @@ export function processPortValue(key, map) {
     }
 }
 
-export function processSimulationValue(key, map) {
-    let value = map[key]
-    simulationValues[key] = value
-    let port = getPortInstance(key)
-    if (port != null) {
-        let controller = port.valueController
-        if (controller instanceof InputController) {
-            controller.setValue(value)
-        }
-    }
-}
-
 export function processPortUpdate(name, f) {
     if (!registerPortInstance(name, f)) {
         let entryElement = document.getElementById("port." + name)
@@ -65,7 +51,7 @@ export function processPortUpdate(name, f) {
         let spec = getFactory(f.kind)
         if (spec == null) {
             console.log("Factory " + f.kind + " not found.")
-            return
+            spec = {kind: "INPUT_PORT", type: "Bool"}
         }
         if (spec.kind == "PROPERTY") {
             let inputElement = document.getElementById("port." + f.name)
@@ -73,11 +59,18 @@ export function processPortUpdate(name, f) {
             return
         }
 
-        let isExpandable = spec.kind == "INPUT_PORT" && typeof f.type != "string"
+        let isExpandable = spec.kind == "INPUT_PORT" && f.type != null && typeof f.type != "string"
         let entryElement = document.createElement( "div")
         entryElement.id = "port." + f.name
         entryElement.className = "port"
-        insertById(document.getElementById(spec.kind == "OUTPUT_PORT" ? f.kind == "NamedCells" ? "namedCellListContainer" :  "outputPortList" : "inputPortList"), entryElement)
+
+        let cut = name.indexOf(".")
+        let containerName = cut != -1 ? "integration." + name.substring(0, cut) :
+            spec.kind == "OUTPUT_PORT" ? f.kind == "NamedCells" ? "namedCellListContainer" :  "outputPortList" : "inputPortList"
+
+        let containerElement = document.getElementById(containerName)
+        let targetElement = ensureCategory(containerElement, f.category)
+        insertById(targetElement, entryElement)
 
         let entryContentElement = document.createElement("div")
 
@@ -124,33 +117,11 @@ export function processPortUpdate(name, f) {
         entryContentElement.style.paddingLeft = "10px"
         entryContentElement.style.clear = "both"
 
-        let showValue = true
-        if (spec.kind == "INPUT_PORT") {
-            let entrySimulationElement = document.createElement("span")
-            entrySimulationElement.id = "port." + name + ".simulationValue"
-            entrySimulationElement.className = "portSimulationValue"
-            if (!isExpandable) {
-                let controller = f.valueController = InputController.create(
-                    {type: camelCase(f.type)})
-                entrySimulationElement.appendChild(controller.inputElement)
-                controller.inputElement.addEventListener("change", () => {
-                    post("portSimulation?name=" + name, controller.getValue())
-                })
-            } else {
-                console.log(spec)
-                let controller = f.valueController = FormController.create(entrySimulationElement, f.type)
-                controller.addListener(() => {
-                    post("portSimulation?name=" + name, controller.getValue())
-                })
-            }
-            showValue = !document.getElementById("simulationMode").checked
-            entrySimulationElement.style.display = showValue ? "none" : "inline"
-            entryContentElement.appendChild(entrySimulationElement)
 
+        if (spec.kind == "INPUT_PORT") {
             let entryValueElement = document.createElement("span")
             entryValueElement.id = "port." + name + ".value"
             entryValueElement.className = "portValue"
-            entryValueElement.style.display = showValue ? "inline" : "none"
             entryContentElement.appendChild(entryValueElement)
         } else {
            // let sourceElement = document.createElement("div")

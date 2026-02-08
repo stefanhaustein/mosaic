@@ -20,8 +20,6 @@ object Model : ModelInterface {
 
     var modificationTag: Long = 0
 
-    /* Can't be a proper property as the setter needs a modification token. */
-    private var simulationMode_: Boolean = false
     private var pendingUpdates = mutableListOf<(ModificationToken)->Unit>()
 
     var runMode_: Boolean = false
@@ -80,38 +78,6 @@ object Model : ModelInterface {
         }
     }
 
-    override val simulationMode: Boolean
-        get() = simulationMode_
-
-    fun setSimulationMode(enabled: Boolean, token: ModificationToken) {
-        simulationMode_ = enabled
-        settingsTag = token.tag
-
-        if (enabled) {
-            for (port in ports) {
-                port.notifySimulationModeChanged(token)
-            }
-            for (integration in integrations) {
-                integration.notifySimulationModeChanged(token)
-            }
-            for (plugin in plugins) {
-                plugin.notifySimulationModeChanged(token)
-            }
-        } else {
-            for (plugin in plugins) {
-                plugin.notifySimulationModeChanged(token)
-            }
-            for (integration in integrations) {
-                integration.notifySimulationModeChanged(token)
-            }
-            for (port in ports) {
-                port.notifySimulationModeChanged(token)
-            }
-
-        }
-
-    }
-
     fun setRunMode(value: Boolean, token: ModificationToken) {
         runMode_ = value
         settingsTag = token.tag
@@ -124,7 +90,6 @@ object Model : ModelInterface {
             val toml = TomsonParser.parse(data)
             for ((key, map) in toml) {
                 if (key.isEmpty()) {
-                    setSimulationMode(map["simulationMode"] as Boolean? ?: false, token)
                     setRunMode(map["runMode"] as Boolean? ?: false, token)
                 } else if (key.startsWith("sheets.") && key.endsWith(".cells")) {
                     val name = key.substringAfter("sheets.").substringBeforeLast(".cells")
@@ -148,13 +113,6 @@ object Model : ModelInterface {
                             e.printStackTrace()
                         }
                     }
-                } else if (key == "simulationValues") {
-                    for((key, value) in map) {
-                        val port = ports[key]
-                        if (port is InputPortHolder) {
-                            port.simulationValueChanged(token, value)
-                        }
-                    }
                 }
             }
         } catch (ex: Exception) {
@@ -171,7 +129,6 @@ object Model : ModelInterface {
 
     fun serialize(writer: Writer, forClient: Boolean = false, tag: Long = -1) {
         if (settingsTag > tag) {
-            writer.write("simulationMode = $simulationMode_\n")
             writer.write("runMode = $runMode_\n")
         }
         integrations.serialize(writer, forClient, tag)
@@ -238,16 +195,6 @@ object Model : ModelInterface {
             sheet.clear(modificationToken)
         }
     }
-
-    fun setSimulationValue(name: String, value: Any?, token: ModificationToken) {
-        if (simulationMode_) {
-            val port = ports[name]
-            if (port is InputPortHolder) {
-                port.simulationValueChanged(token, value)
-            }
-        }
-    }
-
 
     @OptIn(ExperimentalContracts::class)
     override fun applySynchronizedWithToken(

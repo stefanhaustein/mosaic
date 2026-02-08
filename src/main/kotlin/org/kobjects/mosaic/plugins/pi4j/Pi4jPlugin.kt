@@ -21,15 +21,10 @@ class Pi4jPlugin(val model: ModelInterface) : Plugin {
     }
 
     fun reInit() {
-        if (Model.simulationMode == (pi4j == null)) {
-            return
-        }
+
         try {
-            if (model.simulationMode) {
-                pi4j?.shutdown()
-            } else {
-                pi4j = Pi4J.newAutoContext()
-            }
+            pi4j?.shutdown()
+            pi4j = Pi4J.newAutoContext()
         } catch (e: Throwable) {
             pi4j = null
             error = e

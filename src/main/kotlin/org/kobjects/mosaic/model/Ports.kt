@@ -9,7 +9,7 @@ class Ports : Iterable<PortHolder> {
 
     private val portMap = mutableMapOf<String, PortHolder>()
 
-    override fun iterator(): Iterator<PortHolder> = portMap.values.iterator()
+    override fun iterator(): Iterator<PortHolder> = (portMap.values + Model.integrations.flatMap { it.nodes.values }).iterator()
 
     operator fun get(key: String): PortHolder? = portMap[key]
 
@@ -37,7 +37,7 @@ class Ports : Iterable<PortHolder> {
                         override val value = Unit
                         override fun detach() {}
                     }
-                }, emptyMap(), token.tag
+                }, emptyMap(), tag = token.tag
             )
         }
     }
@@ -72,9 +72,9 @@ class Ports : Iterable<PortHolder> {
             )
 
             val port = when (specification) {
-                is InputPortSpec -> InputPortHolder(name, specification, config, token.tag)
-                is OutputPortSpec -> OutputPortHolder(name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, token.tag)
-                is PropertySpec -> OutputPortHolder(name, specification.getOutputPortSpec(), config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, token.tag)
+                is InputPortSpec -> InputPortHolder(name, specification, config, tag = token.tag)
+                is OutputPortSpec -> OutputPortHolder(name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
+                is PropertySpec -> OutputPortHolder(name, specification.getOutputPortSpec(), config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
                 else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
             }
             portMap[name] = port
@@ -85,8 +85,10 @@ class Ports : Iterable<PortHolder> {
     fun serialize(writer: Writer, forClient: Boolean, tag: Long) {
         val definitions = StringBuilder()
         val values = StringBuilder()
-        val simulationValues = StringBuilder()
-        for (port in portMap.values + Model.integrations.flatMap { it.nodes.values }) {
+        for (port in this) {
+            if (port.name.contains(".")) {
+                println()
+            }
             if (port.tag > tag) {
                 definitions.append(port.name).append(": ")
                 port.toJson(definitions, forClient)
@@ -95,9 +97,6 @@ class Ports : Iterable<PortHolder> {
             if (port.valueTag > tag) {
                 values.append("${port.name}: ${port.value.toJson()}\n")
             }
-            if (port is InputPortHolder && port.simulationValueTag > tag) {
-                simulationValues.append("${port.name}: ${port.simulationValue.toJson()}\n")
-            }
         }
 
         if (definitions.isNotEmpty()) {
@@ -105,10 +104,6 @@ class Ports : Iterable<PortHolder> {
         }
         if (forClient && values.isNotEmpty()) {
             writer.write("[portValues]\n\n$values\n")
-        }
-
-        if (simulationValues.isNotEmpty()) {
-            writer.write("[simulationValues]\n\n$simulationValues\n")
         }
     }
 }

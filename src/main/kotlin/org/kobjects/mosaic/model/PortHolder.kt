@@ -8,10 +8,15 @@ interface PortHolder:  Node {
     val name: String
     val tag: Long
 
+    val displayName: String?
+        get() = null
+    val category: String?
+        get() = null
+
     fun toJson(sb: StringBuilder, forClient: Boolean)
 
     fun attach(token: ModificationToken)
 
     override fun qualifiedId() = name
-    fun notifySimulationModeChanged(token: ModificationToken)
+
 }

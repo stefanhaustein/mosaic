@@ -11,8 +11,7 @@ interface Node {
 
     /**
      * Re-calculates the value bases on inputs.
-     * Input port values will be refreshed from the port/simulation
-     * value here.
+     * Input port values will be refreshed from the port value here.
      */
     fun recalculateValue(tag: Long): Boolean
     fun detach()

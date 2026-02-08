@@ -4,7 +4,6 @@ import {
     currentCell, currentSheet,
     portValues, selectCell, selectionRangeX, selectionRangeY,
     selectSheet, setRunMode,
-    simulationValues
 } from "./shared_state.js";
 import { registerFactory } from "./shared_model.js"
 import { blink } from "./lib/dom.js";
@@ -17,7 +16,6 @@ import {
     processPortSpec,
     processPortUpdate,
     processPortValue,
-    processSimulationValue
 } from "./port_panel_controller.js";
 import {getColumn, getRow, iterateKeys, toCellId} from "./lib/utils.js";
 
@@ -89,10 +87,6 @@ function processSection(sectionName, map) {
     } else switch (sectionName) {
         case "":
             currentTag = map["tag"]
-            let simulationMode = map["simulationMode"]
-            if (simulationMode != null) {
-                document.getElementById("simulationMode").checked = simulationMode
-            }
             let runMode = map["runMode"]
             if (runMode != null) {
                 setRunMode(runMode)
@@ -117,11 +111,6 @@ function processSection(sectionName, map) {
         case "portValues":
             for (let key in map) {
                 processPortValue(key, map)
-            }
-            break
-        case "simulationValues":
-            for (let key in map) {
-                processSimulationValue(key, map)
             }
             break
         case "integrations":
