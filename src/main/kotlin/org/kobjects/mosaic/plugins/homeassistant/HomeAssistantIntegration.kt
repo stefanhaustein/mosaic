@@ -1,21 +1,19 @@
 package org.kobjects.mosaic.plugins.homeassistant
 
 import org.kobjects.mosaic.model.InputPortHolder
+import org.kobjects.mosaic.model.OutputPortHolder
 import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec
-import org.kobjects.mosaic.pluginapi.InputPortInstance
 import org.kobjects.mosaic.pluginapi.InputPortSpec
 import org.kobjects.mosaic.pluginapi.IntegrationInstance
 import org.kobjects.mosaic.pluginapi.IntegrationSpec
 import org.kobjects.mosaic.pluginapi.ModelInterface
+import org.kobjects.mosaic.pluginapi.OutputPortSpec
 import org.kobjects.mosaic.pluginapi.ParameterSpec
-import org.kobjects.mosaic.pluginapi.PropertySpec
 import org.kobjects.mosaic.pluginapi.Type
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity.Kind
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntityState
 import org.kobjects.mosaic.plugins.homeassistant.client.HomeAssistantClient
-import java.util.Locale
-import java.util.Locale.getDefault
 
 class HomeAssistantIntegration(
     val model: ModelInterface,
@@ -28,48 +26,6 @@ class HomeAssistantIntegration(
 ) : IntegrationInstance(kind, name, tag) {
     var client: HomeAssistantClient? = null
 
-    init {
-        attach()
-    }
-
-    private fun attach() {
-        client = HomeAssistantClient(host, port, token)
-
-        for (entity in client?.entities?.values ?: emptyList()) {
-            val cut = entity.id.indexOf('.')
-            val kind = entity.id.substring(0, cut)
-            val id =  entity.id.replace('.', '_')
-            val fqName = name + "." + id
-            val spec = InputPortSpec(
-                namespace = this,
-                category = "",
-                name = kind,
-                type = when (kind) {
-                    "light" -> Type.BOOL
-                    else -> Type.BOOL
-                },
-                description = "",
-                emptyList(),
-                tag = tag,
-                createFn = { _, _ ->
-                    throw UnsupportedOperationException()
-                }
-            )
-            val portHolder = InputPortHolder(
-                name = fqName,
-                specification = spec,
-                configuration = emptyMap(),
-                displayName = getDisplayName(entity),
-                category = getCategory(entity),
-                tag = tag)
-
-            portHolder.instance = HAEntityInputPortInstance(entity, portHolder)
-            portHolder.value = entity.state.state == "on"
-
-            nodes.put(id, portHolder)
-        }
-
-    }
 
     override val operationSpecs = Kind.values().map {
         val type = getType(it)
@@ -80,13 +36,81 @@ class HomeAssistantIntegration(
             description = "",
             type = type,
             parameters = emptyList(),
+            modifiers = setOf(AbstractArtifactSpec.Modifier.UNINSTANTIABLE),
             tag = tag,
             createFn = { _, _ ->
                 throw UnsupportedOperationException()
             }
         )
-    }.filterNotNull()
+    }.filterNotNull() + listOf(Kind.LIGHT).map {
+        OutputPortSpec(
+            namespace = this,
+            category = "",
+            name = it.name.lowercase() + "_out",
+            description = "",
+            parameters = emptyList(),
+            modifiers = setOf(AbstractArtifactSpec.Modifier.UNINSTANTIABLE),
+            tag = tag,
+            createFn = {
+                throw UnsupportedOperationException()
+            }
+        )
+    }
 
+    private fun getInputSpec(kind: Kind): InputPortSpec? =
+        operationSpecs.find { it.name == kind.name.lowercase() } as InputPortSpec?
+
+
+    private fun getOutputSpec(kind: Kind): OutputPortSpec? =
+        operationSpecs.find { it.name == kind.name.lowercase() + "_out" } as OutputPortSpec?
+
+
+    init {
+        attach()
+    }
+
+
+    private fun attach() {
+        client = HomeAssistantClient(host, port, token)
+
+        for (entity in client?.entities?.values ?: emptyList()) {
+            val id =  entity.id.replace('.', '_')
+            val fqName = "$name.$id"
+
+            val inputPortSpec = getInputSpec(entity.kind)
+            if (inputPortSpec != null) {
+
+                val inputPortHolder = InputPortHolder(
+                    name = fqName,
+                    specification = inputPortSpec,
+                    configuration = emptyMap(),
+                    displayName = getDisplayName(entity),
+                    category = getCategory(entity),
+                    tag = tag
+                )
+
+                inputPortHolder.instance = HAEntityInputPortInstance(entity, inputPortHolder)
+                inputPortHolder.value = getValue(entity)
+
+                nodes.put(id, inputPortHolder)
+
+                if (entity.kind == Kind.LIGHT) {
+                    val outputPortHolder = OutputPortHolder(
+                        name = fqName + "_out",
+                        specification = getOutputSpec(entity.kind) ?: throw RuntimeException("OuputPortSpec not found for ${entity.kind}"),
+                        rawFormula = "",
+                        configuration = emptyMap(),
+                        displayName = getDisplayName(entity) + "_out",
+                        category = getCategory(entity),
+                        tag = tag
+                    )
+
+                    outputPortHolder.instance = EntityOutputPortInstance(this, entity)
+                   // nodes.put(id + "_out", outputPortHolder)
+                }
+            }
+        }
+    }
 
         // emptyList<AbstractArtifactSpec>() // client?.entities?.values?.filter { it.disabledBy == null }?.map { entityOperationSpec(it) } ?: emptyList()
 
