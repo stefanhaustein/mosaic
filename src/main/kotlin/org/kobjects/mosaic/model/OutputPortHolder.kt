@@ -6,7 +6,7 @@ import org.kobjects.mosaic.pluginapi.*
 
 class OutputPortHolder(
     override val name: String,
-    val specification: OutputPortSpec,
+    override val specification: OutputPortSpec,
     val configuration: Map<String, Any?>,
     val rawFormula: String,
     override val displayName: String? = null,

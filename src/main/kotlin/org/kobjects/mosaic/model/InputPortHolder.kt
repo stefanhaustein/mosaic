@@ -6,7 +6,7 @@ import org.kobjects.mosaic.pluginapi.*
 
 open class InputPortHolder(
     override val name: String,
-    val specification: InputPortSpec,
+    override val specification: InputPortSpec,
     val configuration: Map<String, Any?>,
     override val displayName: String? = null,
     override val category: String? = null,

@@ -13,6 +13,8 @@ interface PortHolder:  Node {
     val category: String?
         get() = null
 
+    val specification: AbstractArtifactSpec
+
     fun toJson(sb: StringBuilder, forClient: Boolean)
 
     fun attach(token: ModificationToken)

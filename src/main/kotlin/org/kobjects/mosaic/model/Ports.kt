@@ -2,6 +2,7 @@ package org.kobjects.mosaic.model
 
 import org.kobjects.mosaic.json.toJson
 import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec.Modifier
 import java.io.Writer
 
 
@@ -89,7 +90,7 @@ class Ports : Iterable<PortHolder> {
             if (port.name.contains(".")) {
                 println()
             }
-            if (port.tag > tag) {
+            if (port.tag > tag && (forClient || !port.specification.modifiers.contains(Modifier.UNINSTANTIABLE))) {
                 definitions.append(port.name).append(": ")
                 port.toJson(definitions, forClient)
                 definitions.append('\n')
