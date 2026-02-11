@@ -73,8 +73,12 @@ data class CellRangeReference(
 
     companion object {
 
+        val empty = CellRangeReference(Model.sheets.values.first(), 0, 0, 0, 0)
+
 
         fun parse(name: String, impliedSheet: Sheet? = null): CellRangeReference {
+            if (name.isBlank()) return empty
+
             val cut0 = name.indexOf("!")
             val sheet: Sheet
             if (cut0 == -1) {

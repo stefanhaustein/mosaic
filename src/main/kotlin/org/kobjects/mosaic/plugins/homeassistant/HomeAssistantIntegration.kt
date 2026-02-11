@@ -106,7 +106,7 @@ class HomeAssistantIntegration(
                     )
 
                     outputPortHolder.instance = EntityOutputPortInstance(this, entity)
-                   // nodes.put(id + "_out", outputPortHolder)
+                    nodes.put(id + "_out", outputPortHolder)
                 }
             }
         }
