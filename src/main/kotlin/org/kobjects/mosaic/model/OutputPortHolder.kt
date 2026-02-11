@@ -48,12 +48,16 @@ class OutputPortHolder(
     fun reparse() {
         singleCell = !rawFormula.contains(":")
         val rawReference = if (rawFormula.startsWith("=")) rawFormula.substring(1) else rawFormula
-        cellRange = CellRangeReference.parse(rawReference)
+        val newCellRange = if (rawReference.isBlank()) null else CellRangeReference.parse(rawReference)
+        cellRange = newCellRange
 
         clearDependsOn()
-        for (cell in cellRange!!) {
-            inputs.add(cell)
-            cell.outputs.add(this)
+
+        if (newCellRange != null) {
+            for (cell in newCellRange) {
+                inputs.add(cell)
+                cell.outputs.add(this)
+            }
         }
     }
 
