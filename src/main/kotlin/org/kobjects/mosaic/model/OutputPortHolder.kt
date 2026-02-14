@@ -3,15 +3,16 @@ package org.kobjects.mosaic.model
 import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.json.toJson
 import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec.Modifier
 
 class OutputPortHolder(
     override val name: String,
     override val specification: OutputPortSpec,
     val configuration: Map<String, Any?>,
-    val rawFormula: String,
+    var rawFormula: String,
     override val displayName: String? = null,
     override val category: String? = null,
-    override val tag: Long
+    override var tag: Long
 ) : /*ExpressionNode(),*/Node,  PortHolder {
     var instance: OutputPortInstance? = null
     var error: Exception? = null
@@ -26,7 +27,7 @@ class OutputPortHolder(
 
 
     override fun recalculateValue(tag: Long): Boolean {
-        val newValue = if (singleCell) cellRange!!.iterator().next().value else CellRangeValues(cellRange!!)
+        val newValue = if(cellRange == null) null else if (singleCell) cellRange!!.iterator().next().value else CellRangeValues(cellRange!!)
         valueTag = tag
         if (newValue == this.value) {
             return false
@@ -97,15 +98,18 @@ class OutputPortHolder(
 
 
     override fun toJson(sb: StringBuilder, forClient: Boolean) {
-        sb.append("""{"name":${name.quote()}, "kind":${specification.fqName.quote()}""")
-        if (category != null) {
-            sb.append(""", "category": ${category?.quote()}""")
+        sb.append("""{"name":${name.quote()}""")
+        if (forClient || !specification.modifiers.contains(Modifier.UNINSTANTIABLE)) {
+            sb.append(""", "kind":${specification.fqName.quote()}""")
+            if (category != null) {
+                sb.append(""", "category": ${category?.quote()}""")
+            }
+            if (displayName != null) {
+                sb.append(""", "displayName": ${displayName?.quote()}""")
+            }
+            sb.append(""", "configuration": """)
+            configuration.toJson(sb)
         }
-        if (displayName != null) {
-            sb.append(""", "displayName": ${displayName?.quote()}""")
-        }
-        sb.append(""", "configuration": """)
-        configuration.toJson(sb)
         if (forClient) {
             serializeDependencies(sb)
         }

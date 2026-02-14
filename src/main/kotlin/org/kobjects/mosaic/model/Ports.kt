@@ -12,7 +12,12 @@ class Ports : Iterable<PortHolder> {
 
     override fun iterator(): Iterator<PortHolder> = (portMap.values + Model.integrations.flatMap { it.nodes.values }).iterator()
 
-    operator fun get(key: String): PortHolder? = portMap[key]
+    operator fun get(key: String): PortHolder? {
+        val cut: Int = key.indexOf('.')
+        if (cut == -1) return portMap[key]
+        val integration = Model.integrations[key.substring(0, cut)]
+        return integration?.nodes?.get(key.substring(cut + 1))
+    }
 
     val keys
         get() = portMap.keys
@@ -56,30 +61,40 @@ class Ports : Iterable<PortHolder> {
         }
 
         if (jsonSpec["deleted"] as Boolean? != true) {
-            val kind = jsonSpec["kind"].toString()
-
-            val specification = if (kind.contains(".")) {
-                val parts = kind.split(".")
-                val integration = Model.integrations[parts[0]] ?: throw IllegalArgumentException("Integration '${parts[0]}' not found.")
-                integration.operationSpecs.find { it.fqName == kind } ?: throw IllegalArgumentException("'${parts[1]}' not found in integration $integration.")
+            if (!jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
+                val port = this[name]
+                if (port is OutputPortHolder) {
+                    port.rawFormula = jsonSpec["source"]?.toString() ?: ""
+                    port.reparse()
+                    port.tag = token.tag
+                }
             } else {
-                Model.factories[kind] ?: throw IllegalArgumentException("Unrecognized port type '$kind'")
+                val kind = jsonSpec["kind"].toString()
+
+                val specification = if (kind.contains(".")) {
+                    val parts = kind.split(".")
+                    val integration = Model.integrations[parts[0]] ?: throw IllegalArgumentException("Integration '${parts[0]}' not found.")
+                    integration.operationSpecs.find { it.fqName == kind } ?: throw IllegalArgumentException("'${parts[1]}' not found in integration $integration.")
+                } else {
+                    Model.factories[kind] ?: throw IllegalArgumentException("Unrecognized port type '$kind'")
+                }
+
+                portMap[name]?.detach()
+
+                val config = specification.convertConfiguration(
+                    jsonSpec["configuration"] as? Map<String, Any> ?: emptyMap()
+                )
+
+                val port = when (specification) {
+                    is InputPortSpec -> InputPortHolder(name, specification, config, tag = token.tag)
+                    is OutputPortSpec -> OutputPortHolder(name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
+                    is PropertySpec -> OutputPortHolder(name, specification.getOutputPortSpec(), config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
+                    else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
+                }
+                portMap[name] = port
+                port.attach(token)
+
             }
-
-            portMap[name]?.detach()
-
-            val config = specification.convertConfiguration(
-                jsonSpec["configuration"] as? Map<String, Any> ?: emptyMap()
-            )
-
-            val port = when (specification) {
-                is InputPortSpec -> InputPortHolder(name, specification, config, tag = token.tag)
-                is OutputPortSpec -> OutputPortHolder(name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
-                is PropertySpec -> OutputPortHolder(name, specification.getOutputPortSpec(), config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
-                else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
-            }
-            portMap[name] = port
-            port.attach(token)
         }
     }
 
@@ -90,7 +105,7 @@ class Ports : Iterable<PortHolder> {
             if (port.name.contains(".")) {
                 println()
             }
-            if (port.tag > tag && (forClient || !port.specification.modifiers.contains(Modifier.UNINSTANTIABLE))) {
+            if (port.tag > tag && (forClient || port is OutputPortHolder || !port.specification.modifiers.contains(Modifier.UNINSTANTIABLE))) {
                 definitions.append(port.name).append(": ")
                 port.toJson(definitions, forClient)
                 definitions.append('\n')

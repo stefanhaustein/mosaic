@@ -1,8 +1,8 @@
-import {portValues, showDependencies} from "./shared_state.js";
+import {currentSheet, portValues, showDependencies} from "./shared_state.js";
 import {showPortDialog} from "./port_editor.js";
 import {insertById, setDragHandler} from "./lib/dom.js";
 import {getFactory, getPortInstance, registerPortInstance} from "./shared_model.js";
-import {ensureCategory} from "./lib/utils.js";
+import {ensureCategory, post} from "./lib/utils.js";
 import {updateSpec} from "./artifacts.js";
 
 
@@ -73,8 +73,6 @@ export function processPortUpdate(name, f) {
         insertById(targetElement, entryElement)
 
         let entryContentElement = document.createElement("div")
-
-
         let entryConfigElement = document.createElement("img")
         entryConfigElement.src = "/img/settings.svg"
         entryConfigElement.className = "portConfig"
@@ -124,12 +122,14 @@ export function processPortUpdate(name, f) {
             entryValueElement.className = "portValue"
             entryContentElement.appendChild(entryValueElement)
         } else {
-           // let sourceElement = document.createElement("div")
-           // sourceElement.style.float = "right"
-           // sourceElement.style.paddingRight = "5px"
-           // sourceElement.textContent =  f.source
-
-            entryContentElement.append(f.source)
+            let sourceElement = document.createElement("input")
+            sourceElement.style.float = "right"
+            sourceElement.style.paddingRight = "5px"
+            sourceElement.value =  f.source
+            sourceElement.addEventListener("change", () => {
+                post("ports/" + f.name, {source: sourceElement.value})
+            })
+            entryContentElement.append(sourceElement)
         }
 
 

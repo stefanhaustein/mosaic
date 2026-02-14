@@ -70,8 +70,7 @@ fun Application.module() {
             }
             call.respond(HttpStatusCode.OK)
         }
-        post("/ports/{name}") {
-            val name = call.parameters["name"]!!
+        post("/ports/{name}") { val name = call.parameters["name"]!!
             val jsonText = call.receiveText()
             println("/ports/$name: $jsonText")
             val jsonSpec = JsonParser.parseObject(jsonText)
