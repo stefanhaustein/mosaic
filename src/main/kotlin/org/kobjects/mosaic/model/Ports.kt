@@ -88,7 +88,6 @@ class Ports : Iterable<PortHolder> {
                 val port = when (specification) {
                     is InputPortSpec -> InputPortHolder(name, specification, config, tag = token.tag)
                     is OutputPortSpec -> OutputPortHolder(name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
-                    is PropertySpec -> OutputPortHolder(name, specification.getOutputPortSpec(), config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
                     else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
                 }
                 portMap[name] = port

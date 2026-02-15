@@ -12,7 +12,6 @@ export function updateSpec(parent, idPrefix, spec) {
     let icon = "add_circle"
     switch (spec.kind) {
         case "FUNCTION":
-        case "PROPERTY":
             icon = "variable_insert"
             createAction = async () => {
                 let value = "=" + spec.name + (spec.params && spec.params.length ? "(" : "")
@@ -70,19 +69,6 @@ export function updateSpec(parent, idPrefix, spec) {
     titleElement.style.marginTop = "10px"
     titleElement.style.paddingLeft = "20px"
     element.appendChild(titleElement)
-
-    if (spec.kind == "PROPERTY" && spec.modifiers && spec.modifiers.indexOf("SETTABLE") != -1) {
-        let inputElement = document.createElement("input")
-        element.appendChild(inputElement)
-        inputElement.id = "port." + spec.name
-        inputElement.addEventListener("change", () => {
-            post("ports/" + spec.name, {
-                kind: spec.name,
-                name: spec.name,
-                source: inputElement.value
-                })
-        })
-    }
 
     let descriptionElement = document.createElement("div")
     descriptionElement.style.paddingLeft = "20px"
