@@ -37,12 +37,12 @@
     padding: 3px 6px;
     margin-top: 1px;
     margin-bottom: 1px;
+    display: flex;
 }
 
 
 .portConfig {
     padding: 3px;
-    float: right;
 }
 
 
