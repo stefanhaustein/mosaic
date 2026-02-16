@@ -10,6 +10,7 @@ interface PortHolder:  Node {
 
     val displayName: String?
         get() = null
+    
     val category: String?
         get() = null
 
