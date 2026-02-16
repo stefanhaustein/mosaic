@@ -1,9 +1,10 @@
 package org.kobjects.mosaic.model.expression;
 
 import org.kobjects.mosaic.model.Cell
+import org.kobjects.mosaic.model.ExpressionNode
 
 class CellExpression(
-    owner: Cell,
+    owner: ExpressionNode,
     val target: Cell
 ) : Expression() {
 

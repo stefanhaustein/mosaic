@@ -1,11 +1,12 @@
 package org.kobjects.mosaic.model.expression
 
 import org.kobjects.mosaic.model.Cell
+import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.pluginapi.ModificationToken
 import org.kobjects.mosaic.pluginapi.*
 
 class PluginOperationCall(
-    val owner: Cell,
+    val owner: Node,
     operationSpec: FunctionSpec,
     val configuration: Map<String, Any?>,
     val parameters: Map<String, Pair<Expression, Type>>
@@ -48,7 +49,7 @@ class PluginOperationCall(
 
 
     companion object {
-        fun create(expressionHolder: Cell, operationSpec: FunctionSpec, parameters: Map<String, Expression>): PluginOperationCall {
+        fun create(expressionHolder: Node, operationSpec: FunctionSpec, parameters: Map<String, Expression>): PluginOperationCall {
             val mappedConfig = mutableMapOf<String, Any?>()
             val mappedParameters = mutableMapOf<String, Pair<Expression, Type>>()
             for ((index, specParam) in operationSpec.parameters.withIndex()) {

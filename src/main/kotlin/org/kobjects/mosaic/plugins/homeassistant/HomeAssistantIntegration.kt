@@ -81,6 +81,7 @@ class HomeAssistantIntegration(
             if (inputPortSpec != null) {
 
                 val inputPortHolder = InputPortHolder(
+                    this,
                     name = fqName,
                     specification = inputPortSpec,
                     configuration = emptyMap(),
@@ -96,9 +97,10 @@ class HomeAssistantIntegration(
 
                 if (entity.kind == Kind.LIGHT) {
                     val outputPortHolder = OutputPortHolder(
+                        this,
                         name = fqName + "_out",
                         specification = getOutputSpec(entity.kind) ?: throw RuntimeException("OuputPortSpec not found for ${entity.kind}"),
-                        rawFormula = "",
+                  //      rawFormula = "",
                         configuration = emptyMap(),
                         displayName = getDisplayName(entity) + "_out",
                         category = getCategory(entity),

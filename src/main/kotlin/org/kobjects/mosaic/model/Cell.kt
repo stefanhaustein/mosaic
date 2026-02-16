@@ -11,102 +11,34 @@ import org.kobjects.mosaic.model.expression.Literal
 import org.kobjects.mosaic.model.parser.ParsingContext
 import org.kobjects.mosaic.model.parser.TcFormulaParser
 import org.kobjects.mosaic.pluginapi.ModificationToken
+import org.kobjects.mosaic.pluginapi.Namespace
 
 class Cell(
     val sheet: Sheet,
     id: String
-) : Node, Iterable<Cell>, ToJson {
+) : ExpressionNode(), Iterable<Cell>, ToJson {
 
     val column = getColumn(id)
     val row = getRow(id)
 
+    override val owner: Namespace
+        get() = sheet
 
     val id: String
         get() = id(column, row)
 
-    var rawFormula = ""
     var image: String? = null
 
     var validation: Map<String, Any?>? = null
-
-    var expression: Expression = Literal(Unit)
-    override var value: Any? = null
-
-    override var valueTag = 0L
-    var formulaTag = 0L
 
     override val inputs = mutableSetOf<Node>()
     override val outputs = mutableSetOf<Node>()
 
 
-    override fun recalculateValue(tag: Long): Boolean {
-        var newValue: Any?
-        try {
-            newValue = expression.eval(EvaluationContext(tag))
-        } catch (e: Exception) {
-            e.printStackTrace()
-            newValue = e
-        }
-        return if (newValue == value) false else {
-            value = newValue
-            valueTag = tag
-            true
-        }
-    }
-
-    override fun detach() {
-        clearDependsOn()
-    }
-
-    fun clearDependsOn() {
-        for (dep in inputs) {
-            dep.outputs.remove(this)
-        }
-        inputs.clear()
-    }
-
-    fun reparse() {
-        clearDependsOn()
-        expression.detachAll()
-        expression = if (rawFormula.startsWith("=")) {
-            try {
-                val context = ParsingContext(this)
-                val parsed = TcFormulaParser.parseExpression(rawFormula.substring(1), context)
-                parsed.attachAll()
-                parsed
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Literal(e)
-            }
-        } else {
-            when (rawFormula.lowercase()) {
-                "true" -> Literal(true)
-                "false" -> Literal(false)
-                else -> {
-                    try {
-                        Literal(Values.parseNumber(rawFormula))
-                    } catch (e: Exception) {
-                        Literal(rawFormula)
-                    }
-                }
-            }
-        }
-    }
-
     fun clear(modificationToken: ModificationToken) {
         setFormula("", modificationToken)
         setImage("", modificationToken)
         setValidation(emptyMap(), modificationToken)
-    }
-
-    fun setFormula(value: String, modificationToken: ModificationToken) {
-        if (value != rawFormula) {
-            rawFormula = value
-            reparse()
-            formulaTag = modificationToken.tag
-            modificationToken.formulaChanged = true
-            modificationToken.addRefresh(this)
-        }
     }
 
     fun setImage(path: String, modificationToken: ModificationToken) {

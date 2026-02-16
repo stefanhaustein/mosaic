@@ -1,6 +1,7 @@
 package org.kobjects.mosaic.model
 
 import org.kobjects.mosaic.json.quote
+import org.kobjects.mosaic.pluginapi.Namespace
 
 interface Node {
     val value: Any?
@@ -8,7 +9,7 @@ interface Node {
     val valueTag: Long
     val outputs: MutableSet<Node>
     val inputs: MutableSet<Node>
-
+    val owner: Namespace?
     /**
      * Re-calculates the value bases on inputs.
      * Input port values will be refreshed from the port value here.

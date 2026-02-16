@@ -6,68 +6,21 @@ import org.kobjects.mosaic.pluginapi.*
 import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec.Modifier
 
 class OutputPortHolder(
+    override val owner: Namespace?,
     override val name: String,
     override val specification: OutputPortSpec,
     val configuration: Map<String, Any?>,
-    var rawFormula: String,
     override val displayName: String? = null,
     override val category: String? = null,
     override var tag: Long
-) : /*ExpressionNode(),*/Node,  PortHolder {
+) : ExpressionNode(),  PortHolder {
     var instance: OutputPortInstance? = null
     var error: Exception? = null
-    var cellRange: CellRangeReference? = null
-    var singleCell = false
 
     override var value: Any? = null
     override var valueTag: Long = tag
 
-    override val outputs = mutableSetOf<Node>()
-    override val inputs = mutableSetOf<Node>()
 
-
-    override fun recalculateValue(tag: Long): Boolean {
-        val newValue = if(cellRange == null) null else if (singleCell) cellRange!!.iterator().next().value else CellRangeValues(cellRange!!)
-        valueTag = tag
-        if (newValue == this.value) {
-            return false
-        }
-        this.value = newValue
-        if (instance != null) {
-            try {
-                instance?.setValue(value)
-                error = null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                error = e
-            }
-        }
-        return true
-    }
-
-
-    fun reparse() {
-        singleCell = !rawFormula.contains(":")
-        val rawReference = if (rawFormula.startsWith("=")) rawFormula.substring(1) else rawFormula
-        val newCellRange = if (rawReference.isBlank()) null else CellRangeReference.parse(rawReference)
-        cellRange = newCellRange
-
-        clearDependsOn()
-
-        if (newCellRange != null) {
-            for (cell in newCellRange) {
-                inputs.add(cell)
-                cell.outputs.add(this)
-            }
-        }
-    }
-
-    fun clearDependsOn() {
-        for (dep in inputs) {
-            dep.outputs.remove(this)
-        }
-        inputs.clear()
-    }
 
     override fun attach(token: ModificationToken) {
         detach()
@@ -117,6 +70,9 @@ class OutputPortHolder(
 
     }
 
+    override fun notifyValueChanged(newValue: Any?) {
+        instance?.setValue(newValue)
+    }
 
     override fun toString() = name
 }

@@ -3,9 +3,10 @@ package org.kobjects.mosaic.model.expression;
 import org.kobjects.mosaic.model.Cell
 import org.kobjects.mosaic.model.CellRangeReference
 import org.kobjects.mosaic.model.CellRangeValues
+import org.kobjects.mosaic.model.ExpressionNode
 
 class CellRangeExpression(
-    owner: Cell,
+    owner: ExpressionNode,
     val target: CellRangeReference
 ) : Expression() {
 

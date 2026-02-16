@@ -3,7 +3,7 @@ package org.kobjects.mosaic.model.expression;
 import org.kobjects.mosaic.model.*
 
 class PortExpression(
-    owner: Cell,
+    owner: Node,
     val port: PortHolder
 
 ) : Expression() {

@@ -28,7 +28,7 @@ class Ports : Iterable<PortHolder> {
             token.symbolsChanged = true
             port.detach()
             portMap[name] = InputPortHolder(
-                name, InputPortSpec(
+                null, name, InputPortSpec(
                     null,
                     "GPIO",
                     // The operation name; used to identify tombstone ports on the client
@@ -86,8 +86,8 @@ class Ports : Iterable<PortHolder> {
                 )
 
                 val port = when (specification) {
-                    is InputPortSpec -> InputPortHolder(name, specification, config, tag = token.tag)
-                    is OutputPortSpec -> OutputPortHolder(name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
+                    is InputPortSpec -> InputPortHolder(null, name, specification, config, tag = token.tag)
+                    is OutputPortSpec -> OutputPortHolder(null, name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
                     else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
                 }
                 portMap[name] = port

@@ -1,12 +1,13 @@
 package org.kobjects.mosaic.model
 
 import org.kobjects.mosaic.pluginapi.ModificationToken
+import org.kobjects.mosaic.pluginapi.Namespace
 
 
 class Sheet(
-    val name: String,
+    override val name: String,
     var tag: Long = 0L
-) {
+) : Namespace {
     val highlighted = mutableSetOf<CellRangeReference>()
     var highlightTag: Long = 0L
     val cells = mutableMapOf<String, Cell>()

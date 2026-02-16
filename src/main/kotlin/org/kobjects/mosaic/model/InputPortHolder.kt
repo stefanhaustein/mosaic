@@ -5,6 +5,7 @@ import org.kobjects.mosaic.json.toJson
 import org.kobjects.mosaic.pluginapi.*
 
 open class InputPortHolder(
+    override val owner: Namespace?,
     override val name: String,
     override val specification: InputPortSpec,
     val configuration: Map<String, Any?>,

@@ -4,6 +4,7 @@ import org.kobjects.parsek.expression.Operator
 import org.kobjects.parsek.expression.PrattParser
 import org.kobjects.mosaic.model.CellRangeReference
 import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.Sheet
 import org.kobjects.mosaic.model.expression.*
 import org.kobjects.mosaic.pluginapi.FunctionSpec
 
@@ -47,7 +48,7 @@ object TcFormulaParser : PrattParser<TcScanner, ParsingContext, Expression>(
 
             TcTokenType.CELL_IDENTIFIER -> {
                 val name = scanner.consume().text
-                val cellRange = CellRangeReference.parse(name, context.cell.sheet)
+                val cellRange = CellRangeReference.parse(name, context.cell.owner as? Sheet)
 
                 if (name.contains(":")) {
                     CellRangeExpression(context.cell, cellRange)
