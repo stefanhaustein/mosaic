@@ -27,14 +27,12 @@ open class InputPortHolder(
 
     override fun attach(token: ModificationToken) {
         detach()
-
-            try {
-                instance = specification.createFn(configuration, this)
-            } catch (e: Exception) {
-                portValue = e
-                e.printStackTrace()
-            }
-
+        try {
+            instance = specification.createFn(configuration, this)
+        } catch (e: Exception) {
+            portValue = e
+            e.printStackTrace()
+        }
     }
 
     override fun detach() {

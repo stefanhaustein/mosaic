@@ -8,7 +8,9 @@ import org.kobjects.mosaic.plugins.pi4j.devices.Bmp280Port
 import org.kobjects.mosaic.plugins.pi4j.devices.Scd4xPort
 import org.kobjects.mosaic.plugins.pi4j.pixtend.PiXtendIntegration
 
-class Pi4jPlugin(val model: ModelInterface) : Plugin {
+class Pi4jPlugin(
+    val model: ModelInterface
+) : Plugin {
     var pi4j: Context? = null
     var error: Throwable? = null
 

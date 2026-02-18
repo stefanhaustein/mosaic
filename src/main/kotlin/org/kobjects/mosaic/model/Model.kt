@@ -3,6 +3,7 @@ package org.kobjects.mosaic.model
 import org.kobjects.mosaic.json.JsonParser
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
 import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
 import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantPlugin
 import org.kobjects.mosaic.plugins.pi4j.Pi4jPlugin
 import org.kobjects.mosaic.svg.SvgManager
@@ -47,7 +48,7 @@ object Model : ModelInterface {
         addPlugin(BuiltinFunctions)
         addPlugin(Pi4jPlugin(this))
         addPlugin(svgs)
-        addPlugin(HomeAssistantPlugin(this))
+        addIntegration(HomeAssistantIntegration.spec(this))
         // addPlugin(MqttPlugin)
 
         applySynchronizedWithToken { runtimeContext ->
@@ -66,6 +67,9 @@ object Model : ModelInterface {
         updateListeners.add(UpdateListenerData(permanent = permanent, onChangeOnly = onChangeOnly, listener = listener))
     }
 
+    fun addIntegration(spec: IntegrationSpec) {
+        factories.add(spec)
+    }
 
     fun addPlugin(plugin: Plugin) {
         plugins.add(plugin)
