@@ -6,14 +6,14 @@ import org.kobjects.mosaic.pluginapi.*
 import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec.Modifier
 
 class OutputPortHolder(
-    override val owner: Namespace?,
+    owner: Namespace?,
     override val name: String,
     override val specification: OutputPortSpec,
     val configuration: Map<String, Any?>,
     override val displayName: String? = null,
     override val category: String? = null,
     override var tag: Long
-) : ExpressionNode(),  PortHolder {
+) : ExpressionNode(owner),  PortHolder {
     var instance: OutputPortInstance? = null
     var error: Exception? = null
 

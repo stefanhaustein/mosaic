@@ -20,6 +20,6 @@ interface PortHolder:  Node {
 
     fun attach(token: ModificationToken)
 
-    override fun qualifiedId() = name
+    override fun qualifiedId() = if (owner == null) name else owner?.name + "." + name
 
 }

@@ -6,8 +6,11 @@ import org.kobjects.mosaic.model.expression.Literal
 import org.kobjects.mosaic.model.parser.ParsingContext
 import org.kobjects.mosaic.model.parser.TcFormulaParser
 import org.kobjects.mosaic.pluginapi.ModificationToken
+import org.kobjects.mosaic.pluginapi.Namespace
 
-abstract class ExpressionNode : Node {
+abstract class ExpressionNode(
+    override val owner: Namespace?
+) : Node {
 
 
     var rawFormula = ""

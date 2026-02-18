@@ -15,17 +15,17 @@ import org.kobjects.mosaic.pluginapi.Namespace
 
 class Cell(
     val sheet: Sheet,
-    id: String
-) : ExpressionNode(), Iterable<Cell>, ToJson {
+    val id: String
+) : ExpressionNode(sheet), Iterable<Cell>, ToJson {
 
-    val column = getColumn(id)
-    val row = getRow(id)
+    val column: Int
+        get() = getColumn(id)
+    val row: Int
+        get() = getRow(id)
 
     override val owner: Namespace
         get() = sheet
 
-    val id: String
-        get() = id(column, row)
 
     var image: String? = null
 

@@ -3,6 +3,7 @@ package org.kobjects.mosaic.model
 import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.pluginapi.Namespace
 
+// Can't be an abstract class becuase PortHolder needs to be a sub-interface
 interface Node {
     val value: Any?
     /** Used to track when the value was changed last. */
