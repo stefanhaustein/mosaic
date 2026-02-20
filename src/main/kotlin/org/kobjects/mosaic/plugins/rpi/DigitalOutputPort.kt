@@ -1,11 +1,11 @@
-package org.kobjects.mosaic.plugins.pi4j
+package org.kobjects.mosaic.plugins.rpi
 
 
 import com.pi4j.io.gpio.digital.*
 import org.kobjects.mosaic.pluginapi.*
 
 class DigitalOutputPort(
-    val plugin: Pi4jPlugin,
+    val plugin: RpiIntegration,
     val address: Int
 )  : OutputPortInstance {
 
@@ -33,7 +33,7 @@ class DigitalOutputPort(
 
 
     companion object {
-        fun spec(plugin: Pi4jPlugin) = OutputPortSpec(
+        fun spec(plugin: RpiIntegration) = OutputPortSpec(
             null,
             "GPIO",
             "dout",

@@ -1,4 +1,4 @@
-package org.kobjects.mosaic.plugins.pi4j
+package org.kobjects.mosaic.plugins.rpi
 
 import com.pi4j.io.gpio.digital.*
 import com.pi4j.io.gpio.digital.DigitalInput
@@ -6,7 +6,7 @@ import org.kobjects.mosaic.pluginapi.*
 
 class DigitalInputPort(
     val host: InputPortListener,
-    val plugin: Pi4jPlugin,
+    val plugin: RpiIntegration,
     val address: Int
 ) : InputPortInstance, DigitalStateChangeListener {
 
@@ -32,7 +32,7 @@ class DigitalInputPort(
     }
 
     companion object {
-        fun spec(plugin: Pi4jPlugin) = InputPortSpec(
+        fun spec(plugin: RpiIntegration) = InputPortSpec(
             null,
             category = "GPIO",
             "din",

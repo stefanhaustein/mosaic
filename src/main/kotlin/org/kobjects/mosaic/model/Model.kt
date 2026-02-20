@@ -4,7 +4,9 @@ import org.kobjects.mosaic.json.JsonParser
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
 import org.kobjects.mosaic.pluginapi.*
 import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
-import org.kobjects.mosaic.plugins.pi4j.Pi4jPlugin
+import org.kobjects.mosaic.plugins.pixtend.PiXtendAnalogInputPort
+import org.kobjects.mosaic.plugins.pixtend.PiXtendIntegration
+import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 import org.kobjects.mosaic.svg.SvgManager
 import java.io.File
 import java.io.FileWriter
@@ -44,9 +46,10 @@ object Model : ModelInterface {
     private val lock = ReentrantLock()
 
     init {
-        addPlugin(BuiltinFunctions)
-        addPlugin(Pi4jPlugin(this))
-        addPlugin(svgs)
+        addOperations(BuiltinFunctions.operationSpecs)
+        addIntegration(RpiIntegration.spec(this))
+        addIntegration(PiXtendIntegration.spec(this))
+        addOperations(svgs.operationSpecs)
         addIntegration(HomeAssistantIntegration.spec(this))
         // addPlugin(MqttPlugin)
 
@@ -70,9 +73,8 @@ object Model : ModelInterface {
         factories.add(spec)
     }
 
-    fun addPlugin(plugin: Plugin) {
-        plugins.add(plugin)
-        for (spec in plugin.operationSpecs) {
+    fun addOperations(operations: List<AbstractArtifactSpec>) {
+        for (spec in operations) {
             when (spec) {
                 is FunctionSpec -> functions.add(spec)
                 is AbstractFactorySpec -> factories.add(spec)

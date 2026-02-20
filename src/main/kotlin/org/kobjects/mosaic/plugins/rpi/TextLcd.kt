@@ -1,4 +1,4 @@
-package org.kobjects.mosaic.plugins.pi4j
+package org.kobjects.mosaic.plugins.rpi
 
 
 import com.pi4j.io.i2c.I2C
@@ -7,7 +7,7 @@ import org.kobjects.mosaic.pluginapi.*
 import kotlin.math.min
 
 class TextLcd(
-    val plugin: Pi4jPlugin,
+    val plugin: RpiIntegration,
     bus: Int,
     address: Int,
     val width: Int,
@@ -50,7 +50,7 @@ class TextLcd(
 
 
     companion object {
-        fun spec(plugin: Pi4jPlugin) = OutputPortSpec(
+        fun spec(plugin: RpiIntegration) = OutputPortSpec(
             null,
             "Drivers",
             "Lcd",

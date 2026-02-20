@@ -2,8 +2,8 @@ package org.kobjects.mosaic.model.builtin
 
 import org.kobjects.mosaic.pluginapi.*
 
-object BuiltinFunctions : Plugin {
-    override val operationSpecs = listOf<AbstractArtifactSpec>(
+object BuiltinFunctions {
+    val operationSpecs = listOf<AbstractArtifactSpec>(
         FunctionSpec(
             null,
             "Time",
@@ -115,7 +115,7 @@ object BuiltinFunctions : Plugin {
 
         OutputPortSpec(
             null,
-            "GPIO",
+            category = "",
             "NamedCells",
             "A named range of cells",
             emptyList(),

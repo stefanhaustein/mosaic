@@ -1,17 +1,20 @@
-package org.kobjects.mosaic.plugins.pi4j.pixtend
+package org.kobjects.mosaic.plugins.pixtend
 
+import com.pi4j.Pi4J
+import com.pi4j.context.Context
 import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.pluginapi.*
-import org.kobjects.mosaic.plugins.pi4j.Pi4jPlugin
+import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 
 class PiXtendIntegration(
-    val pi4j: Pi4jPlugin,
+    val model: ModelInterface,
     kind: String,
     name: String,
     tag: Long,
     var pixtendModel: PiXtendDriver.Model
 
 ): IntegrationInstance(kind, name, tag) {
+    var pi4j: Context? = null
     var driver: PiXtendDriver? = null
     var error: Exception? = null
     val inputPorts = mutableSetOf<PiXtendInputPortInstance>()
@@ -24,9 +27,10 @@ class PiXtendIntegration(
     private fun attach() {
 
             try {
-                driver = PiXtendDriver(pi4j.pi4j, this@PiXtendIntegration.pixtendModel)
+                pi4j = Pi4J.newAutoContext()
+                driver = PiXtendDriver(pi4j, this@PiXtendIntegration.pixtendModel)
                 error = null
-                pi4j.model.runAsync { syncState(driver!!, ++invocationId) }
+                model.runAsync { syncState(driver!!, ++invocationId) }
             } catch (e: Exception) {
                 e.printStackTrace()
                 error = e
@@ -39,9 +43,9 @@ class PiXtendIntegration(
             return
         }
         driver.syncState()
-        pi4j.model.applySynchronizedWithToken(
+        model.applySynchronizedWithToken(
             callback = { tag, anyChange ->
-                pi4j.model.runAsync {
+                model.runAsync {
                     syncState(driver, invocationId)
                 }
             }
@@ -56,14 +60,14 @@ class PiXtendIntegration(
     companion object {
         val piXtendModel = Type.ENUM(PiXtendDriver.Model.entries)
 
-        fun spec(pi4j: Pi4jPlugin) = IntegrationSpec(
+        fun spec(model: ModelInterface) = IntegrationSpec(
             category = "PLC",
             name = "pixt",
             description = "PiXtend PLC Integration",
             parameters = listOf(ParameterSpec("model", piXtendModel, PiXtendDriver.Model.V2S)),
             modifiers = setOf(AbstractArtifactSpec.Modifier.SINGLETON),
         ) { kind, name, tag, config ->
-            PiXtendIntegration(pi4j, kind, name, tag, config["model"] as PiXtendDriver.Model)
+            PiXtendIntegration(model, kind, name, tag, config["model"] as PiXtendDriver.Model)
         }
     }
 
@@ -83,6 +87,9 @@ class PiXtendIntegration(
 
     override fun detach() {
         invocationId++
+        pi4j?.shutdown()
+        pi4j = null
+
     }
 
     override fun notifySimulationModeChanged(token: ModificationToken) {

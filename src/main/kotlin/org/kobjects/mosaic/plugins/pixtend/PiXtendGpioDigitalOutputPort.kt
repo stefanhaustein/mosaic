@@ -1,36 +1,37 @@
-package org.kobjects.mosaic.plugins.pi4j.pixtend
+package org.kobjects.mosaic.plugins.pixtend
 
+import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.pluginapi.*
 
-class PiXtendAnalogOutputPort(
+class PiXtendGpioDigitalOutputPort(
     val integration: PiXtendIntegration,
     val index: Int,
 ) : OutputPortInstance {
 
     init {
-        integration.driver?.setAnalogOutEnabled(index, true)
+        integration.driver?.setGpioMode(index, PiXtendDriver.GpioMode.DIGITAL_OUTPUT)
     }
 
     override fun setValue(value: Any?) {
-        integration.driver?.setAnalogOut(index, value as Double)
+        integration.driver?.setGpioOut(index, value as Boolean)
     }
 
     override fun detach() {
-        integration.driver?.setAnalogOutEnabled(index, false)
+
     }
 
     companion object {
         fun spec(integration: PiXtendIntegration) = OutputPortSpec(
             integration,
             "PiXtend",
-            "aout",
+            "gpio_dout",
        //     Type.REAL,
-            "PiXtend analog output.",
+            "PiXtend GPIO configured as digital output.",
             listOf(ParameterSpec("index", Type.INT, 0)),
             emptySet(),
             integration.tag
         ) {
-            PiXtendAnalogOutputPort(integration, it["index"] as Int)
+            PiXtendGpioDigitalOutputPort(integration, it["index"] as Int)
         }
     }
 }

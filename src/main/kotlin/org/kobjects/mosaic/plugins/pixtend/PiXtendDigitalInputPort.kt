@@ -1,4 +1,4 @@
-package org.kobjects.mosaic.plugins.pi4j.pixtend
+package org.kobjects.mosaic.plugins.pixtend
 
 import org.kobjects.mosaic.pluginapi.*
 

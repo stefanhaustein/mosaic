@@ -1,15 +1,15 @@
-package org.kobjects.mosaic.plugins.pi4j.pixtend
+package org.kobjects.mosaic.plugins.pixtend
 
 import org.kobjects.mosaic.pluginapi.*
 
-class PiXtendDigitalOutputPort(
+class PiXtendRelayPort(
     val integration: PiXtendIntegration,
     val index: Int,
 ) : OutputPortInstance {
 
 
     override fun setValue(value: Any?) {
-        integration.driver?.setDigitalOut(index, value as Boolean)
+        integration.driver?.setRelay(index, value as Boolean)
     }
 
     override fun detach() {
@@ -18,11 +18,11 @@ class PiXtendDigitalOutputPort(
 
     companion object {
         fun spec(integration: PiXtendIntegration) = OutputPortSpec(
-            integration,
+            null,
             "PiXtend",
-            "dout",
+            "pixt.relay",
        //     Type.REAL,
-            "PiXtend digital output.",
+            "PiXtend relay.",
             listOf(ParameterSpec("index", Type.INT, 0)),
             emptySet(),
             integration.tag
