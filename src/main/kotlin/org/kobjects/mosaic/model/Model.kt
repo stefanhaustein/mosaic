@@ -4,7 +4,6 @@ import org.kobjects.mosaic.json.JsonParser
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
 import org.kobjects.mosaic.pluginapi.*
 import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
-import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantPlugin
 import org.kobjects.mosaic.plugins.pi4j.Pi4jPlugin
 import org.kobjects.mosaic.svg.SvgManager
 import java.io.File

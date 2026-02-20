@@ -18,9 +18,6 @@ class Pi4jPlugin(
         reInit()
     }
 
-    override fun notifySimulationModeChanged(token: ModificationToken) {
-        reInit()
-    }
 
     fun reInit() {
 
