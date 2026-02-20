@@ -31,8 +31,6 @@ object Model : ModelInterface {
 
     val updateListeners = mutableSetOf<UpdateListenerData>()
 
-    val plugins = mutableListOf<Plugin>()
-
     val functions = Functions()
     val factories = Factories()
     val ports = Ports()
