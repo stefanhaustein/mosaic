@@ -22,6 +22,7 @@ export function updateSpec(parent, idPrefix, spec) {
             break;
         case "INTEGRATION":
             createAction = () => { showIntegrationCreationDialog(spec) }
+            break
         case "INPUT_PORT":
         case "OUTPUT_PORT":
             createAction = () => {

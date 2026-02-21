@@ -11,7 +11,7 @@ import { blink } from "./lib/dom.js";
 
 import {addOption} from "./lib/dom.js";
 import {processFunction} from "./operation_panel_controller.js";
-import {processIntegrationUpdate, updateIntegrationSpec} from "./integration_panel_controller.js";
+import {processIntegrationInstanceUpdate, updateIntegrationSpec} from "./integration_panel_controller.js";
 import {
     processPortSpec,
     processPortUpdate,
@@ -115,7 +115,7 @@ function processSection(sectionName, map) {
             break
         case "integrations":
             for (let name in map) {
-                processIntegrationUpdate(name, map[name])
+                processIntegrationInstanceUpdate(name, map[name])
             }
             break
         default:

@@ -7,7 +7,7 @@ let integrationSpecListElement = document.getElementById("integrationSpecList")
 let sidePanel = document.getElementById("sidePanel")
 let panelSelectElement = document.getElementById("panelSelect")
 
-export function processIntegrationUpdate(name, integration) {
+export function processIntegrationInstanceUpdate(name, integration) {
     let key = name.toLowerCase()
     let id = "integration." + key
     let element = document.getElementById(id)
@@ -28,7 +28,10 @@ export function processIntegrationUpdate(name, integration) {
             console.log ("operations: ", integration["operations"])
 
             for (const op of ops) {
-                updateSpec(element, id + ".", op)
+                console.log("op: ", op, "Modifiers: ", op.modifiers)
+                if ((op.modifiers || []).indexOf("UNINSTANTIABLE") == -1) {
+                    updateSpec(element, id + ".", op)
+                }
             }
             /*
             let nameSpan = document.createElement("span")

@@ -4,9 +4,7 @@ import {post, transformSchema} from "./lib/utils.js";
 import {getFactory, getIntegrationInstance, getPortInstance} from "./shared_model.js";
 import {promptDialog} from "./lib/dialogs.js";
 
-let integrationListElement = document.getElementById("integrationList")
 let dialogElement = document.getElementById("dialog")
-
 
 export function showIntegrationInstanceConfigurationDialog(spec, instance) {
     let instanceConfiguration = instance["configuration"]

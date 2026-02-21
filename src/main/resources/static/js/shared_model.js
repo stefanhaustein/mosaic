@@ -19,7 +19,7 @@ export function getFactory(name) {
     name = name.toLowerCase()
     let cut = name.indexOf(".")
     if (cut == -1) {
-        return functions[name]
+        return functions[name] || factories[name]
     }
     let integration = getIntegrationInstance(name.substring(0, cut))
     if (integration == null) {

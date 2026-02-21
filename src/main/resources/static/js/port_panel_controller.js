@@ -66,9 +66,10 @@ export function processPortUpdate(name, f) {
         portElement.append(bulletElement, entryElement)
 
         let cut = name.indexOf(".")
-        let containerName = cut != -1 ? "integration." + name.substring(0, cut) :
-            spec.kind == "OUTPUT_PORT" ? f.kind == "NamedCells" ? "namedCellListContainer" :  "outputPortList" : "inputPortList"
+        let containerName = f.kind == "NamedCells" ? "namedCellListContainer" : cut != -1 ? "integration." + name.substring(0, cut) :
+            spec.kind == "OUTPUT_PORT" ?  "outputPortList" : "inputPortList"
 
+        console.log("determined container name ", containerName, " for ", f, "spec", spec)
 
         let containerElement = document.getElementById(containerName)
         let targetElement = ensureCategory(containerElement, f.category)
