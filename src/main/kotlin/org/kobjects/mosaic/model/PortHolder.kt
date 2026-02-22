@@ -16,6 +16,8 @@ interface PortHolder:  Node {
 
     val specification: AbstractArtifactSpec
 
+    override val owner: Integration
+
     fun toJson(sb: StringBuilder, forClient: Boolean)
 
     fun attach(token: ModificationToken)

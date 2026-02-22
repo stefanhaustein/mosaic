@@ -181,9 +181,7 @@ object Model : ModelInterface {
         modificationToken.symbolsChanged = true
         modificationToken.formulaChanged = true
 
-        for (key in ports.keys.toList()) {
-            ports.deletePort(key, modificationToken)
-        }
+        // TODO: Delete integrations!!
 
         for (sheet in sheets.values) {
             sheet.clear(modificationToken)

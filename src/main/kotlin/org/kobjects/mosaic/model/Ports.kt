@@ -8,31 +8,27 @@ import java.io.Writer
 
 class Ports : Iterable<PortHolder> {
 
-    private val portMap = mutableMapOf<String, PortHolder>()
-
-    override fun iterator(): Iterator<PortHolder> = (portMap.values + Model.integrations.flatMap { it.nodes.values }).iterator()
+    override fun iterator(): Iterator<PortHolder> = Model.integrations.flatMap { it.nodes.values }.iterator()
 
     operator fun get(key: String): PortHolder? {
         val cut: Int = key.indexOf('.')
-        if (cut == -1) return portMap[key]
         val integration = Model.integrations[key.substring(0, cut)]
         return integration?.nodes?.get(key.substring(cut + 1))
     }
 
-    val keys
-        get() = portMap.keys
 
     fun deletePort(name: String, token: ModificationToken) {
-        val port = portMap[name]
+        val port = this[name]
         if (port != null) {
+            val cut = name.indexOf('.')
+            val localName = name.substring(cut + 1)
             token.symbolsChanged = true
             port.detach()
-            portMap[name] = InputPortHolder(
-                port.owner, name, InputPortSpec(
-                    null,
-                    "GPIO",
-                    // The operation name; used to identify tombstone ports on the client
+            port.owner.nodes[localName] = InputPortHolder(
+                port.owner, localName, InputPortSpec(
+                    port.owner,
                     "TOMBSTONE",
+                    localName,
                     Type.VOID,
                     "",
                     emptyList(),
@@ -49,11 +45,11 @@ class Ports : Iterable<PortHolder> {
     }
 
     // The name is separate because it's typically the key of the spec map
-    fun definePort(name: String, jsonSpec: Map<String, Any?>, token: ModificationToken) {
+    fun definePort(fqName: String, jsonSpec: Map<String, Any?>, token: ModificationToken) {
         token.symbolsChanged = true
 
         // Always delete what's there.
-        val previousName = jsonSpec["previousName"]?.toString() ?: name
+        val previousName = jsonSpec["previousName"]?.toString() ?: fqName
         try {
             deletePort(previousName, token)
         } catch (e: Exception) {
@@ -62,7 +58,7 @@ class Ports : Iterable<PortHolder> {
 
         if (jsonSpec["deleted"] as Boolean? != true) {
             if (!jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
-                val port = this[name]
+                val port = this[fqName]
                 if (port is OutputPortHolder) {
                     port.rawFormula = jsonSpec["source"]?.toString() ?: ""
                     port.reparse()
@@ -72,21 +68,23 @@ class Ports : Iterable<PortHolder> {
                 val kind = jsonSpec["kind"].toString()
 
                 val parts = kind.split(".")
-                val integration = Model.integrations[parts[0]] ?: throw IllegalArgumentException("Integration '${parts[0]}' not found.")
-                val specification = integration.operationSpecs.find { it.fqName == kind } ?: throw IllegalArgumentException("'${parts[1]}' not found in integration $integration.")
+                val integrationName = parts[0]
+                val loclName = parts[1]
+                val integration = Model.integrations[integrationName] ?: throw IllegalArgumentException("Integration '$integrationName' not found.")
+                val specification = integration.operationSpecs.find { it.fqName == kind } ?: throw IllegalArgumentException("'$loclName' not found in integration $integration.")
 
-                portMap[name]?.detach()
+                this[fqName]?.detach()
 
                 val config = specification.convertConfiguration(
                     jsonSpec["configuration"] as? Map<String, Any> ?: emptyMap()
                 )
 
                 val port = when (specification) {
-                    is InputPortSpec -> InputPortHolder(integration, name, specification, config, tag = token.tag)
-                    is OutputPortSpec -> OutputPortHolder(integration, name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
+                    is InputPortSpec -> InputPortHolder(integration, fqName, specification, config, tag = token.tag)
+                    is OutputPortSpec -> OutputPortHolder(integration, fqName, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
                     else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
                 }
-                portMap[name] = port
+                integration.nodes[loclName] = port
                 port.attach(token)
 
             }
