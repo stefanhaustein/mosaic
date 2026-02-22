@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.pluginapi
 
-class IntegrationSpec(
+class IntegrationFactory(
     category: String,
     name: String,
     description: String,
@@ -8,7 +8,7 @@ class IntegrationSpec(
     modifiers: Set<Modifier> = emptySet(),
     tag: Long = 0,
     displayName: String? = null,
-    val createFn: (kind: String, name: String, tag: Long, initialConfiguration: Map<String, Any?>) -> IntegrationInstance,
+    val createFn: (kind: String, name: String, tag: Long, initialConfiguration: Map<String, Any?>) -> Integration,
 ) : AbstractFactorySpec(
     null,
     category,

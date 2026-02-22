@@ -28,7 +28,7 @@ class Ports : Iterable<PortHolder> {
             token.symbolsChanged = true
             port.detach()
             portMap[name] = InputPortHolder(
-                null, name, InputPortSpec(
+                port.owner, name, InputPortSpec(
                     null,
                     "GPIO",
                     // The operation name; used to identify tombstone ports on the client
@@ -71,13 +71,9 @@ class Ports : Iterable<PortHolder> {
             } else {
                 val kind = jsonSpec["kind"].toString()
 
-                val specification = if (kind.contains(".")) {
-                    val parts = kind.split(".")
-                    val integration = Model.integrations[parts[0]] ?: throw IllegalArgumentException("Integration '${parts[0]}' not found.")
-                    integration.operationSpecs.find { it.fqName == kind } ?: throw IllegalArgumentException("'${parts[1]}' not found in integration $integration.")
-                } else {
-                    Model.factories[kind] ?: throw IllegalArgumentException("Unrecognized port type '$kind'")
-                }
+                val parts = kind.split(".")
+                val integration = Model.integrations[parts[0]] ?: throw IllegalArgumentException("Integration '${parts[0]}' not found.")
+                val specification = integration.operationSpecs.find { it.fqName == kind } ?: throw IllegalArgumentException("'${parts[1]}' not found in integration $integration.")
 
                 portMap[name]?.detach()
 
@@ -86,8 +82,8 @@ class Ports : Iterable<PortHolder> {
                 )
 
                 val port = when (specification) {
-                    is InputPortSpec -> InputPortHolder(null, name, specification, config, tag = token.tag)
-                    is OutputPortSpec -> OutputPortHolder(null, name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
+                    is InputPortSpec -> InputPortHolder(integration, name, specification, config, tag = token.tag)
+                    is OutputPortSpec -> OutputPortHolder(integration, name, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
                     else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
                 }
                 portMap[name] = port

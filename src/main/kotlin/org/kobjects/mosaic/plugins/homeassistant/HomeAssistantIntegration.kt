@@ -4,8 +4,8 @@ import org.kobjects.mosaic.model.InputPortHolder
 import org.kobjects.mosaic.model.OutputPortHolder
 import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec
 import org.kobjects.mosaic.pluginapi.InputPortSpec
-import org.kobjects.mosaic.pluginapi.IntegrationInstance
-import org.kobjects.mosaic.pluginapi.IntegrationSpec
+import org.kobjects.mosaic.pluginapi.Integration
+import org.kobjects.mosaic.pluginapi.IntegrationFactory
 import org.kobjects.mosaic.pluginapi.ModelInterface
 import org.kobjects.mosaic.pluginapi.OutputPortSpec
 import org.kobjects.mosaic.pluginapi.ParameterSpec
@@ -23,7 +23,7 @@ class HomeAssistantIntegration(
     var host: String,
     var port: Int,
     var token: String,
-) : IntegrationInstance(kind, name, tag) {
+) : Integration(kind, name, tag) {
     var client: HomeAssistantClient? = null
 
 
@@ -154,7 +154,7 @@ class HomeAssistantIntegration(
             }
         }
 
-        fun spec(model: ModelInterface) = IntegrationSpec(
+        fun spec(model: ModelInterface) = IntegrationFactory(
             category = "HomeAutomation",
             name = "HomeAssistant",
             "HomeAssistant integration",

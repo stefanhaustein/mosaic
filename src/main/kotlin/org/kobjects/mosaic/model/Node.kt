@@ -10,7 +10,7 @@ interface Node {
     val valueTag: Long
     val outputs: MutableSet<Node>
     val inputs: MutableSet<Node>
-    val owner: Namespace?
+    val owner: Namespace
     /**
      * Re-calculates the value bases on inputs.
      * Input port values will be refreshed from the port value here.

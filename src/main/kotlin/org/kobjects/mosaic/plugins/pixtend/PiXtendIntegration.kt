@@ -4,7 +4,6 @@ import com.pi4j.Pi4J
 import com.pi4j.context.Context
 import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.pluginapi.*
-import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 
 class PiXtendIntegration(
     val model: ModelInterface,
@@ -13,7 +12,7 @@ class PiXtendIntegration(
     tag: Long,
     var pixtendModel: PiXtendDriver.Model
 
-): IntegrationInstance(kind, name, tag) {
+): Integration(kind, name, tag) {
     var pi4j: Context? = null
     var driver: PiXtendDriver? = null
     var error: Exception? = null
@@ -60,7 +59,7 @@ class PiXtendIntegration(
     companion object {
         val piXtendModel = Type.ENUM(PiXtendDriver.Model.entries)
 
-        fun spec(model: ModelInterface) = IntegrationSpec(
+        fun spec(model: ModelInterface) = IntegrationFactory(
             category = "PLC",
             name = "pixt",
             description = "PiXtend PLC Integration",

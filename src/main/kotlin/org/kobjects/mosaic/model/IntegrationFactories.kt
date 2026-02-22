@@ -1,12 +1,13 @@
 package org.kobjects.mosaic.model
 
-import org.kobjects.mosaic.pluginapi.AbstractFactorySpec
 
-class Factories : Iterable<AbstractFactorySpec> {
+import org.kobjects.mosaic.pluginapi.IntegrationFactory
 
-    private val factoryMap = mutableMapOf<String, AbstractFactorySpec>()
+class IntegrationFactories : Iterable<IntegrationFactory> {
 
-    fun add(factory: AbstractFactorySpec) {
+    private val factoryMap = mutableMapOf<String, IntegrationFactory>()
+
+    fun add(factory: IntegrationFactory) {
         factoryMap[factory.fqName] = factory
     }
 

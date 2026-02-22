@@ -2,11 +2,10 @@ package org.kobjects.mosaic.pluginapi
 
 import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.json.toJson
-import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.PortHolder
 
 
-abstract class IntegrationInstance(
+abstract class Integration(
     // The name of the IntegrationSpec
     val kind: String,
     // The name of this instance.
@@ -52,9 +51,9 @@ abstract class IntegrationInstance(
     abstract fun reconfigure(configuration: Map<String, Any?>)
 
     class Tombstone(
-        deletedInstance: IntegrationInstance,
+        deletedInstance: Integration,
         tag: Long
-    ) : IntegrationInstance(
+    ) : Integration(
         "TOMBSTONE",
         deletedInstance.name,
         tag

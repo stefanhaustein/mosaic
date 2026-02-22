@@ -4,7 +4,6 @@ import org.kobjects.mosaic.json.JsonParser
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
 import org.kobjects.mosaic.pluginapi.*
 import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
-import org.kobjects.mosaic.plugins.pixtend.PiXtendAnalogInputPort
 import org.kobjects.mosaic.plugins.pixtend.PiXtendIntegration
 import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 import org.kobjects.mosaic.svg.SvgManager
@@ -32,7 +31,7 @@ object Model : ModelInterface {
     val updateListeners = mutableSetOf<UpdateListenerData>()
 
     val functions = Functions()
-    val factories = Factories()
+    val factories = IntegrationFactories()
     val ports = Ports()
     val integrations = Integrations()
 
@@ -44,12 +43,13 @@ object Model : ModelInterface {
     private val lock = ReentrantLock()
 
     init {
-        addOperations(BuiltinFunctions.operationSpecs)
+        BuiltinFunctions.operationSpecs.forEach { functions.add(it) }
         addIntegration(RpiIntegration.spec(this))
         addIntegration(PiXtendIntegration.spec(this))
-        addOperations(svgs.operationSpecs)
         addIntegration(HomeAssistantIntegration.spec(this))
         // addPlugin(MqttPlugin)
+
+        integrations.integrationMap["root"] = Root()
 
         applySynchronizedWithToken { runtimeContext ->
             runtimeContext.loading = true
@@ -67,19 +67,10 @@ object Model : ModelInterface {
         updateListeners.add(UpdateListenerData(permanent = permanent, onChangeOnly = onChangeOnly, listener = listener))
     }
 
-    fun addIntegration(spec: IntegrationSpec) {
+    fun addIntegration(spec: IntegrationFactory) {
         factories.add(spec)
     }
 
-    fun addOperations(operations: List<AbstractArtifactSpec>) {
-        for (spec in operations) {
-            when (spec) {
-                is FunctionSpec -> functions.add(spec)
-                is AbstractFactorySpec -> factories.add(spec)
-                else -> throw IllegalArgumentException("Function or factory expected; got $spec (${spec::class.simpleName})")
-            }
-        }
-    }
 
     fun setRunMode(value: Boolean, token: ModificationToken) {
         runMode_ = value

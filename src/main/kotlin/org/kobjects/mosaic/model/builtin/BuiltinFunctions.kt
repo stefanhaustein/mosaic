@@ -3,7 +3,7 @@ package org.kobjects.mosaic.model.builtin
 import org.kobjects.mosaic.pluginapi.*
 
 object BuiltinFunctions {
-    val operationSpecs = listOf<AbstractArtifactSpec>(
+    val operationSpecs = listOf<FunctionSpec>(
         FunctionSpec(
             null,
             "Time",
@@ -110,22 +110,5 @@ object BuiltinFunctions {
                 StateMachine.create(it)
             },
         ),
-
-        RestOut.SPEC,
-
-        OutputPortSpec(
-            null,
-            category = "",
-            "NamedCells",
-            "A named range of cells",
-            emptyList(),
-            emptySet(),
-            0
-        ) {
-                object : OutputPortInstance {
-                    override fun setValue(value: Any?) {}
-                    override fun detach() {}
-                }
-            }
     )
 }

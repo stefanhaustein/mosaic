@@ -9,7 +9,7 @@ import org.kobjects.mosaic.plugins.rpi.devices.Scd4xPort
 class RpiIntegration(
     val model: ModelInterface,
     tag: Long
-) : IntegrationInstance("rpi", "rpi", tag) {
+) : Integration("rpi", "rpi", tag) {
     var pi4j: Context? = null
     var error: Throwable? = null
 
@@ -50,7 +50,7 @@ class RpiIntegration(
     }
 
     companion object {
-        fun spec(model: ModelInterface) = IntegrationSpec(
+        fun spec(model: ModelInterface) = IntegrationFactory(
             "",
             "rpi",
             "Raspberry Pi GPIO integration",

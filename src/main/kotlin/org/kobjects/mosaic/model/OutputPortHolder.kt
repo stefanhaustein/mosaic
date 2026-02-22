@@ -6,7 +6,7 @@ import org.kobjects.mosaic.pluginapi.*
 import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec.Modifier
 
 class OutputPortHolder(
-    owner: Namespace?,
+    owner: Namespace,
     override val name: String,
     override val specification: OutputPortSpec,
     val configuration: Map<String, Any?>,

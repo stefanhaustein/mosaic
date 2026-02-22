@@ -22,8 +22,6 @@ class SvgManager(root: File) {
             }
         }
     }
-
-    val operationSpecs = emptyList<AbstractArtifactSpec>()
     /*
     override val operationSpecs: List<OperationSpec>
         get() {

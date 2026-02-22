@@ -9,7 +9,7 @@ import org.kobjects.mosaic.pluginapi.ModificationToken
 import org.kobjects.mosaic.pluginapi.Namespace
 
 abstract class ExpressionNode(
-    override val owner: Namespace?
+    override val owner: Namespace
 ) : Node {
 
 
