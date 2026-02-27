@@ -1,6 +1,6 @@
 import {getColumn, getRow, nullToEmtpy, post, toRangeKey} from "./lib/utils.js";
 import {renderCell} from "./cell_renderer.js";
-import {getAllPorts, getPortFactory, getPortInstance, model} from "./shared_model.js";
+import {getPortFactory, getPortInstance, model} from "./shared_model.js";
 import {removeClasses, renderDependencies, renderRangeHighlight} from "./shared_state_internal_renderer.js";
 
 export let portValues = {}
@@ -165,13 +165,13 @@ export function selectCell(id, rangeX = 0, rangeY = 0) {
     }
 
     let name = toRangeKey(getColumn(id), getRow(id), rangeX, rangeY)
-    let normalizedKey = currentSheet.name + "!" + toRangeKey(getColumn(id), getRow(id), rangeX, rangeY)
-    for (let port of getAllPorts()) {
-        if (port.type == "NamedCells" && port.source == normalizedKey) {
-            name = port.name.substring(port.name.indexOf("!"))
-            break
-        }
-    }
+    // let normalizedKey = currentSheet.name + "!" + toRangeKey(getColumn(id), getRow(id), rangeX, rangeY)
+    // for (let port of getAllPorts()) {
+    //   if (port.type == "NamedCells" && port.source == normalizedKey) {
+    //       name = port.name.substring(port.name.indexOf("!"))
+    //       break
+    //   }
+    // }
     originElement.textContent = name
 
     let newData = currentSheet.cells[id]

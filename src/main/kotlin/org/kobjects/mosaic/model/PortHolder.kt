@@ -8,6 +8,9 @@ interface PortHolder:  Node {
     val name: String
     val tag: Long
 
+    val fqName: String
+        get() = owner.name + "." + name
+
     val displayName: String?
         get() = null
     

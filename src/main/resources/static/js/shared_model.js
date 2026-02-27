@@ -1,14 +1,9 @@
 let factories = {}
 let functions = {}
 let integrations = {}
-let ports = {}
 
 export var model = {
     sheets: {}
-}
-
-export function getAllPorts() {
-    return Object.values(ports)
 }
 
 export function getAllFactories() {
@@ -45,12 +40,16 @@ export function getIntegrationFactory(name) {
     return getFactory(name)
 }
 
-export function getPortFactory(name) {
-    return getFactory(name)
+export function getPortFactory(fqName) {
+    let parts = fqName.split(".")
+    let integration = getIntegrationInstance(parts[0].toLowerCase())
+    return integration.factories[parts[1].toLowerCase()]
 }
 
-export function getPortInstance(name) {
-    return ports[name.toLowerCase()]
+export function getPortInstance(fqName) {
+    let parts = fqName.split(".")
+    let integration = getIntegrationInstance(parts[0].toLowerCase())
+    return integration.ports[parts[1].toLowerCase()]
 }
 
 export function registerFactory(name, factory) {
@@ -71,26 +70,47 @@ export function registerFunction(name, f) {
 }
 
 export function registerIntegrationInstance(name, instance) {
+
+    let existing = getIntegrationInstance(name)
+
     instance.name = name
     let key = name.toLowerCase()
-    instance.key = key
+
     if (instance.type == "TOMBSTONE") {
         delete integrations[key]
         return false
     }
+
+    instance.key = key
+    if (instance.ports == null) {
+        instance.ports = existing == null ? [] : existing.ports
+    }
+    if (instance.factories == null) {
+        instance.factories = existing == null ? [] : existing.factories
+    }
+
+
     integrations[key] = instance
     return true
 }
 
-export function registerPortInstance(name, instance) {
-    instance.name = name
-    let key = instance.name.toLowerCase()
-    instance.key = key
-    if (instance.kind == "TOMBSTONE") {
-        delete ports[key]
+export function registerPortInstance(fqName, port) {
+    let parts = fqName.split(".")
+
+    if (parts.length != 2) {
+        console.log("fqName ", fqName, " does not contain a dot for port ", port)
+        throw Error("fqName "+ fqName+ " does not contain a dot for port "+JSON.stringify(port))
+    }
+
+    port.name = parts[1]
+    let key = port.name.toLowerCase()
+    port.key = key
+    let integration = getIntegrationInstance(parts[0].toLowerCase())
+    if (port.kind == "TOMBSTONE") {
+        delete integration.ports[key]
         return false
     }
-    ports[key] = instance
+    integration.ports[key] = port
     return true
 }
 

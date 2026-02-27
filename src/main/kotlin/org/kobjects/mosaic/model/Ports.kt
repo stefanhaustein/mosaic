@@ -104,7 +104,7 @@ class Ports : Iterable<PortHolder> {
                 definitions.append('\n')
             }
             if (port.valueTag > tag) {
-                values.append("${port.name}: ${port.value.toJson()}\n")
+                values.append("${port.fqName}: ${port.value.toJson()}\n")
             }
         }
 
