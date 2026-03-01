@@ -74,15 +74,14 @@ class HomeAssistantIntegration(
         client = HomeAssistantClient(host, port, token)
 
         for (entity in client?.entities?.values ?: emptyList()) {
-            val id =  entity.id.replace('.', '_')
-            val fqName = "$name.$id"
+            val name =  entity.id.replace('.', '_')
 
             val inputPortSpec = getInputSpec(entity.kind)
             if (inputPortSpec != null) {
 
                 val inputPortHolder = InputPortHolder(
                     this,
-                    name = fqName,
+                    name = name,
                     specification = inputPortSpec,
                     configuration = emptyMap(),
                     displayName = getDisplayName(entity),
@@ -93,12 +92,12 @@ class HomeAssistantIntegration(
                 inputPortHolder.instance = HAEntityInputPortInstance(entity, inputPortHolder)
                 inputPortHolder.value = getValue(entity)
 
-                nodes.put(id, inputPortHolder)
+                nodes.put(name, inputPortHolder)
 
                 if (entity.kind == Kind.LIGHT) {
                     val outputPortHolder = OutputPortHolder(
                         this,
-                        name = fqName + "_out",
+                        name = name + "_out",
                         specification = getOutputSpec(entity.kind) ?: throw RuntimeException("OuputPortSpec not found for ${entity.kind}"),
                   //      rawFormula = "",
                         configuration = emptyMap(),
@@ -108,7 +107,7 @@ class HomeAssistantIntegration(
                     )
 
                     outputPortHolder.instance = EntityOutputPortInstance(this, entity)
-                    nodes.put(id + "_out", outputPortHolder)
+                    nodes.put(name + "_out", outputPortHolder)
                 }
             }
         }

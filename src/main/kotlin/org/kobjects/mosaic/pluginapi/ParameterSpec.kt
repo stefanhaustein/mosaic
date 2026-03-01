@@ -1,25 +1,42 @@
 package org.kobjects.mosaic.pluginapi
 
-import org.kobjects.mosaic.json.ToJson
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import org.kobjects.mosaic.json.LegacyToJson
 import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.json.toJson
+import org.kobjects.mosaic.json.legacyToJson
+import org.kobjects.tomson.ToJson
+import org.kobjects.tomson.genericToJson
+import org.kobjects.tomson.toJson
 
 data class ParameterSpec(
     val name: String,
     val type: Type,
     val defaultValue: Any?,
     val modifiers: Set<Modifier> = emptySet()
-) : ToJson {
+) : LegacyToJson, ToJson {
 
-    override fun toJson(sb: StringBuilder) {
-        sb.append("""{"name":${name.quote()}, "type":""")
-        type.toJson(sb)
+    override fun toJson() = buildJsonObject {
+        put ("name", JsonPrimitive(name))
+        put("type", type.toJson())
         if (defaultValue != null) {
-            sb.append(""", "default":""")
-            defaultValue.toJson(sb)
+            put("default", genericToJson(defaultValue))
         }
         if (modifiers.isNotEmpty()) {
-            sb.append(""", "modifiers":${modifiers.map { it.name }.toJson()}""")
+            put ("modifiers", modifiers.toJson())
+        }
+    }
+
+    override fun legacyToJson(sb: StringBuilder) {
+        sb.append("""{"name":${name.quote()}, "type":""")
+        type.legacyToJson(sb)
+        if (defaultValue != null) {
+            sb.append(""", "default":""")
+            defaultValue.legacyToJson(sb)
+        }
+        if (modifiers.isNotEmpty()) {
+            sb.append(""", "modifiers":${modifiers.map { it.name }.legacyToJson()}""")
         }
         sb.append("}")
     }

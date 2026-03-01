@@ -2,7 +2,7 @@ package org.kobjects.mosaic.json
 
 import kotlinx.serialization.json.*
 
-object JsonParser {
+object LegacyJsonParser {
 
     fun parse(serialized: String): Any? {
         try {

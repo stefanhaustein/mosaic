@@ -9,11 +9,11 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.html.dom.serialize
-import org.kobjects.mosaic.json.JsonParser
-import org.kobjects.mosaic.json.toJson
+import org.kobjects.mosaic.json.LegacyJsonParser
+import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.CellRangeReference
 import org.kobjects.mosaic.model.Model
-import org.kobjects.mosaic.tomson.TomsonParser
+import org.kobjects.mosaic.tomson.LegacyTomsonParser
 import java.io.File
 import java.io.StringWriter
 import kotlin.coroutines.resume
@@ -42,7 +42,7 @@ fun Application.module() {
         post("/update/{cell}") {
             val cell = call.parameters["cell"]!!
             val text = call.receiveText()
-            val json = JsonParser.parseObject(text)
+            val json = LegacyJsonParser.parseObject(text)
             Model.applySynchronizedWithToken { token ->
                 Model.getOrCreate(cell).setJson(json, token)
             }
@@ -51,7 +51,7 @@ fun Application.module() {
         post("/runMode") {
             val jsonText = call.receiveText()
             println("Received JSON: $jsonText")
-            val value = JsonParser.parse(jsonText)
+            val value = LegacyJsonParser.parse(jsonText)
             Model.applySynchronizedWithToken { token ->
                 Model.setRunMode(value as Boolean, token)
             }
@@ -61,7 +61,7 @@ fun Application.module() {
             val rawTargetRange = call.parameters["target"]!!
             val targetRange = CellRangeReference.parse(rawTargetRange)
             val tomsonText = call.receiveText()
-            val tomson = TomsonParser.parse(tomsonText)
+            val tomson = LegacyTomsonParser.parse(tomsonText)
 
             println("/paste/$targetRange: $tomsonText")
 
@@ -73,7 +73,7 @@ fun Application.module() {
         post("/ports/{name}") { val name = call.parameters["name"]!!
             val jsonText = call.receiveText()
             println("/ports/$name: $jsonText")
-            val jsonSpec = JsonParser.parseObject(jsonText)
+            val jsonSpec = LegacyJsonParser.parseObject(jsonText)
             Model.applySynchronizedWithToken { token ->
                 Model.ports.definePort(name, jsonSpec, token)
             }
@@ -83,7 +83,7 @@ fun Application.module() {
             val name = call.parameters["name"]!!
             val jsonText = call.receiveText()
             println("/integrations/$name: $jsonText")
-            val jsonSpec = JsonParser.parseObject(jsonText)
+            val jsonSpec = LegacyJsonParser.parseObject(jsonText)
             Model.applySynchronizedWithToken { token ->
                 Model.integrations.configureIntegration(name, jsonSpec, token)
             }
@@ -92,7 +92,7 @@ fun Application.module() {
         post("/sheet") {
             val jsonText = call.receiveText()
             println("Received JSON: $jsonText")
-            val jsonSpec = JsonParser.parseObject(jsonText)
+            val jsonSpec = LegacyJsonParser.parseObject(jsonText)
             val name = jsonSpec["name"] as String?
             Model.applySynchronizedWithToken { token ->
                 Model.updateSheet(name, jsonSpec, token)
@@ -145,7 +145,7 @@ fun Application.module() {
         }
         get("/rest/{path...}") {
             val path = call.parameters.getAll("path")!!.joinToString("/")
-            val json = Model.restValues[path].toJson()
+            val json = Model.restValues[path].legacyToJson()
             call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
         }
         get("img/{name...}") {

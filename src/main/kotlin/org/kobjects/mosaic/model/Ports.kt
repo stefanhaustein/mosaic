@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model
 
-import org.kobjects.mosaic.json.toJson
+import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.pluginapi.*
 import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec.Modifier
 import java.io.Writer
@@ -12,10 +12,12 @@ class Ports : Iterable<PortHolder> {
 
     operator fun get(key: String): PortHolder? {
         val cut: Int = key.indexOf('.')
+        if (cut == -1) {
+            return null
+        }
         val integration = Model.integrations[key.substring(0, cut)]
         return integration?.nodes?.get(key.substring(cut + 1))
     }
-
 
     fun deletePort(name: String, token: ModificationToken) {
         val port = this[name]
@@ -92,25 +94,16 @@ class Ports : Iterable<PortHolder> {
     }
 
     fun serialize(writer: Writer, forClient: Boolean, tag: Long) {
-        val definitions = StringBuilder()
         val values = StringBuilder()
         for (port in this) {
             if (port.name.contains(".")) {
                 println()
             }
-            if (port.tag > tag && (forClient || port is OutputPortHolder || !port.specification.modifiers.contains(Modifier.UNINSTANTIABLE))) {
-                definitions.append(port.name).append(": ")
-                port.toJson(definitions, forClient)
-                definitions.append('\n')
-            }
             if (port.valueTag > tag) {
-                values.append("${port.fqName}: ${port.value.toJson()}\n")
+                values.append("${port.fqName}: ${port.value.legacyToJson()}\n")
             }
         }
 
-        if (definitions.isNotEmpty()) {
-            writer.write("[ports]\n\n$definitions\n")
-        }
         if (forClient && values.isNotEmpty()) {
             writer.write("[portValues]\n\n$values\n")
         }

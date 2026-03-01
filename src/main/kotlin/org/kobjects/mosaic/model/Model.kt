@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model
 
-import org.kobjects.mosaic.json.JsonParser
+import org.kobjects.mosaic.json.LegacyJsonParser
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
 import org.kobjects.mosaic.pluginapi.*
 import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
@@ -9,7 +9,7 @@ import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 import org.kobjects.mosaic.svg.SvgManager
 import java.io.File
 import java.io.FileWriter
-import org.kobjects.mosaic.tomson.TomsonParser
+import org.kobjects.mosaic.tomson.LegacyTomsonParser
 import java.io.Writer
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -81,35 +81,32 @@ object Model : ModelInterface {
 
     fun loadData(data: String, token: ModificationToken) {
         try {
-            val toml = TomsonParser.parse(data)
+            val toml = LegacyTomsonParser.parse(data)
             for ((key, map) in toml) {
-                if (key.isEmpty()) {
-                    setRunMode(map["runMode"] as Boolean? ?: false, token)
-                } else if (key.startsWith("sheets.") && key.endsWith(".cells")) {
-                    val name = key.substringAfter("sheets.").substringBeforeLast(".cells")
-                    val sheet = Sheet(name)
-                    sheets[name] = sheet
-                    sheet.parseToml(map, token)
-                } else if (key == "ports") {
-                    for ((name, value) in map) {
-                        try {
-                            ports.definePort(name, value as Map<String, Any>, token)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                try {
+                    val parts = key.split(".")
+                    if (parts.size == 1 && parts[0].isEmpty()) {
+                        setRunMode(map["runMode"] as Boolean? ?: false, token)
+                    } else if (parts.size == 3 && parts[0] == "sheets" && parts[2] == "cells") {
+                        val name = parts[1]
+                        val sheet = Sheet(name)
+                        sheets[name] = sheet
+                        sheet.parseToml(map, token)
+                    } else if (parts.size == 2 && parts[0] == "integration") {
+                        val name = parts[1]
+                        integrations.configureIntegration(name, map, token)
+                    } else if (parts.size == 3 && parts[0] == "integration" && parts[2] == "ports") {
+
+                    } else {
+                        System.err.println("Unrecognized toml section: $key")
                     }
-                } else if (key == "integrations") {
-                    for ((name, value) in map) {
-                        try {
-                            integrations.configureIntegration(name, value as Map<String, Any>, token)
-                        } catch (e: Exception) {
-                            System.err.println("Failed to load integration '$name'.")
-                            e.printStackTrace()
-                        }
-                    }
+                } catch (e: Exception) {
+                    System.err.println("Error processing section $key")
+                    e.printStackTrace()
                 }
             }
         } catch (ex: Exception) {
+            System.err.println("load data failed")
             ex.printStackTrace()
         }
     }
@@ -125,13 +122,13 @@ object Model : ModelInterface {
         if (settingsTag > tag) {
             writer.write("runMode = $runMode_\n")
         }
-        integrations.serialize(writer, forClient, tag)
 
         if (forClient) {
-            writer.write(factories.serialize(tag))
             writer.write(functions.serialize(tag))
+            writer.write(factories.serialize(tag))
         }
 
+        integrations.serialize(writer, forClient, tag)
         ports.serialize(writer, forClient, tag)
 
         writer.write("\n")
@@ -164,7 +161,7 @@ object Model : ModelInterface {
                     if (oldSheet != null) {
                         for (oldCell in oldSheet.cells.values) {
                             val newCell = newSheet.getOrCreateCell(oldCell.id)
-                            newCell.setJson(JsonParser.parseObject(oldCell.toJson()), token)
+                            newCell.setJson(LegacyJsonParser.parseObject(oldCell.legacyToJson()), token)
                         }
                     }
                     sheets[previousName]?.delete(token)

@@ -91,10 +91,6 @@ class PiXtendIntegration(
 
     }
 
-    override fun notifySimulationModeChanged(token: ModificationToken) {
-        detach()
-        attach()
-    }
 
     override fun reconfigure(configuration: Map<String, Any?>) {
         invocationId++

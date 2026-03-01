@@ -1,7 +1,13 @@
 package org.kobjects.mosaic.pluginapi
 
-import org.kobjects.mosaic.json.ToJson
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import org.kobjects.mosaic.json.LegacyToJson
 import org.kobjects.mosaic.json.quote
+import org.kobjects.tomson.ToJson
+import org.kobjects.tomson.toJson
 
 abstract class AbstractArtifactSpec(
     val namespace: Namespace?,
@@ -14,7 +20,7 @@ abstract class AbstractArtifactSpec(
     val modifiers: Set<Modifier>,
     val tag: Long,
     val displayName: String?,
-) : ToJson {
+) : LegacyToJson, ToJson {
 
     val fqName
         get() = if (namespace != null) namespace.name + "." + name else name
@@ -38,10 +44,27 @@ abstract class AbstractArtifactSpec(
         return result
     }
 
-    override fun toJson(sb: StringBuilder) {
+    override fun toJson() = buildJsonObject {
+        put("name", JsonPrimitive(fqName))
+        put("category", JsonPrimitive(category))
+        put("kind", JsonPrimitive(kind.name))
+        if (type != null) {
+            put ("type", type.toJson())
+        }
+        if (displayName != null) {
+            put("displayName", JsonPrimitive(displayName))
+        }
+        put("description", JsonPrimitive(description))
+        put("parameters", parameters.toJson())
+        put("modifiers", modifiers.toJson())
+    }
+
+    override fun legacyToJson(sb: StringBuilder) {
+        sb.append(toJson().toString())
+        /*
         sb.append("""{"name":${fqName.quote()},"category":${category.quote()},"kind":"$kind",""")
         if (type != null) {
-            sb.append(""""type":${type.toJson()},""")
+            sb.append(""""type":${type.legacyToJson()},""")
         }
         if (displayName != null) {
             sb.append(""""displayName":${displayName.quote()},""")
@@ -54,7 +77,7 @@ abstract class AbstractArtifactSpec(
             } else {
                 sb.append(",")
             }
-            param.toJson(sb)
+            param.legacyToJson(sb)
         }
         sb.append("]")
         if (modifiers.isNotEmpty()) {
@@ -62,7 +85,7 @@ abstract class AbstractArtifactSpec(
             sb.append(modifiers.joinToString(",") { it.name.quote() })
             sb.append("]")
         }
-        sb.append("}")
+        sb.append("}")*/
     }
 
 

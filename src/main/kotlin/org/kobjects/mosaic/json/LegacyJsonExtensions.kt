@@ -17,23 +17,23 @@ fun String.escape() = StringBuilder().also { escape(it) }.toString()
 
 fun String.quote() = """"${escape()}""""
 
-fun Any?.toJson() = StringBuilder().also { this.toJson(it) }.toString()
+fun Any?.legacyToJson() = StringBuilder().also { this.legacyToJson(it) }.toString()
 
-fun Any?.toJson(sb: StringBuilder) {
+fun Any?.legacyToJson(sb: StringBuilder) {
     when (this) {
         null -> sb.append("null")
-        is ToJson -> this.toJson(sb)
-        is Double -> if (this.isFinite()) sb.append(this) else this.toString().toJson(sb)
-        is Float -> if (this.isFinite()) sb.append(this) else this.toString().toJson(sb)
+        is LegacyToJson -> this.legacyToJson(sb)
+        is Double -> if (this.isFinite()) sb.append(this) else this.toString().legacyToJson(sb)
+        is Float -> if (this.isFinite()) sb.append(this) else this.toString().legacyToJson(sb)
         is Number -> sb.append(this)
         is Boolean -> sb.append(this)
-        is Map<*, *> -> this.toJson(sb)
-        is Iterable<*> -> this.toJson(sb)
+        is Map<*, *> -> this.legacyToJson(sb)
+        is Iterable<*> -> this.legacyToJson(sb)
         else -> sb.append(this.toString().quote())
     }
 }
 
-fun Iterable<*>.toJson(sb: StringBuilder) {
+fun Iterable<*>.legacyToJson(sb: StringBuilder) {
     var first = true
     sb.append('[')
     for (v in this) {
@@ -42,12 +42,12 @@ fun Iterable<*>.toJson(sb: StringBuilder) {
         } else {
             sb.append(",")
         }
-        v.toJson(sb)
+        v.legacyToJson(sb)
     }
     sb.append(']')
 }
 
-fun Map<*, *>.toJson(sb: StringBuilder) {
+fun Map<*, *>.legacyToJson(sb: StringBuilder) {
     var first = true
     sb.append('{')
     for ((k, v) in this) {
@@ -57,7 +57,7 @@ fun Map<*, *>.toJson(sb: StringBuilder) {
             sb.append(",")
         }
         sb.append(k.toString().quote()).append(":")
-        v.toJson(sb)
+        v.legacyToJson(sb)
     }
     sb.append('}')
 }

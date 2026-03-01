@@ -1,5 +1,6 @@
 package org.kobjects.mosaic.model
 
+import kotlinx.serialization.json.JsonObject
 import org.kobjects.mosaic.pluginapi.*
 
 // Can't be an abstract class because ExpressionNode already is a superclass of OutputPortHolder.
@@ -21,10 +22,11 @@ interface PortHolder:  Node {
 
     override val owner: Integration
 
-    fun toJson(sb: StringBuilder, forClient: Boolean)
+    fun legacyToJson(sb: StringBuilder, forClient: Boolean)
 
     fun attach(token: ModificationToken)
 
     override fun qualifiedId() = if (owner == null) name else owner?.name + "." + name
 
+    fun toJson(forClient: Boolean): JsonObject
 }

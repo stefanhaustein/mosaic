@@ -4,6 +4,7 @@ import org.kobjects.mosaic.model.Model.integrations
 import org.kobjects.mosaic.pluginapi.Integration
 import org.kobjects.mosaic.pluginapi.IntegrationFactory
 import org.kobjects.mosaic.pluginapi.ModificationToken
+import org.kobjects.tomson.TomsonOutput
 import java.io.Writer
 
 class Integrations : Iterable<Integration> {
@@ -28,7 +29,7 @@ class Integrations : Iterable<Integration> {
         }
 
         val type = jsonSpec["type"].toString()
-        val specification = Model.factories[type] as IntegrationFactory
+        val specification = Model.factories[type] ?: throw IllegalArgumentException("$type is not a integration factory")
         val config = specification.convertConfiguration(jsonSpec["configuration"] as Map<String, Any?>)
         var integration = integrationMap[name]
 
@@ -37,26 +38,17 @@ class Integrations : Iterable<Integration> {
         } else {
             integration = specification.createFn(type, name, token.tag, config)
             integrationMap[name] = integration
-            //for (operation in integration.operationSpecs) {
-            //    Model.factories.add(operation)
-            //}
             token.symbolsChanged = true
         }
     }
 
 
     fun serialize(writer: Writer, forClient: Boolean, tag: Long) {
-        val sb = StringBuilder()
+        val tomson = TomsonOutput(writer)
         for (integration in integrations) {
             if (integration.tag > tag && (forClient || (integration !is Integration.Tombstone && integration !is Root))) {
-                sb.append(integration.name).append(": ")
-                integration.toJson(sb, forClient)
-                sb.append('\n')
+                integration.serialize(tomson, forClient)
             }
-        }
-        if (sb.isNotEmpty()) {
-            writer.write("[integrations]\n\n")
-            writer.write(sb.toString())
         }
     }
 

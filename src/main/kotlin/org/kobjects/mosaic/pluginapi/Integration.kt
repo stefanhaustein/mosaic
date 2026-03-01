@@ -1,8 +1,11 @@
 package org.kobjects.mosaic.pluginapi
 
-import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.json.toJson
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.mosaic.model.PortHolder
+import org.kobjects.tomson.TomsonOutput
+import org.kobjects.tomson.toJson
 
 
 abstract class Integration(
@@ -20,32 +23,32 @@ abstract class Integration(
 
     abstract fun detach()
 
-    open fun notifySimulationModeChanged(token: ModificationToken) {
-
-    }
-
-    fun portsToJson(sb: StringBuilder, forClient: Boolean) {
-
-    }
-
-
-    fun toJson(sb: StringBuilder, forClient: Boolean) {
-        sb.append("""{"name":${name.quote()}, "type":${kind.quote()}, "configuration": """)
-        configuration.toJson(sb)
+    fun serialize(out: TomsonOutput, forClient: Boolean) {
+        out.appendSection("integration.$name", configToJson())
         if (forClient) {
-            sb.append(""", "operations": [""")
-            var first = true
-            for (operationSpec in operationSpecs) {
-                if (first) {
-                    first = false
-                } else {
-                    sb.append(", ")
-                }
-                operationSpec.toJson(sb)
-            }
-            sb.append("]")
+            out.appendSection("integration.$name.factories", factoriesToJson())
         }
-        sb.append("}")
+        out.appendSection("integration.$name.ports", portsToJson(forClient))
+    }
+
+    fun configToJson(): JsonObject =
+        buildJsonObject {
+            put("type", JsonPrimitive(kind))
+            put("configuration", configuration.toJson())
+        }
+
+    fun factoriesToJson(): JsonObject = buildJsonObject {
+        for (operationSpec in operationSpecs) {
+            put(operationSpec.name,operationSpec.toJson())
+        }
+    }
+
+    fun portsToJson(forClient: Boolean): JsonObject = buildJsonObject {
+        for (port in nodes.values) {
+            if (forClient || !port.specification.modifiers.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE)) {
+                put(port.name, port.toJson(forClient))
+            }
+        }
     }
 
     abstract fun reconfigure(configuration: Map<String, Any?>)

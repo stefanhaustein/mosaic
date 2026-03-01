@@ -1,9 +1,12 @@
 package org.kobjects.mosaic.model
 
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.json.toJson
+import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.pluginapi.*
 import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec.Modifier
+import org.kobjects.tomson.toJson
 
 class OutputPortHolder(
     override val owner: Integration,
@@ -20,7 +23,9 @@ class OutputPortHolder(
     override var value: Any? = null
     override var valueTag: Long = tag
 
-
+    init {
+        require(!name.contains(".")) { "Port name '$name' must not contain '.'" }
+    }
 
     override fun attach(token: ModificationToken) {
         detach()
@@ -50,7 +55,7 @@ class OutputPortHolder(
     }
 
 
-    override fun toJson(sb: StringBuilder, forClient: Boolean) {
+    override fun legacyToJson(sb: StringBuilder, forClient: Boolean) {
         sb.append("""{"name":${name.quote()}""")
         if (forClient || !specification.modifiers.contains(Modifier.UNINSTANTIABLE)) {
             sb.append(""", "kind":${specification.fqName.quote()}""")
@@ -61,7 +66,7 @@ class OutputPortHolder(
                 sb.append(""", "displayName": ${displayName?.quote()}""")
             }
             sb.append(""", "configuration": """)
-            configuration.toJson(sb)
+            configuration.legacyToJson(sb)
         }
         if (forClient) {
             serializeDependencies(sb)
@@ -69,6 +74,27 @@ class OutputPortHolder(
         sb.append(""", "source":${rawFormula.quote()}}""")
 
     }
+
+
+    override fun toJson(forClient: Boolean) = buildJsonObject {
+        put("kind", JsonPrimitive(specification.name))
+        val type = specification.type
+        if (type != null) {
+            put("type", type.toJson())
+        }
+        if (category != null) {
+            put("category", JsonPrimitive(category))
+        }
+        if (displayName != null) {
+            put("displayName", JsonPrimitive(displayName))
+        }
+        put("configuration", configuration.toJson())
+        // if (forClient) {
+        //  serializeDependencies
+        // }
+    }
+
+
 
     override fun notifyValueChanged(newValue: Any?) {
         instance?.setValue(newValue)

@@ -1,8 +1,12 @@
 package org.kobjects.mosaic.model
 
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.json.toJson
+import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.tomson.toJson
 
 open class InputPortHolder(
     override val owner: Integration,
@@ -24,6 +28,11 @@ open class InputPortHolder(
     override var value: Any? = null
 
     var portValue: Any? = null
+
+    init {
+        require(!name.contains(".")) { "Port name '$name' must not contain '.'" }
+    }
+
 
     override fun attach(token: ModificationToken) {
         detach()
@@ -70,9 +79,9 @@ open class InputPortHolder(
     }
 
 
-    override fun toJson(sb: StringBuilder, forClient: Boolean) {
+    override fun legacyToJson(sb: StringBuilder, forClient: Boolean) {
         sb.append("""{"name":${name.quote()}, "kind":${specification.fqName.quote()}, "type":""")
-        specification.type.toJson(sb)
+        specification.type.legacyToJson(sb)
         if (category != null) {
             sb.append(""", "category": ${category?.quote()}""")
         }
@@ -80,11 +89,29 @@ open class InputPortHolder(
             sb.append(""", "displayName": ${displayName?.quote()}""")
         }
         sb.append(""", "configuration": """)
-        configuration.toJson(sb)
+        configuration.legacyToJson(sb)
         if (forClient) {
             serializeDependencies(sb)
         }
         sb.append("}")
+    }
+
+    override fun toJson(forClient: Boolean) = buildJsonObject {
+        put("kind", JsonPrimitive(specification.name))
+        val type = specification.type
+        if (type != null) {
+            put("type", type.toJson())
+        }
+        if (category != null) {
+            put("category", JsonPrimitive(category))
+        }
+        if (displayName != null) {
+            put("displayName", JsonPrimitive(displayName))
+        }
+        put("configuration", configuration.toJson())
+        // if (forClient) {
+        //  serializeDependencies
+        // }
     }
 
 

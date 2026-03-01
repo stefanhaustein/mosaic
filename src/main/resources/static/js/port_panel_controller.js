@@ -20,7 +20,7 @@ setDragHandler(document.getElementById("divider"), (dx, dy) => {
 })
 
 
-export function processPortSpec(spec) {
+export function processPortFactory(spec) {
     let container= spec.kind == "OUTPUT_PORT" ? outputPortSpecListElement : inputPortSpecListElement
     if (spec.name == "NamedCells") {
         document.getElementById("addNamedCellsButton").addEventListener("click", () => { showPortDialog(spec) })

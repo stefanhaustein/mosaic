@@ -2,21 +2,16 @@ package org.kobjects.mosaic.model
 
 import kotlinx.datetime.*
 import kotlinx.datetime.format.char
-import org.kobjects.mosaic.json.ToJson
+import org.kobjects.mosaic.json.LegacyToJson
 import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.json.toJson
-import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.model.expression.Expression
-import org.kobjects.mosaic.model.expression.Literal
-import org.kobjects.mosaic.model.parser.ParsingContext
-import org.kobjects.mosaic.model.parser.TcFormulaParser
+import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.pluginapi.ModificationToken
 import org.kobjects.mosaic.pluginapi.Namespace
 
 class Cell(
     val sheet: Sheet,
     val id: String
-) : ExpressionNode(sheet), Iterable<Cell>, ToJson {
+) : ExpressionNode(sheet), Iterable<Cell>, LegacyToJson {
 
     val column: Int
         get() = getColumn(id)
@@ -86,7 +81,7 @@ class Cell(
                  sb.append(' ') */
                 sb.append("""{"type": "instant", "rendered":${localDateTime.time.format(TIME_FORMAT_SECONDS).quote()}}""")
             }
-            else -> value.toJson(sb)
+            else -> value.legacyToJson(sb)
         }
     }
 
@@ -98,7 +93,7 @@ class Cell(
                 properties.add("\"f\": ${rawFormula.quote()}")
             }
             if (validation?.isNotEmpty() == true) {
-                properties.add("\"v\": ${validation.toJson()}")
+                properties.add("\"v\": ${validation.legacyToJson()}")
             }
             if (!image.isNullOrBlank()) {
                 properties.add("\"i\": ${image!!.quote()}")
@@ -122,7 +117,7 @@ class Cell(
         }
     }
 
-    override fun toJson(sb: StringBuilder) {
+    override fun legacyToJson(sb: StringBuilder) {
         serialize(sb, -1, false)
     }
 

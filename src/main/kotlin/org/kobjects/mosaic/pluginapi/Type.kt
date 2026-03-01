@@ -1,12 +1,14 @@
 package org.kobjects.mosaic.pluginapi
 
-import org.kobjects.mosaic.json.ToJson
+import kotlinx.serialization.json.JsonPrimitive
+import org.kobjects.mosaic.json.LegacyToJson
 import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.json.toJson
+import org.kobjects.mosaic.json.legacyToJson
+import org.kobjects.tomson.ToJson
 import kotlin.enums.EnumEntries
 
 /** This looks odd because it used to be an enum */
-interface Type : ToJson {
+interface Type : LegacyToJson, ToJson {
     object INT: Type {
         override fun toString() = "Int"
         override fun valueFromString(s: String) = s.toInt()
@@ -39,9 +41,11 @@ interface Type : ToJson {
         override fun toString() = "Range"
     }
 
-    override fun toJson(sb: StringBuilder) {
+    override fun legacyToJson(sb: StringBuilder) {
         sb.append(toString().quote())
     }
+
+    override fun toJson() = JsonPrimitive(toString())
 
     fun valueFromString(s: String): Any =
         throw UnsupportedOperationException("Can't parse '$this' yet.")
@@ -52,8 +56,8 @@ interface Type : ToJson {
 
     class ENUM<T : Enum<T>>(val entries: EnumEntries<T>) : Type {
 
-        override fun toJson(sb: StringBuilder) {
-            entries.map {it.name}.toJson(sb)
+        override fun legacyToJson(sb: StringBuilder) {
+            entries.map {it.name}.legacyToJson(sb)
         }
 
         override fun valueFromString(s: String) =
@@ -62,13 +66,13 @@ interface Type : ToJson {
     }
 
     class Struct(val fields: List<Field>) : Type {
-        override fun toJson(sb: StringBuilder) = fields.toJson(sb)
+        override fun legacyToJson(sb: StringBuilder) = fields.legacyToJson(sb)
     }
 
-    class Field(val name: String, val type: Type) : ToJson {
-        override fun toJson(sb: StringBuilder) {
+    class Field(val name: String, val type: Type) : LegacyToJson {
+        override fun legacyToJson(sb: StringBuilder) {
             sb.append("""{"name": ${name.quote()}, "type":""")
-            type.toJson(sb)
+            type.legacyToJson(sb)
             sb.append("}")
         }
     }

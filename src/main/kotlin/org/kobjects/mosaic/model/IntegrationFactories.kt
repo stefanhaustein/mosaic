@@ -20,10 +20,10 @@ class IntegrationFactories : Iterable<IntegrationFactory> {
         for (factory in this) {
             if (factory.tag > tag) {
                 sb.append(factory.fqName).append(": ")
-                factory.toJson(sb)
+                factory.legacyToJson(sb)
                 sb.append('\n')
             }
         }
-        return if (sb.isEmpty()) "" else "[factories]\n\n$sb"
+        return if (sb.isEmpty()) "" else "\n[integrations]\n\n$sb"
     }
 }

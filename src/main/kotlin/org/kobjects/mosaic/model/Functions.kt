@@ -19,11 +19,11 @@ class Functions : Iterable<FunctionSpec> {
         for (function in this) {
             if (function.tag > tag) {
                 sb.append(function.fqName).append(": ")
-                function.toJson(sb)
+                function.legacyToJson(sb)
                 sb.append('\n')
             }
         }
-        return if (sb.isEmpty()) "" else "[functions]\n\n$sb"
+        return if (sb.isEmpty()) "" else "\n[functions]\n\n$sb"
     }
 
 }

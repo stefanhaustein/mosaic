@@ -1,8 +1,8 @@
 package org.kobjects.mosaic.tomson
 
-import org.kobjects.mosaic.json.JsonParser
+import org.kobjects.mosaic.json.LegacyJsonParser
 
-object TomsonParser {
+object LegacyTomsonParser {
 
     fun parse(input: String): Map<String, Map<String, Any?>> {
         val result = mutableMapOf<String, Map<String, Any?>>()
@@ -23,7 +23,7 @@ object TomsonParser {
                 pendingValue += "\n$line"
             } else {
                 if (pendingKey.isNotEmpty()) {
-                    currentSectionMap[pendingKey] = JsonParser.parse(pendingValue)
+                    currentSectionMap[pendingKey] = LegacyJsonParser.parse(pendingValue)
                     pendingKey = ""
                     pendingValue = ""
                 } else {
@@ -52,7 +52,7 @@ object TomsonParser {
             }
         }
         if (pendingKey.isNotEmpty()) {
-            currentSectionMap[pendingKey] = JsonParser.parse(pendingValue)
+            currentSectionMap[pendingKey] = LegacyJsonParser.parse(pendingValue)
         } else {
             require(pendingValue.isEmpty()) {
                 "Unexpected pending value '$pendingValue' at EOF"

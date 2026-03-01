@@ -51,7 +51,7 @@ export function processIntegrationInstanceUpdate(name, integration) {
     }
 }
 
-export function updateIntegrationSpec(spec) {
+export function updateIntegrationFactory(spec) {
     updateSpec(
         integrationSpecListElement,
         "integration.spec.",
