@@ -1,5 +1,5 @@
 import {FormController} from "./forms/form_builder.js";
-import {getAllFactories, getFactory, getFunction, getIntegrationInstance, getPortInstance} from "./shared_model.js";
+import {getAllFactories, getIntegrationFactory, getFunction, getIntegration, getPort} from "./shared_model.js";
 import {currentSheet} from "./shared_state.js";
 import {selectPanel} from "./menu_controller.js";
 import {post, transformSchema} from "./lib/utils.js";
@@ -48,10 +48,9 @@ export function showPortDialog(constructorSpec, portSpec) {
         "type": "String",
         "modifiers": ["CONSTANT"],
         "validation": {
-            "Integration name conflict": (name) => getIntegrationInstance(name) == null,
-            "Factory name conflict": (name) => getFactory(name) == null,
+            "Integration name conflict": (name) => getIntegration(name) == null,
+            "Factory name conflict": (name) => getIntegrationFactory(name) == null,
             "Function name conflict": (name) => getFunction(name) == null,
-            "Port name conflict": (name) => getPortInstance(name) == null || (portSpec != null && name.toLowerCase() == portSpec.name.toLowerCase()),
             "Valid: letters, '_', digits after '_'": /^[a-zA-Z]+(_[a-zA-Z0-9_]*)?$/
         }}]
 

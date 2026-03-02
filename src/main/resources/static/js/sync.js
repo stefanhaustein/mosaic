@@ -1,20 +1,19 @@
 import {renderCell} from "./cell_renderer.js"
-import {getIntegrationInstance, model} from "./shared_model.js"
+import {getIntegration, model} from "./shared_model.js"
 import {
     currentCell, currentSheet,
     portValues, selectCell, selectionRangeX, selectionRangeY,
     selectSheet, setRunMode,
 } from "./shared_state.js";
-import { registerFactory } from "./shared_model.js"
+import { registerIntegrationFactory, registerPortFactory } from "./shared_model.js"
 import { blink } from "./lib/dom.js";
 
 
 import {addOption} from "./lib/dom.js";
 import {processFunction} from "./operation_panel_controller.js";
-import {processIntegrationInstanceUpdate, updateIntegrationFactory} from "./integration_panel_controller.js";
+import {processIntegrationUpdate, processPortUpdate, updateIntegrationFactory} from "./integration_panel_controller.js";
 import {
     processPortFactory,
-    processPortUpdate,
     processPortValue,
 } from "./port_panel_controller.js";
 import {getColumn, getRow, iterateKeys, toCellId} from "./lib/utils.js";
@@ -98,20 +97,19 @@ function processSection(sectionName, map) {
         case "integration": {
             let integrationName = parts[1]
             if (parts.length == 2) {
-                processIntegrationInstanceUpdate(integrationName, map)
-            } else if (parts[2] == "factories") {
-                for (let portName in map) {
-                    let entry = map[portName]
-                    let fqName = portName.indexOf(".") == -1 ? integrationName + "." + portName : portName
-                    console.log("prcessFactoryUpdate", fqName, entry)
-                    processPortFactoryUpdate(fqName, entry)
-                }
-            } else if (parts[2] == "ports") {
-                for (let portName in map) {
-                    let entry = map[portName]
-                    let fqName = portName.indexOf(".") == -1 ? integrationName + "." + portName : portName
-                    console.log("prcessPortUpdate", fqName, entry)
-                    processPortUpdate(fqName, entry)
+                processIntegrationUpdate(integrationName, map)
+            } else if (parts.length == 3) {
+                let integration = getIntegration(integrationName)
+                if (parts[2] == "factories") {
+                    for (let portName in map) {
+                        processPortFactoryUpdate(integration, portName, map[portName])
+                    }
+                } else if (parts[2] == "ports") {
+                    for (let portName in map) {
+                        processPortUpdate(integration, portName, map[portName])
+                    }
+                } else {
+                    console.log("Unrecognized integration section: ", sectionName)
                 }
             } else {
                 console.log("Unrecognized integration section: ", sectionName)
@@ -257,25 +255,14 @@ function processSheetCellsUpdate(name, map) {
 
 
 function processIntegrationFactoryUpdate(name, f) {
-    registerFactory(name, f)
+    registerIntegrationFactory(name, f)
     updateIntegrationFactory(f)
 }
 
 
 
-function processPortFactoryUpdate(name, f) {
-    registerFactory(name, f)
-
-    switch (f.kind) {
-        case "INTEGRATION":
-            updateIntegrationFactory(f)
-            break
-        case "INPUT_PORT":
-        case "OUTPUT_PORT":
-            processPortFactory(f)
-            break
-        default:
-            console.log("Unrecognized Factory: ", name, f)
-    }
+function processPortFactoryUpdate(integration, name, f) {
+    registerPortFactory(integration, name, f)
+    processPortFactory(f)
 }
 

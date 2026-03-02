@@ -1,4 +1,4 @@
-let factories = {}
+let integrationFactories = {}
 let functions = {}
 let integrations = {}
 
@@ -10,20 +10,10 @@ export function getAllFactories() {
     return Object.values(factories)
 }
 
-export function getFactory(name) {
-    name = name.toLowerCase()
-    let cut = name.indexOf(".")
-    if (cut == -1) {
-        return functions[name] || factories[name]
-    }
-    let integration = getIntegrationInstance(name.substring(0, cut))
-    if (integration == null) {
-        console.log("integration not found: " + name.substring(0, cut))
-        return null
-    }
-    let op = integration.operations.find((entry) => entry.name == name )
+export function getPortFactory(integration, name) {
+    let op = integration.factories[name.toLowerCase()];
     if (op == null) {
-        console.log("operation '" + name + "' not found in " + JSON.stringify(integration.operations))
+        console.log("port factory '" + name + "' not found in " + JSON.stringify(integration.factories))
     }
     return op
 }
@@ -32,7 +22,7 @@ export function getFunction(name) {
     return functions[name.toLowerCase()]
 }
 
-export function getIntegrationInstance(name) {
+export function getIntegration(name) {
     return integrations[name.toLowerCase()]
 }
 
@@ -40,26 +30,18 @@ export function getIntegrationFactory(name) {
     return getFactory(name)
 }
 
-export function getPortFactory(fqName) {
-    let parts = fqName.split(".")
-    let integration = getIntegrationInstance(parts[0].toLowerCase())
-    return integration.factories[parts[1].toLowerCase()]
+export function getPort(integration, name) {
+    return integration.ports[name.toLowerCase()]
 }
 
-export function getPortInstance(fqName) {
-    let parts = fqName.split(".")
-    let integration = getIntegrationInstance(parts[0].toLowerCase())
-    return integration.ports[parts[1].toLowerCase()]
-}
-
-export function registerFactory(name, factory) {
+export function registerIntegrationFactory(name, factory) {
     factory.name = name
     let key = factory.key = name.toLowerCase()
     if (factory.modifiers != null && factory.modifiers.indexOf("DELETED") != -1) {
         delete factories[key]
         return false
     }
-    factories[key] = factory
+    integrationFactories[key] = factory
     return true
 }
 
@@ -69,9 +51,9 @@ export function registerFunction(name, f) {
     functions[key] = f
 }
 
-export function registerIntegrationInstance(name, instance) {
+export function registerIntegration(name, instance) {
 
-    let existing = getIntegrationInstance(name)
+    let existing = getIntegration(name)
 
     instance.name = name
     let key = name.toLowerCase()
@@ -94,18 +76,25 @@ export function registerIntegrationInstance(name, instance) {
     return true
 }
 
-export function registerPortInstance(fqName, port) {
-    let parts = fqName.split(".")
 
-    if (parts.length != 2) {
-        console.log("fqName ", fqName, " does not contain a dot for port ", port)
-        throw Error("fqName "+ fqName+ " does not contain a dot for port "+JSON.stringify(port))
+export function registerPortFactory(integration, name, spec) {
+    spec.name = name
+    spec.fqName = integration.name + "." + name
+    let key = name.toLowerCase()
+    spec.key = key
+    if (spec.kind == "TOMBSTONE") {
+        delete integration.ports[key]
+        return false
     }
+    integration.factories[key] = spec
+    return true
+}
 
-    port.name = parts[1]
-    let key = port.name.toLowerCase()
+export function registerPort(integration, name, port) {
+    port.name = name
+    port.fqName = integration.name + "." + name
+    let key = name.toLowerCase()
     port.key = key
-    let integration = getIntegrationInstance(parts[0].toLowerCase())
     if (port.kind == "TOMBSTONE") {
         delete integration.ports[key]
         return false
