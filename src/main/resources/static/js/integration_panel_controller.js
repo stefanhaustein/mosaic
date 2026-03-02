@@ -2,6 +2,7 @@ import {registerIntegration, registerPort, getPortFactory} from "./shared_model.
 import {addOption, insertById} from "./lib/dom.js";
 import {updateSpec} from "./artifacts.js";
 import {ensureCategory} from "./lib/utils.js";
+import {portValues} from "./shared_state.js";
 
 let integrationListElement = document.getElementById("integrationList")
 let integrationSpecListElement = document.getElementById("integrationSpecList")
@@ -89,9 +90,7 @@ export function processPortUpdate(integration, name, f) {
         let entryElement = document.createElement( "div")
         portElement.append(bulletElement, entryElement)
 
-        let cut = name.indexOf(".")
-        let containerName = f.kind == "NamedCells" ? "namedCellListContainer" : cut != -1 ? "integration." + name.substring(0, cut) :
-            spec.kind == "OUTPUT_PORT" ?  "outputPortList" : "inputPortList"
+        let containerName = "integration." + integration.key + ".ports"
 
         console.log("determined container name ", containerName, " for ", f, "spec", spec)
 
@@ -191,3 +190,20 @@ export function processPortUpdate(integration, name, f) {
         }
     }
 }
+
+
+export function processPortFactory(integration, spec) {
+    let container = document.getElementById("integration." + integration.key + ".factories")
+    updateSpec(container, "portspec.", spec)
+}
+
+export function processPortValue(fqKey, map) {
+    let value = map[fqKey]
+    portValues[fqKey] = value
+    let target = document.getElementById("port." + fqKey + ".value")
+    if (target != null) {
+        target.textContent = JSON.stringify(value)
+    }
+}
+
+

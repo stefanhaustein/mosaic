@@ -7,15 +7,15 @@ import {
 } from "./shared_state.js";
 import { registerIntegrationFactory, registerPortFactory } from "./shared_model.js"
 import { blink } from "./lib/dom.js";
-
-
 import {addOption} from "./lib/dom.js";
 import {processFunction} from "./operation_panel_controller.js";
-import {processIntegrationUpdate, processPortUpdate, updateIntegrationFactory} from "./integration_panel_controller.js";
 import {
+    processIntegrationUpdate,
+    processPortUpdate,
+    updateIntegrationFactory,
     processPortFactory,
     processPortValue,
-} from "./port_panel_controller.js";
+} from "./integration_panel_controller.js";
 import {getColumn, getRow, iterateKeys, toCellId} from "./lib/utils.js";
 
 let sheetSelectElement = document.getElementById("sheetSelect")
@@ -263,6 +263,6 @@ function processIntegrationFactoryUpdate(name, f) {
 
 function processPortFactoryUpdate(integration, name, f) {
     registerPortFactory(integration, name, f)
-    processPortFactory(f)
+    processPortFactory(integration, f)
 }
 
