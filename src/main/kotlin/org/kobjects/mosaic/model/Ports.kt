@@ -50,6 +50,16 @@ class Ports : Iterable<PortHolder> {
     fun definePort(fqName: String, jsonSpec: Map<String, Any?>, token: ModificationToken) {
         token.symbolsChanged = true
 
+        if (jsonSpec["deleted"] as Boolean? != true && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
+            val port = this[fqName]
+            if (port is OutputPortHolder) {
+                port.rawFormula = jsonSpec["source"]?.toString() ?: ""
+                port.reparse()
+                port.tag = token.tag
+            }
+            return
+        }
+
         // Always delete what's there.
         val previousName = jsonSpec["previousName"]?.toString() ?: fqName
         try {
@@ -59,14 +69,7 @@ class Ports : Iterable<PortHolder> {
         }
 
         if (jsonSpec["deleted"] as Boolean? != true) {
-            if (!jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
-                val port = this[fqName]
-                if (port is OutputPortHolder) {
-                    port.rawFormula = jsonSpec["source"]?.toString() ?: ""
-                    port.reparse()
-                    port.tag = token.tag
-                }
-            } else {
+
                 val kind = jsonSpec["kind"].toString()
 
                 val parts = kind.split(".")
@@ -89,7 +92,7 @@ class Ports : Iterable<PortHolder> {
                 integration.nodes[loclName] = port
                 port.attach(token)
 
-            }
+
         }
     }
 

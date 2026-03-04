@@ -92,6 +92,7 @@ class OutputPortHolder(
         // if (forClient) {
         //  serializeDependencies
         // }
+        put("source", JsonPrimitive(rawFormula))
     }
 
 

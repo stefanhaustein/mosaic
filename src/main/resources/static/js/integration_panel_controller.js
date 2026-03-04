@@ -1,8 +1,9 @@
 import {registerIntegration, registerPort, getPortFactory} from "./shared_model.js";
 import {addOption, insertById} from "./lib/dom.js";
 import {updateSpec} from "./artifacts.js";
-import {ensureCategory} from "./lib/utils.js";
-import {portValues} from "./shared_state.js";
+import {ensureCategory, post} from "./lib/utils.js";
+import {currentCell, currentSheet, portValues, showDependencies} from "./shared_state.js";
+import {showPortDialog} from "./port_editor.js";
 
 let integrationListElement = document.getElementById("integrationList")
 let integrationSpecListElement = document.getElementById("integrationSpecList")
@@ -137,7 +138,7 @@ export function processPortUpdate(integration, name, f) {
         switch (spec.kind) {
             case "INPUT_PORT":
                 let entryValueElement = document.createElement("span")
-                entryValueElement.id = "port." + name + ".value"
+                entryValueElement.id = "port." + f.fqName + ".value"
                 entryValueElement.className = "portValue"
                 entryContentElement.appendChild(entryValueElement)
 
@@ -156,7 +157,7 @@ export function processPortUpdate(integration, name, f) {
                 let sourceElement = document.createElement("input")
                 sourceElement.value =  f.source
                 sourceElement.addEventListener("change", () => {
-                    post("ports/" + f.name, {source: sourceElement.value})
+                    post("ports/" + f.fqName, {source: sourceElement.value})
                 })
                 entryContentElement.append(sourceElement)
 
@@ -193,6 +194,9 @@ export function processPortUpdate(integration, name, f) {
 
 
 export function processPortFactory(integration, spec) {
+    if (spec.modifiers.indexOf("UNINSTANTIABLE") != -1) {
+        return
+    }
     let container = document.getElementById("integration." + integration.key + ".factories")
     updateSpec(container, "portspec.", spec)
 }
