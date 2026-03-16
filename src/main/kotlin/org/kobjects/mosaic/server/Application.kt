@@ -70,12 +70,14 @@ fun Application.module() {
             }
             call.respond(HttpStatusCode.OK)
         }
-        post("/ports/{name}") { val name = call.parameters["name"]!!
+        post("/ports/{integrationName}/{portName}") {
+            val integrationName = call.parameters["integrationName"]!!
+            val portName = call.parameters["portName"]!!
             val jsonText = call.receiveText()
-            println("/ports/$name: $jsonText")
+            println("/ports/$integrationName/$portName: $jsonText")
             val jsonSpec = LegacyJsonParser.parseObject(jsonText)
             Model.applySynchronizedWithToken { token ->
-                Model.ports.definePort(name, jsonSpec, token)
+                Model.ports.definePort(integrationName, portName, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
         }

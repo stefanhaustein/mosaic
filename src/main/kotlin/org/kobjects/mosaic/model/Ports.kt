@@ -2,7 +2,6 @@ package org.kobjects.mosaic.model
 
 import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.pluginapi.*
-import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec.Modifier
 import java.io.Writer
 
 
@@ -47,8 +46,9 @@ class Ports : Iterable<PortHolder> {
     }
 
     // The name is separate because it's typically the key of the spec map
-    fun definePort(fqName: String, jsonSpec: Map<String, Any?>, token: ModificationToken) {
+    fun definePort(integrationName: String, portName: String, jsonSpec: Map<String, Any?>, token: ModificationToken) {
         token.symbolsChanged = true
+        val fqName = "$integrationName.$portName"
 
         if (jsonSpec["deleted"] as Boolean? != true && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
             val port = this[fqName]
@@ -72,11 +72,8 @@ class Ports : Iterable<PortHolder> {
 
                 val kind = jsonSpec["kind"].toString()
 
-                val parts = kind.split(".")
-                val integrationName = parts[0]
-                val loclName = parts[1]
                 val integration = Model.integrations[integrationName] ?: throw IllegalArgumentException("Integration '$integrationName' not found.")
-                val specification = integration.operationSpecs.find { it.fqName == kind } ?: throw IllegalArgumentException("'$loclName' not found in integration $integration.")
+                val specification = integration.operationSpecs.find { it.name == kind } ?: throw IllegalArgumentException("'$kind' not found in integration $integration.")
 
                 this[fqName]?.detach()
 
@@ -85,14 +82,12 @@ class Ports : Iterable<PortHolder> {
                 )
 
                 val port = when (specification) {
-                    is InputPortSpec -> InputPortHolder(integration, fqName, specification, config, tag = token.tag)
-                    is OutputPortSpec -> OutputPortHolder(integration, fqName, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
+                    is InputPortSpec -> InputPortHolder(integration, portName, specification, config, tag = token.tag)
+                    is OutputPortSpec -> OutputPortHolder(integration, portName, specification, config, jsonSpec["source"] as String? ?: jsonSpec["expression"] as String, tag = token.tag)
                     else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
                 }
-                integration.nodes[loclName] = port
+                integration.nodes[portName] = port
                 port.attach(token)
-
-
         }
     }
 

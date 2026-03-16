@@ -19,8 +19,9 @@ application {
 repositories {
     maven(
         url = "https://central.sonatype.com/repository/maven-snapshots/",
-
-
+    )
+    maven(
+        url = "https://oss.sonatype.org/service/local/staging/deploy/maven2",
     )
     mavenCentral()
 }

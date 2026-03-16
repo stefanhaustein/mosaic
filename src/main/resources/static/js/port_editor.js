@@ -1,15 +1,12 @@
 import {FormController} from "./forms/form_builder.js";
-import {getAllFactories, getIntegrationFactory, getFunction, getIntegration, getPort} from "./shared_model.js";
+import {getAllIntegrationFactories, getIntegrationFactory, getFunction, getIntegration, getPort} from "./shared_model.js";
 import {currentSheet} from "./shared_state.js";
 import {selectPanel} from "./menu_controller.js";
 import {post, transformSchema} from "./lib/utils.js";
 
 
-let portEditorContainer = document.getElementById("portEditorContainer")
-let previousPanel = ""
-
 function hidePortDialog() {
-   selectPanel(previousPanel)
+    document.getElementById("dialog").close()
 }
 
 function renderBinding(targetDiv, constructorSpec, instanceSpec) {
@@ -26,17 +23,16 @@ function renderBinding(targetDiv, constructorSpec, instanceSpec) {
 }
 
 export function showPortDialog(constructorSpec, portSpec) {
-    let previous = selectPanel("PortEditor")
-    if (previous != "PortEditor") {
-        previousPanel = previous
-    }
+    console.log("showPortDialog; ctorSpec: ", constructorSpec, " portSpec: ", portSpec)
+
+    let portEditorContainer = document.getElementById("dialog")
+    portEditorContainer.textContent = ""
+    let dialogTitleElement = document.createElement("div")
+    portEditorContainer.appendChild(dialogTitleElement)
 
     let kind = constructorSpec.kind
     let instanceSpec = portSpec != null ? portSpec.configuration : {}
 
-    portEditorContainer.textContent = ""
-
-    let dialogTitleElement = document.createElement("div")
     dialogTitleElement.className = "dialogTitle"
     dialogTitleElement.textContent = portSpec == null ? "Add " : "Edit "
 
@@ -57,55 +53,19 @@ export function showPortDialog(constructorSpec, portSpec) {
 
     if (kind == "OUTPUT_PORT") {
         portSchema.push({"name": "source", modifiers: ["REFERENCE"]})
-        dialogTitleElement.append(constructorSpec.name == "NamedCells" ? "Named Cell(s)" : "Output Port")
+        dialogTitleElement.append(constructorSpec.name == "NamedCell" ? "Named Cell(s)" : "Output Port")
     } else {
         dialogTitleElement.append("Input Port")
     }
-    portEditorContainer.appendChild(dialogTitleElement)
 
     let previousName = portSpec == null ? null : portSpec["name"]
 
     let portFormController = FormController.create(inputDiv, transformSchema(portSchema))
-    portFormController.setValue(portSpec == null ? {name: kind.substring(0, 1).toLowerCase() + "_"} : portSpec)
+    portFormController.setValue(portSpec == null ? {name: ""} : portSpec)
+    let bindingDiv = document.createElement("div")
 
-    let bindingFormController = null
-    if (constructorSpec.name != "NamedCells") {
-        let typeLabelElement = document.createElement("label")
-        typeLabelElement.textContent = "binding"
-        inputDiv.appendChild(typeLabelElement)
+    let bindingFormController = renderBinding(bindingDiv, constructorSpec, instanceSpec)
 
-        let bindingDiv = document.createElement("div")
-        let typeSelectElement = document.createElement("select")
-
-        for (let f of getAllFactories()) {
-            let name = f.name
-            if (f.kind == kind) {
-                let typeOptionElement = document.createElement("option")
-                typeOptionElement.textContent = name
-                if (constructorSpec != null && name == constructorSpec.name) {
-                    typeOptionElement.setAttribute("selected", "true")
-                }
-                typeSelectElement.appendChild(typeOptionElement)
-            }
-        }
-        bindingFormController = renderBinding(bindingDiv, constructorSpec, instanceSpec)
-
-        typeSelectElement.addEventListener("input", () => {
-            let type = typeSelectElement.value
-            constructorSpec = getFactory(type)
-            if (constructorSpec != null) {
-                bindingFormController = renderBinding(bindingDiv, constructorSpec, instanceSpec)
-            }
-        })
-
-        let typeSelectContainerElement = document.createElement("div")
-        typeSelectContainerElement.className = "inputContainer"
-        typeSelectContainerElement.style.paddingBottom = "18px"
-        typeSelectContainerElement.appendChild(typeSelectElement)
-
-        inputDiv.appendChild(typeSelectContainerElement)
-        inputDiv.appendChild(bindingDiv)
-    }
     portEditorContainer.appendChild(inputDiv)
 
     let buttonDiv = document.createElement("div")
@@ -123,9 +83,11 @@ export function showPortDialog(constructorSpec, portSpec) {
         if (bindingFormController != null) {
             values["configuration"] = bindingFormController.getValue()
         }
-        values["kind"] = constructorSpec["name"]
+        values["kind"] = constructorSpec.name
         values["previousName"] = previousName
-        post("ports/" + values["name"], values)
+
+        let integrationName = constructorSpec.fqName.substring(0, constructorSpec.fqName.indexOf("."))
+        post("ports/" + integrationName + "/" + values.name, values)
         hidePortDialog()
     })
     buttonDiv.appendChild(okButton)
@@ -148,5 +110,6 @@ export function showPortDialog(constructorSpec, portSpec) {
     }
 
     portEditorContainer.appendChild(buttonDiv)
+    portEditorContainer.showModal()
 }
 

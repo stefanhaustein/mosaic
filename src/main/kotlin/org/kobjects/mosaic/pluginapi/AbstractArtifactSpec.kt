@@ -55,7 +55,7 @@ abstract class AbstractArtifactSpec(
             put("displayName", JsonPrimitive(displayName))
         }
         put("description", JsonPrimitive(description))
-        put("parameters", parameters.toJson())
+        put("params", parameters.toJson())
         put("modifiers", modifiers.toJson())
     }
 

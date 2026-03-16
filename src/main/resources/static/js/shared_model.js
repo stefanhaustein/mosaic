@@ -6,8 +6,8 @@ export var model = {
     sheets: {}
 }
 
-export function getAllFactories() {
-    return Object.values(factories)
+export function getAllIntegrationFactories() {
+    return Object.values(integrationFactories)
 }
 
 export function getPortFactory(integration, name) {
@@ -27,7 +27,19 @@ export function getIntegration(name) {
 }
 
 export function getIntegrationFactory(name) {
-    return getFactory(name)
+    return integrationFactories[name.toLowerCase()]
+}
+
+export function getFqPort(name) {
+    let cut = name.indexOf(".")
+    if (cut == -1) {
+        return null
+    }
+    let integration = getIntegration(name.substring(0, cut))
+    if (integration == null) {
+        return null
+    }
+    return getPort(integration, name.substring(cut + 1))
 }
 
 export function getPort(integration, name) {
