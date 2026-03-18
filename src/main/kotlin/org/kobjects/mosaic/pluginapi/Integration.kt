@@ -4,6 +4,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.mosaic.model.PortHolder
+import org.kobjects.mosaic.model.Root
 import org.kobjects.tomson.TomsonOutput
 import org.kobjects.tomson.toJson
 
@@ -23,10 +24,12 @@ abstract class Integration(
 
     abstract fun detach()
 
-    fun serialize(out: TomsonOutput, forClient: Boolean) {
-        out.appendSection("integration.$name", configToJson())
-        if (forClient) {
-            out.appendSection("integration.$name.factories", factoriesToJson())
+    fun serialize(out: TomsonOutput, forClient: Boolean, tag: Long) {
+        if (this.tag > tag && (forClient || (this !is Tombstone && this !is Root))) {
+            out.appendSection("integration.$name", configToJson())
+            if (forClient) {
+                out.appendSection("integration.$name.factories", factoriesToJson())
+            }
         }
         out.appendSection("integration.$name.ports", portsToJson(forClient))
     }

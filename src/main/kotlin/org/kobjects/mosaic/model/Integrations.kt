@@ -46,9 +46,9 @@ class Integrations : Iterable<Integration> {
     fun serialize(writer: Writer, forClient: Boolean, tag: Long) {
         val tomson = TomsonOutput(writer)
         for (integration in integrations) {
-            if (integration.tag > tag && (forClient || (integration !is Integration.Tombstone && integration !is Root))) {
-                integration.serialize(tomson, forClient)
-            }
+
+                integration.serialize(tomson, forClient, tag)
+
         }
     }
 
