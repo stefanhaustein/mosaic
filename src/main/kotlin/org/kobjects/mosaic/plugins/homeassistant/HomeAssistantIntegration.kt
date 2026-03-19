@@ -99,7 +99,7 @@ class HomeAssistantIntegration(
                         this,
                         name = name + "_out",
                         specification = getOutputSpec(entity.kind) ?: throw RuntimeException("OuputPortSpec not found for ${entity.kind}"),
-                  //      rawFormula = "",
+                        rawFormula = "",
                         configuration = emptyMap(),
                         displayName = getDisplayName(entity) + "_out",
                         category = getCategory(entity),

@@ -13,6 +13,7 @@ class OutputPortHolder(
     override val name: String,
     override val specification: OutputPortSpec,
     val configuration: Map<String, Any?>,
+    rawFormula: String,
     override val displayName: String? = null,
     override val category: String? = null,
     override var tag: Long
@@ -25,6 +26,7 @@ class OutputPortHolder(
 
     init {
         require(!name.contains(".")) { "Port name '$name' must not contain '.'" }
+        this.rawFormula = rawFormula
     }
 
     override fun attach(token: ModificationToken) {
