@@ -4,6 +4,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.mosaic.model.PortHolder
+import org.kobjects.mosaic.model.Ports
 import org.kobjects.mosaic.model.Root
 import org.kobjects.tomson.TomsonOutput
 import org.kobjects.tomson.toJson

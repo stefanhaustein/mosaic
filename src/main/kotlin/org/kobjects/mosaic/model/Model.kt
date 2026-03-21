@@ -96,7 +96,10 @@ object Model : ModelInterface {
                         val name = parts[1]
                         integrations.configureIntegration(name, map, token)
                     } else if (parts.size == 3 && parts[0] == "integration" && parts[2] == "ports") {
-
+                        val integrationName = parts[1]
+                        for ((portName, portSpec) in map) {
+                            Model.ports.definePort(integrationName, portName, portSpec as Map<String, Any?>, token)
+                        }
                     } else {
                         System.err.println("Unrecognized toml section: $key")
                     }
