@@ -157,7 +157,7 @@ export function processPortUpdate(integration, name, f) {
                 let sourceElement = document.createElement("input")
                 sourceElement.value =  f.source
                 sourceElement.addEventListener("change", () => {
-                    post("ports/" + f.fqName, {source: sourceElement.value})
+                    post("ports/" + f.fqName.replace(".", "/"), {source: sourceElement.value})
                 })
                 entryContentElement.append(sourceElement)
 
