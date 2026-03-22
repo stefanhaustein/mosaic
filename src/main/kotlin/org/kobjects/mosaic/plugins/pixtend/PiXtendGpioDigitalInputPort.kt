@@ -1,7 +1,10 @@
 package org.kobjects.mosaic.plugins.pixtend
 
 import com.pi4j.drivers.plc.pixtend.PiXtendDriver
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.InputPortListener
+import org.kobjects.mosaic.model.integration.InputPortSpec
 
 class PiXtendGpioDigitalInputPort(
     integration: PiXtendIntegration,
@@ -31,7 +34,11 @@ class PiXtendGpioDigitalInputPort(
             emptySet(),
             integration.tag
         ) { config, listener ->
-            PiXtendGpioDigitalInputPort(integration, config["index"] as Int, listener).apply { integration.inputPorts.add(this) }
+            PiXtendGpioDigitalInputPort(
+                integration,
+                config["index"] as Int,
+                listener
+            ).apply { integration.inputPorts.add(this) }
         }
     }
 }

@@ -2,7 +2,16 @@ package org.kobjects.mosaic.model
 
 import org.kobjects.mosaic.json.LegacyJsonParser
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.function.Functions
+import org.kobjects.mosaic.model.integration.InputPortListener
+import org.kobjects.mosaic.model.integration.IntegrationFactories
+import org.kobjects.mosaic.model.integration.IntegrationFactory
+import org.kobjects.mosaic.model.integration.Integrations
+import org.kobjects.mosaic.model.integration.OutputPortHolder
+import org.kobjects.mosaic.model.integration.Ports
+import org.kobjects.mosaic.model.integration.Root
+import org.kobjects.mosaic.model.sheet.Cell
+import org.kobjects.mosaic.model.sheet.Sheet
 import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
 import org.kobjects.mosaic.plugins.pixtend.PiXtendIntegration
 import org.kobjects.mosaic.plugins.rpi.RpiIntegration

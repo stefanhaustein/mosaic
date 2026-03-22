@@ -2,7 +2,10 @@ package org.kobjects.mosaic.plugins.rpi
 
 import com.pi4j.Pi4J
 import com.pi4j.context.Context
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.integration.Integration
+import org.kobjects.mosaic.model.integration.IntegrationFactory
 import org.kobjects.mosaic.plugins.rpi.devices.Bmp280Port
 import org.kobjects.mosaic.plugins.rpi.devices.Scd4xPort
 
@@ -56,7 +59,7 @@ class RpiIntegration(
             "Raspberry Pi GPIO integration",
             emptyList(),
             setOf(AbstractArtifactSpec.Modifier.SINGLETON)
-            
+
         ) { _, _, tag, _ ->
             RpiIntegration(model, tag)
         }

@@ -1,9 +1,13 @@
 package org.kobjects.mosaic.model.expression
 
-import org.kobjects.mosaic.model.Cell
+import org.kobjects.mosaic.model.function.FunctionInstance
+import org.kobjects.mosaic.model.function.FunctionSpec
 import org.kobjects.mosaic.model.Node
-import org.kobjects.mosaic.pluginapi.ModificationToken
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.function.StatefulFunctionInstance
+import org.kobjects.mosaic.model.ValueChangeListener
+import org.kobjects.mosaic.model.ModificationToken
+import org.kobjects.mosaic.model.Type
 
 class PluginOperationCall(
     val owner: Node,

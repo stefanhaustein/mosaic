@@ -2,8 +2,8 @@ package org.kobjects.mosaic.plugins.mqtt
 
 import io.github.davidepianca98.mqtt.packets.Qos
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.pluginapi.ValueChangeListener
-import org.kobjects.mosaic.pluginapi.StatefulFunctionInstance
+import org.kobjects.mosaic.model.ValueChangeListener
+import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 
 class MqttPublisher(val port: MqttPort, config: Map<String, Any?>) : StatefulFunctionInstance {
 

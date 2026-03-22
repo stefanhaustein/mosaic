@@ -3,7 +3,11 @@ package org.kobjects.mosaic.plugins.mqtt
 import io.github.davidepianca98.MQTTClient
 import io.github.davidepianca98.mqtt.MQTTVersion
 import io.github.davidepianca98.mqtt.Subscription
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.function.FunctionSpec
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.ValueChangeListener
 
 class MqttPort(
     val name: String,
@@ -56,7 +60,7 @@ class MqttPort(
             listOf(
                 ParameterSpec("topic", Type.STRING, null, setOf(ParameterSpec.Modifier.CONSTANT)),
                 ParameterSpec("payload", Type.STRING, null),
-                ),
+            ),
             emptySet(),
             tag,
         ) {

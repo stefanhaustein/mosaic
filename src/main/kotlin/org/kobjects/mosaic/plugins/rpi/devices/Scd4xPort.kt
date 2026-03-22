@@ -2,7 +2,11 @@ package org.kobjects.mosaic.plugins.rpi.devices
 
 import com.pi4j.io.i2c.I2C
 import com.pi4j.drivers.sensor.environment.scd4x.Scd4xDriver
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.InputPortInstance
+import org.kobjects.mosaic.model.integration.InputPortListener
+import org.kobjects.mosaic.model.integration.InputPortSpec
 import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 import java.util.*
 
@@ -75,7 +79,8 @@ class Scd4xPort(
                 ),
             ),
             createFn = { config, host ->
-                Scd4xPort(host, plugin, config["bus"] as? Int ?: 1) },
+                Scd4xPort(host, plugin, config["bus"] as? Int ?: 1)
+            },
         )
     }
 }

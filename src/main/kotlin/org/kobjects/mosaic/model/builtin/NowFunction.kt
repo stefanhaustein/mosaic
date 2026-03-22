@@ -3,8 +3,8 @@ package org.kobjects.mosaic.model.builtin
 import kotlinx.datetime.Clock
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.pluginapi.ValueChangeListener
-import org.kobjects.mosaic.pluginapi.StatefulFunctionInstance
+import org.kobjects.mosaic.model.ValueChangeListener
+import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 import java.util.Timer
 import java.util.TimerTask
 

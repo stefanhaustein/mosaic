@@ -1,6 +1,8 @@
 package org.kobjects.mosaic.model.builtin
 
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.function.FunctionSpec
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
 
 object BuiltinFunctions {
     val operationSpecs = listOf<FunctionSpec>(
@@ -30,12 +32,14 @@ object BuiltinFunctions {
             Type.BOOL,
             "toff",
             "Timed Off",
-            listOf(ParameterSpec("input", Type.BOOL, null), ParameterSpec(
-                "delay",
-                Type.REAL,
-                null,
-                setOf(ParameterSpec.Modifier.CONSTANT)
-            )),
+            listOf(
+                ParameterSpec("input", Type.BOOL, null), ParameterSpec(
+                    "delay",
+                    Type.REAL,
+                    null,
+                    setOf(ParameterSpec.Modifier.CONSTANT)
+                )
+            ),
             createFn = TimedOnOff::createToff,
         ),
 
@@ -46,12 +50,14 @@ object BuiltinFunctions {
             Type.BOOL,
             "ton",
             "Timed On",
-            listOf(ParameterSpec("input", Type.BOOL, null), ParameterSpec(
-                "delay",
-                Type.REAL,
-                null,
-                setOf(ParameterSpec.Modifier.CONSTANT)
-            )),
+            listOf(
+                ParameterSpec("input", Type.BOOL, null), ParameterSpec(
+                    "delay",
+                    Type.REAL,
+                    null,
+                    setOf(ParameterSpec.Modifier.CONSTANT)
+                )
+            ),
             createFn = TimedOnOff::createTon,
         ),
 
@@ -62,12 +68,14 @@ object BuiltinFunctions {
             Type.BOOL,
             "tp",
             "Timed Pulse",
-            listOf(ParameterSpec("input", Type.BOOL, null), ParameterSpec(
-                "delay",
-                Type.REAL,
-                null,
-                setOf(ParameterSpec.Modifier.CONSTANT)
-            )),
+            listOf(
+                ParameterSpec("input", Type.BOOL, null), ParameterSpec(
+                    "delay",
+                    Type.REAL,
+                    null,
+                    setOf(ParameterSpec.Modifier.CONSTANT)
+                )
+            ),
             createFn = TimedPulse::create,
         ),
 
@@ -80,7 +88,8 @@ object BuiltinFunctions {
             "RS-Flipflop",
             listOf(
                 ParameterSpec("s", Type.BOOL, null),
-                ParameterSpec("r", Type.BOOL, null)),
+                ParameterSpec("r", Type.BOOL, null)
+            ),
             emptySet(),
             0,
         ) { FlipflopFunction.createRs() },
@@ -93,7 +102,8 @@ object BuiltinFunctions {
             "SR-Flipflop",
             listOf(
                 ParameterSpec("s", Type.BOOL, null),
-                ParameterSpec("r", Type.BOOL, null)),
+                ParameterSpec("r", Type.BOOL, null)
+            ),
             emptySet(),
             0,
         ) { FlipflopFunction.createSr() },

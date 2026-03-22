@@ -1,6 +1,9 @@
 package org.kobjects.mosaic.plugins.pixtend
 
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.OutputPortInstance
+import org.kobjects.mosaic.model.integration.OutputPortSpec
 
 class PiXtendRelayPort(
     val integration: PiXtendIntegration,
@@ -21,7 +24,7 @@ class PiXtendRelayPort(
             null,
             "PiXtend",
             "pixt.relay",
-       //     Type.REAL,
+            //     Type.REAL,
             "PiXtend relay.",
             listOf(ParameterSpec("index", Type.INT, 0)),
             emptySet(),

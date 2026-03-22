@@ -1,8 +1,6 @@
 package org.kobjects.mosaic.model
 
 import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.pluginapi.Integration
-import org.kobjects.mosaic.pluginapi.Namespace
 
 // Can't be an abstract class becuase PortHolder needs to be a sub-interface
 interface Node {

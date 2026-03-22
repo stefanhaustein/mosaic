@@ -1,8 +1,8 @@
 package org.kobjects.mosaic.plugins.mqtt
 
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.pluginapi.ValueChangeListener
-import org.kobjects.mosaic.pluginapi.StatefulFunctionInstance
+import org.kobjects.mosaic.model.ValueChangeListener
+import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 
 class MqttSubscription(val port: MqttPort, configuration: Map<String, Any?>) : StatefulFunctionInstance {
     val topic = configuration["topic"].toString()

@@ -3,7 +3,12 @@ package org.kobjects.mosaic.plugins.rpi
 
 import com.pi4j.io.i2c.I2C
 import com.pi4j.drivers.display.character.hd44780.Hd44780Driver
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.Format
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.RangeValues
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.OutputPortInstance
+import org.kobjects.mosaic.model.integration.OutputPortSpec
 import kotlin.math.min
 
 class TextLcd(

@@ -2,7 +2,11 @@ package org.kobjects.mosaic.plugins.rpi
 
 import com.pi4j.io.gpio.digital.*
 import com.pi4j.io.gpio.digital.DigitalInput
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.InputPortInstance
+import org.kobjects.mosaic.model.integration.InputPortListener
+import org.kobjects.mosaic.model.integration.InputPortSpec
 
 class DigitalInputPort(
     val host: InputPortListener,

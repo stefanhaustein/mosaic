@@ -1,6 +1,7 @@
 package org.kobjects.mosaic.model.expression;
 
 import org.kobjects.mosaic.model.*
+import org.kobjects.mosaic.model.integration.PortHolder
 
 class PortExpression(
     owner: Node,

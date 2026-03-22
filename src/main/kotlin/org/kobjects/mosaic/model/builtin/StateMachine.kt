@@ -1,12 +1,12 @@
 package org.kobjects.mosaic.model.builtin
 
-import org.kobjects.mosaic.model.Cell
-import org.kobjects.mosaic.model.CellRangeReference
+import org.kobjects.mosaic.model.sheet.Cell
+import org.kobjects.mosaic.model.sheet.CellRangeReference
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.expression.CellRangeExpression
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.pluginapi.ValueChangeListener
-import org.kobjects.mosaic.pluginapi.StatefulFunctionInstance
+import org.kobjects.mosaic.model.ValueChangeListener
+import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 import java.util.*
 
 class StateMachine(

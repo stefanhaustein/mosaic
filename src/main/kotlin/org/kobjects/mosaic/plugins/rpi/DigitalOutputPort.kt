@@ -2,7 +2,10 @@ package org.kobjects.mosaic.plugins.rpi
 
 
 import com.pi4j.io.gpio.digital.*
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.OutputPortInstance
+import org.kobjects.mosaic.model.integration.OutputPortSpec
 
 class DigitalOutputPort(
     val plugin: RpiIntegration,

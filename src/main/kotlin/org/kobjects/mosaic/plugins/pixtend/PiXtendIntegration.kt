@@ -3,7 +3,13 @@ package org.kobjects.mosaic.plugins.pixtend
 import com.pi4j.Pi4J
 import com.pi4j.context.Context
 import com.pi4j.drivers.plc.pixtend.PiXtendDriver
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractFactorySpec
+import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.Integration
+import org.kobjects.mosaic.model.integration.IntegrationFactory
 
 class PiXtendIntegration(
     val model: ModelInterface,

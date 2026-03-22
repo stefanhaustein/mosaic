@@ -52,7 +52,7 @@ export function showPortDialog(constructorSpec, portSpec) {
 
 
     if (kind == "OUTPUT_PORT") {
-        portSchema.push({"name": "source", modifiers: ["REFERENCE"]})
+        portSchema.push({"name": "source"})
         dialogTitleElement.append(constructorSpec.name == "NamedCell" ? "Named Cell(s)" : "Output Port")
     } else {
         dialogTitleElement.append("Input Port")
@@ -77,9 +77,6 @@ export function showPortDialog(constructorSpec, portSpec) {
     okButton.addEventListener("click", () => {
         let values = portFormController.getValue()
         let source = values["source"]
-        if (source != null && source.indexOf("!") == -1) {
-            values["source"] = currentSheet.name + "!" + source
-        }
         if (bindingFormController != null) {
             values["configuration"] = bindingFormController.getValue()
         }

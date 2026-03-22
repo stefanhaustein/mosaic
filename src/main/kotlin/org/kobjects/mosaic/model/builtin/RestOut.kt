@@ -1,7 +1,12 @@
 package org.kobjects.mosaic.model.builtin
 
+import org.kobjects.mosaic.model.AbstractArtifactSpec
 import org.kobjects.mosaic.model.Model
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.RangeValues
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.OutputPortInstance
+import org.kobjects.mosaic.model.integration.OutputPortSpec
 
 class RestOut(val path: String) : OutputPortInstance {
 

@@ -11,7 +11,7 @@ import io.ktor.utils.io.*
 import kotlinx.html.dom.serialize
 import org.kobjects.mosaic.json.LegacyJsonParser
 import org.kobjects.mosaic.json.legacyToJson
-import org.kobjects.mosaic.model.CellRangeReference
+import org.kobjects.mosaic.model.sheet.CellRangeReference
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.tomson.LegacyTomsonParser
 import java.io.File

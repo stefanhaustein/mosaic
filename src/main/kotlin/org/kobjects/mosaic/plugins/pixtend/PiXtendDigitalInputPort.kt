@@ -1,6 +1,9 @@
 package org.kobjects.mosaic.plugins.pixtend
 
-import org.kobjects.mosaic.pluginapi.*
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.InputPortListener
+import org.kobjects.mosaic.model.integration.InputPortSpec
 
 class PiXtendDigitalInputPort(
     integration: PiXtendIntegration,
@@ -26,7 +29,11 @@ class PiXtendDigitalInputPort(
             emptySet(),
             integration.tag
         ) { config, listener ->
-            PiXtendDigitalInputPort(integration, config["index"] as Int, listener).apply { integration.inputPorts.add(this) }
+            PiXtendDigitalInputPort(integration, config["index"] as Int, listener).apply {
+                integration.inputPorts.add(
+                    this
+                )
+            }
         }
     }
 }

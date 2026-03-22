@@ -1,7 +1,7 @@
 package org.kobjects.mosaic.svg
 
-import org.kobjects.mosaic.pluginapi.ParameterSpec
-import org.kobjects.mosaic.pluginapi.Type
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.svg.parser.ExpressionParser
 import org.w3c.dom.Document
 import org.w3c.dom.Element

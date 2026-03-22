@@ -1,15 +1,15 @@
 package org.kobjects.mosaic.plugins.homeassistant
 
-import org.kobjects.mosaic.model.InputPortHolder
-import org.kobjects.mosaic.model.OutputPortHolder
-import org.kobjects.mosaic.pluginapi.AbstractArtifactSpec
-import org.kobjects.mosaic.pluginapi.InputPortSpec
-import org.kobjects.mosaic.pluginapi.Integration
-import org.kobjects.mosaic.pluginapi.IntegrationFactory
-import org.kobjects.mosaic.pluginapi.ModelInterface
-import org.kobjects.mosaic.pluginapi.OutputPortSpec
-import org.kobjects.mosaic.pluginapi.ParameterSpec
-import org.kobjects.mosaic.pluginapi.Type
+import org.kobjects.mosaic.model.integration.InputPortHolder
+import org.kobjects.mosaic.model.integration.OutputPortHolder
+import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.integration.InputPortSpec
+import org.kobjects.mosaic.model.integration.Integration
+import org.kobjects.mosaic.model.integration.IntegrationFactory
+import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.integration.OutputPortSpec
+import org.kobjects.mosaic.model.ParameterSpec
+import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity.Kind
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntityState

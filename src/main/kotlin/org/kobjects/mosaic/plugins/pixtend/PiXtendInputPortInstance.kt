@@ -1,8 +1,8 @@
 package org.kobjects.mosaic.plugins.pixtend
 
-import org.kobjects.mosaic.pluginapi.InputPortInstance
-import org.kobjects.mosaic.pluginapi.InputPortListener
-import org.kobjects.mosaic.pluginapi.ModificationToken
+import org.kobjects.mosaic.model.integration.InputPortInstance
+import org.kobjects.mosaic.model.integration.InputPortListener
+import org.kobjects.mosaic.model.ModificationToken
 
 abstract class PiXtendInputPortInstance(
     val integration: PiXtendIntegration,

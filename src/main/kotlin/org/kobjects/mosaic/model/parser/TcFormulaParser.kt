@@ -2,11 +2,10 @@ package org.kobjects.mosaic.model.parser
 
 import org.kobjects.parsek.expression.Operator
 import org.kobjects.parsek.expression.PrattParser
-import org.kobjects.mosaic.model.CellRangeReference
+import org.kobjects.mosaic.model.sheet.CellRangeReference
 import org.kobjects.mosaic.model.Model
-import org.kobjects.mosaic.model.Sheet
+import org.kobjects.mosaic.model.sheet.Sheet
 import org.kobjects.mosaic.model.expression.*
-import org.kobjects.mosaic.pluginapi.FunctionSpec
 
 
 fun createBinaryOperatorNode(name: String, leftOperand: Expression, rightOperand: Expression): Expression =

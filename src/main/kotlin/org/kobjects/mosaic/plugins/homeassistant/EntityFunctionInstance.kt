@@ -1,8 +1,8 @@
 package org.kobjects.mosaic.plugins.homeassistant
 
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.pluginapi.StatefulFunctionInstance
-import org.kobjects.mosaic.pluginapi.ValueChangeListener
+import org.kobjects.mosaic.model.function.StatefulFunctionInstance
+import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntityState
 
