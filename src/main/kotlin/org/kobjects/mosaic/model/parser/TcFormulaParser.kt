@@ -84,14 +84,12 @@ object TcFormulaParser : PrattParser<TcScanner, ParsingContext, Expression>(
                             val port = integration.nodes[name] ?: throw IllegalArgumentException("'$name' not found in integration '$lowercase'")
                             PortExpression(context.cell, port)
                         } else {
-                            val functionSpec = Model.functions[lowercase] as FunctionSpec?
+                            val functionSpec = Model.functions[lowercase]
                             if (functionSpec != null) {
                                 PluginOperationCall.create(context.cell, functionSpec, parameterList)
                             } else {
-                                val port = Model.ports[lowercase]
-                                require(port != null) {
-                                    "Unresolved identifier $lowercase"
-                                }
+                                val integration = Model.integrations["root"] ?: throw IllegalStateException("root not found")
+                                val port = integration.nodes[name] ?: throw IllegalArgumentException("'$name' not found in root")
                                 PortExpression(context.cell, port)
                             }
                         }
