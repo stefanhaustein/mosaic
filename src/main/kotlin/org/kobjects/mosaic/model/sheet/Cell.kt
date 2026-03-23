@@ -2,6 +2,11 @@ package org.kobjects.mosaic.model.sheet
 
 import kotlinx.datetime.*
 import kotlinx.datetime.format.char
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.json.LegacyToJson
 import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.json.legacyToJson
@@ -26,7 +31,7 @@ class Cell(
 
     var image: String? = null
 
-    var validation: Map<String, Any?>? = null
+    var validation: JsonObject? = null
 
     override val inputs = mutableSetOf<Node>()
     override val outputs = mutableSetOf<Node>()
@@ -35,7 +40,7 @@ class Cell(
     fun clear(modificationToken: ModificationToken) {
         setFormula("", modificationToken)
         setImage("", modificationToken)
-        setValidation(emptyMap(), modificationToken)
+        setValidation(null, modificationToken)
     }
 
     fun setImage(path: String, modificationToken: ModificationToken) {
@@ -50,8 +55,8 @@ class Cell(
            setFormula(formula.toString(), modificationToken)
        }
        val validation = json["v"]
-        setValidation(if (validation == null || validation == Unit || (validation as Map<*,*>).isEmpty()) null
-            else validation as Map<String, Any?>, modificationToken)
+    //    setValidation(if (validation == null || validation == Unit || (validation as Map<*,*>).isEmpty()) null
+        //       else validation as Map<String, Any?>, modificationToken)
 
         val image = json["i"]
         if (image is String) {
@@ -62,7 +67,24 @@ class Cell(
     }
 
 
-    fun setValidation(validation: Map<String, Any?>?, modificationToken: ModificationToken) {
+    fun setJson(json: JsonObject, modificationToken: ModificationToken) {
+        val formula = json["f"]?.jsonPrimitive?.contentOrNull
+        if (formula != null) {
+            setFormula(formula, modificationToken)
+        }
+        val validation = json["v"]
+        setValidation(if (validation is JsonObject) validation else null, modificationToken)
+
+        val image = json["i"]
+        if (image is JsonPrimitive) {
+            setImage(image.jsonPrimitive.content, modificationToken)
+        } else {
+            setImage("", modificationToken)
+        }
+    }
+
+
+    fun setValidation(validation: JsonObject?, modificationToken: ModificationToken) {
         if (validation != this.validation) {
             this.validation = validation
             modificationToken.formulaChanged = true

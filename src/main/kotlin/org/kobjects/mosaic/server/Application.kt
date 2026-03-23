@@ -9,11 +9,15 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.html.dom.serialize
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.json.LegacyJsonParser
 import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.sheet.CellRangeReference
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.tomson.LegacyTomsonParser
+import org.kobjects.tomson.TomsonParser
 import java.io.File
 import java.io.StringWriter
 import kotlin.coroutines.resume
@@ -51,9 +55,9 @@ fun Application.module() {
         post("/runMode") {
             val jsonText = call.receiveText()
             println("Received JSON: $jsonText")
-            val value = LegacyJsonParser.parse(jsonText)
+            val value = Json.parseToJsonElement(jsonText)
             Model.applySynchronizedWithToken { token ->
-                Model.setRunMode(value as Boolean, token)
+                Model.setRunMode(value.jsonPrimitive.boolean, token)
             }
             call.respond(HttpStatusCode.OK)
         }
@@ -61,7 +65,7 @@ fun Application.module() {
             val rawTargetRange = call.parameters["target"]!!
             val targetRange = CellRangeReference.parse(rawTargetRange)
             val tomsonText = call.receiveText()
-            val tomson = LegacyTomsonParser.parse(tomsonText)
+            val tomson = TomsonParser.parse(tomsonText)
 
             println("/paste/$targetRange: $tomsonText")
 

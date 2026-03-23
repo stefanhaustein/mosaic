@@ -1,12 +1,16 @@
-package org.kobjects.mosaic.tomson
+package org.kobjects.tomson
 
-import org.kobjects.mosaic.json.LegacyJsonParser
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
 
-object LegacyTomsonParser {
+object TomsonParser {
 
-    fun parse(input: String): Map<String, Map<String, Any?>> {
-        val result = mutableMapOf<String, Map<String, Any?>>()
-        var currentSectionMap = mutableMapOf<String, Any?>()
+
+    fun parse(input: String): Map<String, JsonObject> {
+        val result = mutableMapOf<String, JsonObject>()
+        var currentSectionMap = mutableMapOf<String, JsonElement>()
         var currentSectionName = ""
 
         var pendingKey = ""
@@ -23,7 +27,7 @@ object LegacyTomsonParser {
                 pendingValue += "\n$line"
             } else {
                 if (pendingKey.isNotEmpty()) {
-                    currentSectionMap[pendingKey] = LegacyJsonParser.parse(pendingValue)
+                    currentSectionMap[pendingKey] = Json.parseToJsonElement(pendingValue)
                     pendingKey = ""
                     pendingValue = ""
                 } else {
@@ -35,10 +39,14 @@ object LegacyTomsonParser {
                 if (line.startsWith("[")) {
                     require(line.endsWith("]"))
                     if (currentSectionMap.isNotEmpty()) {
-                        result[currentSectionName] = currentSectionMap.toMap()
+                        result[currentSectionName] = buildJsonObject {
+                            for ((key, value) in currentSectionMap) {
+                                put(key, value)
+                            }
+                        }
                     }
                     currentSectionName = line.substring(1, line.length - 1)
-                    currentSectionMap = mutableMapOf<String, Any?>()
+                    currentSectionMap.clear()
                 } else {
                     val eq = line.indexOf('=')
                     val col = line.indexOf(':')
@@ -52,17 +60,19 @@ object LegacyTomsonParser {
             }
         }
         if (pendingKey.isNotEmpty()) {
-            currentSectionMap[pendingKey] = LegacyJsonParser.parse(pendingValue)
+            currentSectionMap[pendingKey] = Json.parseToJsonElement(pendingValue)
         } else {
             require(pendingValue.isEmpty()) {
                 "Unexpected pending value '$pendingValue' at EOF"
             }
         }
         if (currentSectionMap.isNotEmpty()) {
-            result[currentSectionName] = currentSectionMap.toMap()
+            result[currentSectionName] = buildJsonObject {
+                for ((key, value) in currentSectionMap) {
+                    put(key, value)
+                }
+            }
         }
         return result.toMap()
     }
-
-
 }

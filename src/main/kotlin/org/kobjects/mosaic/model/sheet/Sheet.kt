@@ -1,5 +1,9 @@
 package org.kobjects.mosaic.model.sheet
 
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
 import kotlin.collections.iterator
@@ -81,8 +85,8 @@ class Sheet(
         }
     }
 
-    fun paste(token: ModificationToken, targetSelectionRange: CellRangeReference, tomson: Map<String, Map<String, Any?>>) {
-        val rawSourceRange = tomson[""]!!["range"] as String
+    fun paste(token: ModificationToken, targetSelectionRange: CellRangeReference, tomson: Map<String, JsonObject>) {
+        val rawSourceRange = tomson[""]!!["range"]!!.jsonPrimitive.content
         val sourceRange = CellRangeReference.parse(rawSourceRange)
 
         val targetRange = CellRangeReference(
@@ -102,7 +106,7 @@ class Sheet(
             try {
                 val column = Cell.getColumn(key) + offsetX
                 val row = Cell.getRow(key) + offsetY
-                getOrCreateCell(Cell.id(column, row)).setJson(value as Map<String, Any>, token)
+                getOrCreateCell(Cell.id(column, row)).setJson(if (value is JsonObject) value else buildJsonObject {  }, token)
             } catch (e: Exception) {
                 System.err.println("Error parsing cell $key = $value")
                 e.printStackTrace()
