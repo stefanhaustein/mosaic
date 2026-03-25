@@ -1,5 +1,7 @@
 package org.kobjects.mosaic.model.integration
 
+import kotlinx.serialization.json.JsonObject
+
 class Root : Integration(
     "Root",
     "root",

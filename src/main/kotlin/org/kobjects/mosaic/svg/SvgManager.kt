@@ -1,6 +1,5 @@
 package org.kobjects.mosaic.svg
 
-import org.kobjects.mosaic.pluginapi.*
 import java.io.File
 
 class SvgManager(root: File) {

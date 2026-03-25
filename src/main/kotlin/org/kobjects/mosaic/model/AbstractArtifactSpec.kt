@@ -1,5 +1,6 @@
 package org.kobjects.mosaic.model
 
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.mosaic.json.LegacyToJson
@@ -23,12 +24,12 @@ abstract class AbstractArtifactSpec(
         get() = if (namespace != null) namespace.name + "." + name else name
 
 
-    fun convertConfiguration(rawConfig: Map<String, Any?>): Map<String, Any?> {
+    fun convertConfiguration(rawConfig: JsonObject?): Map<String, Any?> {
         val result = mutableMapOf<String, Any?>()
         for (paramSpec in parameters) {
             val paramName = paramSpec.name
-            val rawValue = rawConfig[paramName]
-            if (rawValue == null || rawValue == Unit) {
+            val rawValue = rawConfig?.get(paramName)
+            if (rawValue == null) {
                 require (paramSpec.modifiers.contains(ParameterSpec.Modifier.OPTIONAL)) {
                     "Missing mandatory configuration parameter: $paramName for $fqName"
                 }
@@ -38,7 +39,7 @@ abstract class AbstractArtifactSpec(
                 result[paramName] = paramSpec.type.valueFromJson(rawValue)
             }
         }
-        return result
+        return result.toMap()
     }
 
     override fun toJson() = buildJsonObject {

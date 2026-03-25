@@ -2,7 +2,6 @@ package org.kobjects.mosaic.model.sheet
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
@@ -64,10 +63,10 @@ class Sheet(
         return sb.toString()
     }
 
-    fun parseToml(cells: Map<String, Any?>, token: ModificationToken) {
+    fun parseToml(cells: JsonObject, token: ModificationToken) {
         for ((key, value) in cells) {
             try {
-                getOrCreateCell(key).setJson(value as Map<String, Any>, token)
+                getOrCreateCell(key).setJson(value as JsonObject, token)
             } catch (e: Exception) {
                 System.err.println("Error parsing cell $key = $value")
                 e.printStackTrace()

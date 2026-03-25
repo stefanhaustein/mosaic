@@ -1,5 +1,10 @@
 package org.kobjects.mosaic.model.integration
 
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
@@ -48,14 +53,14 @@ class Ports : Iterable<PortHolder> {
     }
 
     // The name is separate because it's typically the key of the spec map
-    fun definePort(integrationName: String, portName: String, jsonSpec: Map<String, Any?>, token: ModificationToken) {
+    fun definePort(integrationName: String, portName: String, jsonSpec: JsonObject, token: ModificationToken) {
         token.symbolsChanged = true
         val fqName = "$integrationName.$portName"
 
-        if (jsonSpec["deleted"] as Boolean? != true && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
+        if (jsonSpec["deleted"]?.jsonPrimitive?.booleanOrNull != true && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
             val port = this[fqName]
             if (port is OutputPortHolder) {
-                port.rawFormula = jsonSpec["source"]?.toString() ?: ""
+                port.rawFormula = jsonSpec["source"]?.jsonPrimitive?.content ?: ""
                 port.reparse()
                 port.tag = token.tag
             }
@@ -63,7 +68,7 @@ class Ports : Iterable<PortHolder> {
         }
 
         // Always delete what's there.
-        val previousName = jsonSpec["previousName"]?.toString() ?: fqName
+        val previousName = jsonSpec["previousName"]?.jsonPrimitive?.contentOrNull ?: fqName
         try {
             deletePort(previousName, token)
         } catch (e: Exception) {
@@ -72,20 +77,25 @@ class Ports : Iterable<PortHolder> {
 
         if (jsonSpec["deleted"] as Boolean? != true) {
 
-                val kind = jsonSpec["kind"].toString()
+                val kind = jsonSpec["kind"]!!.jsonPrimitive.content
 
                 val integration = Model.integrations[integrationName] ?: throw IllegalArgumentException("Integration '$integrationName' not found.")
                 val specification = integration.operationSpecs.find { it.name == kind } ?: throw IllegalArgumentException("'$kind' not found in integration $integration.")
 
                 this[fqName]?.detach()
 
-                val config = specification.convertConfiguration(
-                    jsonSpec["configuration"] as? Map<String, Any> ?: emptyMap()
-                )
+                val resolvedConfiguration = specification.convertConfiguration(jsonSpec["configuration"]?.jsonObject)
 
                 val port = when (specification) {
-                    is InputPortSpec -> InputPortHolder(integration, portName, specification, config, tag = token.tag)
-                    is OutputPortSpec -> OutputPortHolder(integration, portName, specification, config, displayName = jsonSpec["displayName"] as String?, rawFormula = jsonSpec["source"] as String? ?: jsonSpec["expression"] as String? ?: "", tag = token.tag)
+                    is InputPortSpec -> InputPortHolder(integration, portName, specification, resolvedConfiguration, tag = token.tag)
+                    is OutputPortSpec -> OutputPortHolder(
+                        integration,
+                        portName,
+                        specification,
+                        resolvedConfiguration,
+                        displayName = jsonSpec["displayName"]?.jsonPrimitive?.contentOrNull,
+                        rawFormula = jsonSpec["source"]?.jsonPrimitive?.contentOrNull ?: jsonSpec["expression"]?.jsonPrimitive?.contentOrNull ?: "",
+                        tag = token.tag)
                     else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
                 }
                 integration.nodes[portName] = port

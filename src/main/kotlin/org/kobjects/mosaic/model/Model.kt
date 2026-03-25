@@ -1,5 +1,9 @@
 package org.kobjects.mosaic.model
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.json.LegacyJsonParser
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
 import org.kobjects.mosaic.model.function.Functions
@@ -18,7 +22,7 @@ import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 import org.kobjects.mosaic.svg.SvgManager
 import java.io.File
 import java.io.FileWriter
-import org.kobjects.mosaic.tomson.LegacyTomsonParser
+import org.kobjects.tomson.TomsonParser
 import java.io.Writer
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -90,12 +94,12 @@ object Model : ModelInterface {
 
     fun loadData(data: String, token: ModificationToken) {
         try {
-            val toml = LegacyTomsonParser.parse(data)
+            val toml = TomsonParser.parse(data)
             for ((key, map) in toml) {
                 try {
                     val parts = key.split(".")
                     if (parts.size == 1 && parts[0].isEmpty()) {
-                        setRunMode(map["runMode"] as Boolean? ?: false, token)
+                        setRunMode(map["runMode"]?.jsonPrimitive?.booleanOrNull ?: false, token)
                     } else if (parts.size == 3 && parts[0] == "sheets" && parts[2] == "cells") {
                         val name = parts[1]
                         val sheet = Sheet(name)
@@ -107,7 +111,7 @@ object Model : ModelInterface {
                     } else if (parts.size == 3 && parts[0] == "integration" && parts[2] == "ports") {
                         val integrationName = parts[1]
                         for ((portName, portSpec) in map) {
-                            Model.ports.definePort(integrationName, portName, portSpec as Map<String, Any?>, token)
+                            Model.ports.definePort(integrationName, portName, portSpec.jsonObject, token)
                         }
                     } else {
                         System.err.println("Unrecognized toml section: $key")
@@ -173,7 +177,7 @@ object Model : ModelInterface {
                     if (oldSheet != null) {
                         for (oldCell in oldSheet.cells.values) {
                             val newCell = newSheet.getOrCreateCell(oldCell.id)
-                            newCell.setJson(LegacyJsonParser.parseObject(oldCell.legacyToJson()), token)
+                            newCell.setJson(Json.parseToJsonElement(oldCell.legacyToJson()).jsonObject, token)
                         }
                     }
                     sheets[previousName]?.delete(token)

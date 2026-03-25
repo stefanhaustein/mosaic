@@ -11,12 +11,12 @@ import io.ktor.utils.io.*
 import kotlinx.html.dom.serialize
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.json.LegacyJsonParser
 import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.sheet.CellRangeReference
 import org.kobjects.mosaic.model.Model
-import org.kobjects.mosaic.tomson.LegacyTomsonParser
 import org.kobjects.tomson.TomsonParser
 import java.io.File
 import java.io.StringWriter
@@ -46,7 +46,7 @@ fun Application.module() {
         post("/update/{cell}") {
             val cell = call.parameters["cell"]!!
             val text = call.receiveText()
-            val json = LegacyJsonParser.parseObject(text)
+            val json = Json.parseToJsonElement(text).jsonObject
             Model.applySynchronizedWithToken { token ->
                 Model.getOrCreate(cell).setJson(json, token)
             }
@@ -79,7 +79,7 @@ fun Application.module() {
             val portName = call.parameters["portName"]!!
             val jsonText = call.receiveText()
             println("/ports/$integrationName/$portName: $jsonText")
-            val jsonSpec = LegacyJsonParser.parseObject(jsonText)
+            val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
             Model.applySynchronizedWithToken { token ->
                 Model.ports.definePort(integrationName, portName, jsonSpec, token)
             }
@@ -89,7 +89,7 @@ fun Application.module() {
             val name = call.parameters["name"]!!
             val jsonText = call.receiveText()
             println("/integrations/$name: $jsonText")
-            val jsonSpec = LegacyJsonParser.parseObject(jsonText)
+            val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
             Model.applySynchronizedWithToken { token ->
                 Model.integrations.configureIntegration(name, jsonSpec, token)
             }
@@ -98,7 +98,7 @@ fun Application.module() {
         post("/sheet") {
             val jsonText = call.receiveText()
             println("Received JSON: $jsonText")
-            val jsonSpec = LegacyJsonParser.parseObject(jsonText)
+            val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
             val name = jsonSpec["name"] as String?
             Model.applySynchronizedWithToken { token ->
                 Model.updateSheet(name, jsonSpec, token)

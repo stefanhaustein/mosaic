@@ -1,5 +1,9 @@
 package org.kobjects.mosaic.model.integration
 
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.Model.integrations
 import org.kobjects.mosaic.model.ModificationToken
@@ -21,15 +25,15 @@ class Integrations : Iterable<Integration> {
         token.symbolsChanged = true
     }
 
-    fun configureIntegration(name: String, jsonSpec: Map<String, Any?>, token: ModificationToken) {
-        if (jsonSpec["deleted"] == true) {
+    fun configureIntegration(name: String, jsonSpec: JsonObject, token: ModificationToken) {
+        if (jsonSpec["deleted"]?.jsonPrimitive?.booleanOrNull == true) {
             deleteIntegration(name, token)
             return
         }
 
-        val type = jsonSpec["type"].toString()
+        val type = jsonSpec["type"]!!.jsonPrimitive.content
         val specification = Model.factories[type] ?: throw IllegalArgumentException("$type is not a integration factory")
-        val config = specification.convertConfiguration(jsonSpec["configuration"] as Map<String, Any?>)
+        val config = specification.convertConfiguration(jsonSpec["configuration"]?.jsonObject)
         var integration = integrationMap[name]
 
         if (integration != null) {

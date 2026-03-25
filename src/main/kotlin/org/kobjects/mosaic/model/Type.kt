@@ -1,6 +1,11 @@
 package org.kobjects.mosaic.model
 
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.json.LegacyToJson
 import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.json.legacyToJson
@@ -12,17 +17,17 @@ interface Type : LegacyToJson, ToJson {
     object INT: Type {
         override fun toString() = "Int"
         override fun valueFromString(s: String) = s.toInt()
-        override fun valueFromJson(value: Any) = (value as Number).toInt()
+        override fun valueFromJson(value: JsonElement) = value.jsonPrimitive.int
     }
     object REAL: Type {
         override fun toString() = "Real"
         override fun valueFromString(s: String) = s.toDouble()
-        override fun valueFromJson(value: Any) = (value as Number).toDouble()
+        override fun valueFromJson(value: JsonElement) = value.jsonPrimitive.double
     }
     object BOOL: Type {
         override fun toString() = "Bool"
         override fun valueFromString(s: String) = s.toBoolean()
-        override fun valueFromJson(value: Any) = (value as Boolean)
+        override fun valueFromJson(value: JsonElement) = value.jsonPrimitive.boolean
     }
     object STRING: Type {
         override fun toString() = "String"
@@ -50,8 +55,8 @@ interface Type : LegacyToJson, ToJson {
     fun valueFromString(s: String): Any =
         throw UnsupportedOperationException("Can't parse '$this' yet.")
 
-    fun valueFromJson(value: Any): Any =
-        if (value is String) valueFromString(value)
+    fun valueFromJson(value: JsonElement): Any =
+        if (value is JsonPrimitive) valueFromString(value.jsonPrimitive.content)
         else throw UnsupportedOperationException("Can't parse '$this' from JSON yet.")
 
     class ENUM<T : Enum<T>>(val entries: EnumEntries<T>) : Type {

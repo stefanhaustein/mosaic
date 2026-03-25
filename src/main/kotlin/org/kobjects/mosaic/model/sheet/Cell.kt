@@ -49,24 +49,6 @@ class Cell(
         modificationToken.formulaChanged = true
     }
 
-    fun setJson(json: Map<String, Any?>, modificationToken: ModificationToken) {
-       val formula = json["f"]
-       if (formula != null) {
-           setFormula(formula.toString(), modificationToken)
-       }
-       val validation = json["v"]
-    //    setValidation(if (validation == null || validation == Unit || (validation as Map<*,*>).isEmpty()) null
-        //       else validation as Map<String, Any?>, modificationToken)
-
-        val image = json["i"]
-        if (image is String) {
-            setImage(image, modificationToken)
-        } else {
-            setImage("", modificationToken)
-        }
-    }
-
-
     fun setJson(json: JsonObject, modificationToken: ModificationToken) {
         val formula = json["f"]?.jsonPrimitive?.contentOrNull
         if (formula != null) {
