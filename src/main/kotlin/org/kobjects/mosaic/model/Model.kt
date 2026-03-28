@@ -4,7 +4,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import org.kobjects.mosaic.json.LegacyJsonParser
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
 import org.kobjects.mosaic.model.function.Functions
 import org.kobjects.mosaic.model.integration.InputPortListener
