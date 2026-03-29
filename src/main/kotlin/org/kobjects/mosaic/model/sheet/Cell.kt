@@ -2,9 +2,13 @@ package org.kobjects.mosaic.model.sheet
 
 import kotlinx.datetime.*
 import kotlinx.datetime.format.char
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.json.LegacyToJson
@@ -74,20 +78,59 @@ class Cell(
         }
     }
 
+    fun serializeValue(): JsonElement {
+        val value = this.value
+        return when (value) {
+            null,
+            is Unit -> JsonNull
+            is Exception -> buildJsonObject {
+                put("type", JsonPrimitive("err"))
+                put ("msg", JsonPrimitive(value::class.simpleName.toString() + value.message))
+            }
+            is Instant -> buildJsonObject {
+                val localDateTime = value.toLocalDateTime(TimeZone.currentSystemDefault())
+                put("type", JsonPrimitive("instant"))
+                put("rendered", JsonPrimitive(localDateTime.time.format(TIME_FORMAT_SECONDS)))
+            }
+            is Number -> JsonPrimitive(value)
+            is String -> JsonPrimitive(value)
+            is Boolean -> JsonPrimitive(value)
+            else -> buildJsonObject {
+                put("type", JsonPrimitive("err"))
+                put ("msg", JsonPrimitive("Unrecognized value type: '${value.javaClass}' for $value"))
+            }
+        }
+    }
 
     fun serializeValue(sb: StringBuilder) {
-        val value = this.value
-        when (value) {
-            null,
-                is Unit -> {sb.append("null")}
-            is Exception -> sb.append("""{"type": "err", "msg": ${(value::class.simpleName.toString() + value.message).quote()}}""")
-            is Instant -> {
-                val localDateTime = value.toLocalDateTime(TimeZone.currentSystemDefault())
-                /* sb.append(localDateTime.date.format(LocalDate.Formats.ISO))
-                 sb.append(' ') */
-                sb.append("""{"type": "instant", "rendered":${localDateTime.time.format(TIME_FORMAT_SECONDS).quote()}}""")
+        sb.append(Json.encodeToString(serializeValue()))
+    }
+
+    fun serialize(builder: JsonObjectBuilder, tag: Long, forClient: Boolean) {
+        val id = id
+        if (formulaTag > tag) {
+            val properties = buildJsonObject {
+                if (!rawFormula.isNullOrEmpty()) {
+                    put("f", JsonPrimitive(rawFormula.quote()))
+                }
+                val validation = validation
+                if (validation?.isNotEmpty() == true) {
+                    put("v", validation)
+                }
+                if (!image.isNullOrBlank()) {
+                    put("i", JsonPrimitive(image))
+                }
+                if (forClient) {
+                    builder.put("c", serializeValue())
+                    serializeDependencies(this)
+                }
             }
-            else -> value.legacyToJson(sb)
+            if (properties.isNotEmpty()) {
+                builder.put(id, properties)
+            }
+
+        } else if (valueTag > tag) {
+            builder.put("$id.c", serializeValue())
         }
     }
 
@@ -123,8 +166,8 @@ class Cell(
         }
     }
 
-    override fun legacyToJson(sb: StringBuilder) {
-        serialize(sb, -1, false)
+    override fun toJson() = buildJsonObject {
+        serialize(this, -1, false)
     }
 
     override fun qualifiedId() = "${sheet.name}!$id"

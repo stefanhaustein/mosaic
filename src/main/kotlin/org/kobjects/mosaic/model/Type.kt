@@ -1,15 +1,17 @@
 package org.kobjects.mosaic.model
 
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.json.LegacyToJson
-import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.tomson.ToJson
+import org.kobjects.tomson.toJson
 import kotlin.enums.EnumEntries
 
 /** This looks odd because it used to be an enum */
@@ -46,11 +48,7 @@ interface Type : LegacyToJson, ToJson {
         override fun toString() = "Range"
     }
 
-    override fun legacyToJson(sb: StringBuilder) {
-        sb.append(toString().quote())
-    }
-
-    override fun toJson() = JsonPrimitive(toString())
+    override fun toJson(): JsonElement = JsonPrimitive(toString())
 
     fun valueFromString(s: String): Any =
         throw UnsupportedOperationException("Can't parse '$this' yet.")
@@ -61,9 +59,7 @@ interface Type : LegacyToJson, ToJson {
 
     class ENUM<T : Enum<T>>(val entries: EnumEntries<T>) : Type {
 
-        override fun legacyToJson(sb: StringBuilder) {
-            entries.map {it.name}.legacyToJson(sb)
-        }
+        override fun toJson() = JsonArray(entries.toJson())
 
         override fun valueFromString(s: String) =
             entries.first { it.name.lowercase() == s.lowercase() }
@@ -71,14 +67,13 @@ interface Type : LegacyToJson, ToJson {
     }
 
     class Struct(val fields: List<Field>) : Type {
-        override fun legacyToJson(sb: StringBuilder) = fields.legacyToJson(sb)
+        override fun toJson() = JsonArray(fields.map { it.toJson() })
     }
 
     class Field(val name: String, val type: Type) : LegacyToJson {
-        override fun legacyToJson(sb: StringBuilder) {
-            sb.append("""{"name": ${name.quote()}, "type":""")
-            type.legacyToJson(sb)
-            sb.append("}")
+        override fun toJson() = buildJsonObject {
+            put("name", JsonPrimitive(name))
+            put("type", type.toJson())
         }
     }
 

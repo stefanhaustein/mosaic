@@ -2,8 +2,6 @@ package org.kobjects.mosaic.model.integration
 
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Node
 import org.kobjects.tomson.toJson
@@ -78,24 +76,6 @@ open class InputPortHolder(
         return true
     }
 
-
-    override fun legacyToJson(sb: StringBuilder, forClient: Boolean) {
-        sb.append("""{"name":${name.quote()}, "kind":${specification.fqName.quote()}, "type":""")
-        specification.type.legacyToJson(sb)
-        if (category != null) {
-            sb.append(""", "category": ${category?.quote()}""")
-        }
-        if (displayName != null) {
-            sb.append(""", "displayName": ${displayName?.quote()}""")
-        }
-        sb.append(""", "configuration": """)
-        configuration.legacyToJson(sb)
-        if (forClient) {
-            serializeDependencies(sb)
-        }
-        sb.append("}")
-    }
-
     override fun toJson(forClient: Boolean) = buildJsonObject {
         put("kind", JsonPrimitive(specification.name))
         val type = specification.type
@@ -109,9 +89,9 @@ open class InputPortHolder(
             put("displayName", JsonPrimitive(displayName))
         }
         put("configuration", configuration.toJson())
-        // if (forClient) {
-        //  serializeDependencies
-        // }
+        if (forClient) {
+          serializeDependencies(this)
+        }
     }
 
 

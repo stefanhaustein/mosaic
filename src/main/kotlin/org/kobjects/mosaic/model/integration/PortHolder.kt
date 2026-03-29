@@ -24,8 +24,6 @@ interface PortHolder: Node {
 
     override val owner: Integration
 
-    fun legacyToJson(sb: StringBuilder, forClient: Boolean)
-
     fun attach(token: ModificationToken)
 
     override fun qualifiedId() = if (owner == null) name else owner?.name + "." + name

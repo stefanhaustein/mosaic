@@ -57,36 +57,6 @@ abstract class AbstractArtifactSpec(
         put("modifiers", modifiers.toJson())
     }
 
-    override fun legacyToJson(sb: StringBuilder) {
-        sb.append(toJson().toString())
-        /*
-        sb.append("""{"name":${fqName.quote()},"category":${category.quote()},"kind":"$kind",""")
-        if (type != null) {
-            sb.append(""""type":${type.legacyToJson()},""")
-        }
-        if (displayName != null) {
-            sb.append(""""displayName":${displayName.quote()},""")
-        }
-        sb.append(""""description":${description.quote()},"params":[""")
-        var first = true
-        for (param in parameters) {
-            if (first) {
-                first = false
-            } else {
-                sb.append(",")
-            }
-            param.legacyToJson(sb)
-        }
-        sb.append("]")
-        if (modifiers.isNotEmpty()) {
-            sb.append(""","modifiers":[""")
-            sb.append(modifiers.joinToString(",") { it.name.quote() })
-            sb.append("]")
-        }
-        sb.append("}")*/
-    }
-
-
     enum class Modifier {
          NO_SIMULATION, DELETED, SINGLETON, SETTABLE, UNINSTANTIABLE
     }

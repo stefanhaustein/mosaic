@@ -58,27 +58,6 @@ class OutputPortHolder(
     }
 
 
-    override fun legacyToJson(sb: StringBuilder, forClient: Boolean) {
-        sb.append("""{"name":${name.quote()}""")
-        if (forClient || !specification.modifiers.contains(Modifier.UNINSTANTIABLE)) {
-            sb.append(""", "kind":${specification.fqName.quote()}""")
-            if (category != null) {
-                sb.append(""", "category": ${category?.quote()}""")
-            }
-            if (displayName != null) {
-                sb.append(""", "displayName": ${displayName?.quote()}""")
-            }
-            sb.append(""", "configuration": """)
-            configuration.legacyToJson(sb)
-        }
-        if (forClient) {
-            serializeDependencies(sb)
-        }
-        sb.append(""", "source":${rawFormula.quote()}}""")
-
-    }
-
-
     override fun toJson(forClient: Boolean) = buildJsonObject {
         put("kind", JsonPrimitive(specification.name))
         val type = specification.type
@@ -92,9 +71,9 @@ class OutputPortHolder(
             put("displayName", JsonPrimitive(displayName))
         }
         put("configuration", configuration.toJson())
-        // if (forClient) {
-        //  serializeDependencies
-        // }
+        if (forClient) {
+          serializeDependencies(this)
+        }
         put("source", JsonPrimitive(rawFormula))
     }
 

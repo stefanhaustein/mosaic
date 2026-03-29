@@ -19,6 +19,7 @@ import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
 import org.kobjects.mosaic.plugins.pixtend.PiXtendIntegration
 import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 import org.kobjects.mosaic.svg.SvgManager
+import org.kobjects.tomson.TomsonOutput
 import java.io.File
 import java.io.FileWriter
 import org.kobjects.tomson.TomsonParser
@@ -139,7 +140,7 @@ object Model : ModelInterface {
         }
 
         if (forClient) {
-            writer.write(functions.serialize(tag))
+            functions.serialize(TomsonOutput(writer), tag)
             writer.write(factories.serialize(tag))
         }
 

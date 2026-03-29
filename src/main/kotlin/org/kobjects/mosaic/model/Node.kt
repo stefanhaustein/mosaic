@@ -1,5 +1,9 @@
 package org.kobjects.mosaic.model
 
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObjectBuilder
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
 import org.kobjects.mosaic.json.quote
 
 // Can't be an abstract class becuase PortHolder needs to be a sub-interface
@@ -30,4 +34,13 @@ interface Node {
         }
     }
 
+
+    fun serializeDependencies(builder: JsonObjectBuilder) {
+        if (inputs.isNotEmpty()) {
+            builder.put("inputs", JsonArray(inputs.map { JsonPrimitive(it.qualifiedId()) }  ))
+        }
+        if (outputs.isNotEmpty()) {
+            builder.put("outputs", JsonArray(outputs.map { JsonPrimitive(it.qualifiedId()) }  ))
+        }
+    }
 }
