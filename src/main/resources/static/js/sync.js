@@ -213,6 +213,9 @@ function processSheetCellsUpdate(name, map) {
     let sheet = model.sheets[name]
 
     let cells = sheet.cells
+
+    console.log("Map for ", name, ": ", JSON.stringify(map))
+
     for (let key in map) {
         let newValue = map[key]
         if (key.endsWith(".c")) {

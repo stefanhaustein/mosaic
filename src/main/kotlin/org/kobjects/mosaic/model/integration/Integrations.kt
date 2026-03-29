@@ -46,10 +46,8 @@ class Integrations : Iterable<Integration> {
     }
 
 
-    fun serialize(writer: Writer, forClient: Boolean, tag: Long) {
-        val tomson = TomsonOutput(writer)
+    fun serialize(tomson: TomsonOutput, forClient: Boolean, tag: Long) {
         for (integration in integrations) {
-
                 integration.serialize(tomson, forClient, tag)
 
         }

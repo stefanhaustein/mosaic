@@ -2,6 +2,7 @@ package org.kobjects.mosaic.model.integration
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -9,6 +10,7 @@ import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Type
+import org.kobjects.tomson.TomsonOutput
 import java.io.Writer
 
 
@@ -103,19 +105,4 @@ class Ports : Iterable<PortHolder> {
         }
     }
 
-    fun serialize(writer: Writer, forClient: Boolean, tag: Long) {
-        val values = StringBuilder()
-        for (port in this) {
-            if (port.name.contains(".")) {
-                println()
-            }
-            if (port.valueTag > tag) {
-                values.append("${port.fqName}: ${port.value.legacyToJson()}\n")
-            }
-        }
-
-        if (forClient && values.isNotEmpty()) {
-            writer.write("[portValues]\n\n$values\n")
-        }
-    }
 }

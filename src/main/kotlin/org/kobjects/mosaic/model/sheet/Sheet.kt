@@ -1,10 +1,14 @@
 package org.kobjects.mosaic.model.sheet
 
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
+import org.kobjects.tomson.TomsonOutput
+import org.kobjects.tomson.toJson
 import kotlin.collections.iterator
 
 class Sheet(
@@ -37,30 +41,23 @@ class Sheet(
         highlightTag = tag
     }
 
-    fun serialize(tag: Long, forClient: Boolean): String {
-        val sb = StringBuilder()
+    fun serialize(tomson: TomsonOutput, tag: Long, forClient: Boolean) {
         if (deleted) {
             if (forClient) {
-                sb.append("[sheets.$name]\n\ndeleted: true\n\n")
+                tomson.appendSection("sheets.$name", JsonObject(mapOf("deleted" to JsonPrimitive(true))))
             }
         } else {
             if (highlightTag > tag) {
-                sb.append("[sheets.$name]\n\nhighlighted: [")
-                    .append(highlighted.joinToString(",") { """"${it.toStringLocal()}""""})
-                    .append("]\n\n")
+                tomson.appendSection("sheets.$name", JsonObject(mapOf("highlighted" to JsonArray(highlighted.map { it.toJson() }))))
             }
 
-            sb.append("[sheets.$name.cells]\n")
-            var previousRow = -1
-            for (cell in cells.values.sortedBy { it.row * 10000 + it.column }) {
-                if (cell.row != previousRow) {
-                    previousRow = cell.row
-                    sb.append("\n")
+            val json = buildJsonObject {
+                for (cell in cells.values.sortedBy { it.row * 10000 + it.column }) {
+                    cell.serialize(this, tag, forClient)
                 }
-                cell.serialize(sb, tag, forClient)
             }
+            tomson.appendSection("sheets.$name.cells", json)
         }
-        return sb.toString()
     }
 
     fun parseToml(cells: JsonObject, token: ModificationToken) {

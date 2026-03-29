@@ -111,7 +111,7 @@ class Cell(
         if (formulaTag > tag) {
             val properties = buildJsonObject {
                 if (!rawFormula.isNullOrEmpty()) {
-                    put("f", JsonPrimitive(rawFormula.quote()))
+                    put("f", JsonPrimitive(rawFormula))
                 }
                 val validation = validation
                 if (validation?.isNotEmpty() == true) {
@@ -121,7 +121,7 @@ class Cell(
                     put("i", JsonPrimitive(image))
                 }
                 if (forClient) {
-                    builder.put("c", serializeValue())
+                    put("c", serializeValue())
                     serializeDependencies(this)
                 }
             }

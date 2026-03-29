@@ -18,7 +18,7 @@ class TomsonOutput(val target: Appendable = StringBuilder()) {
     }
 
     fun appendValue(name: String, value: JsonElement) {
-        target.appendLine("$name: $value")
+        target.appendLine("$name = $value")
     }
 
 

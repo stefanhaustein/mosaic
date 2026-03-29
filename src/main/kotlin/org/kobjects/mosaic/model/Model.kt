@@ -1,6 +1,7 @@
 package org.kobjects.mosaic.model
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -134,24 +135,22 @@ object Model : ModelInterface {
         return sheet.getOrCreateCell(name.substring(cut + 1))
     }
 
-    fun serialize(writer: Writer, forClient: Boolean = false, tag: Long = -1) {
+    fun serialize(out: TomsonOutput, forClient: Boolean = false, tag: Long = -1) {
         if (settingsTag > tag) {
-            writer.write("runMode = $runMode_\n")
+            out.appendValue("runMode", JsonPrimitive(runMode_))
         }
 
         if (forClient) {
-            functions.serialize(TomsonOutput(writer), tag)
-            writer.write(factories.serialize(tag))
+            functions.serialize(out, tag)
+            factories.serialize(out, tag)
         }
 
-        integrations.serialize(writer, forClient, tag)
-        ports.serialize(writer, forClient, tag)
-
-        writer.write("\n")
+        integrations.serialize(out, forClient, tag)
+        //ports.serialize(writer, forClient, tag)
 
         for (sheet in sheets.values) {
-            writer.write(sheet.serialize(tag, forClient))
-            writer.write("\n")
+           sheet.serialize(out, tag, forClient)
+
         }
     }
 
@@ -159,7 +158,7 @@ object Model : ModelInterface {
     fun save() {
         STORAGE_FILE.parentFile.mkdirs()
         val writer = FileWriter(STORAGE_FILE)
-        serialize(writer)
+        serialize(TomsonOutput(writer))
         writer.close()
     }
 

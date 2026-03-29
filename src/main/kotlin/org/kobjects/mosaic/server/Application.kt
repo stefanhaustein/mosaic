@@ -16,6 +16,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.sheet.CellRangeReference
 import org.kobjects.mosaic.model.Model
+import org.kobjects.tomson.TomsonOutput
 import org.kobjects.tomson.TomsonParser
 import java.io.File
 import java.io.StringWriter
@@ -142,7 +143,7 @@ fun Application.module() {
                 if (forClient) {
                     writer.write("tag = ${Model.modificationTag}\n\n")
                 }
-                Model.serialize(writer, forClient, tag)
+                Model.serialize(TomsonOutput(writer), forClient, tag)
                 writer.close()
                 writer.toString()
             }

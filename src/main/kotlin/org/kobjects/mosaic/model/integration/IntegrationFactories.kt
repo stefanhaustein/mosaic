@@ -1,5 +1,8 @@
 package org.kobjects.mosaic.model.integration
 
+import kotlinx.serialization.json.buildJsonObject
+import org.kobjects.tomson.TomsonOutput
+
 
 class IntegrationFactories : Iterable<IntegrationFactory> {
 
@@ -13,15 +16,16 @@ class IntegrationFactories : Iterable<IntegrationFactory> {
 
     override fun iterator() = factoryMap.values.iterator()
 
-    fun serialize(tag: Long): String {
-        val sb = StringBuilder()
-        for (factory in this) {
-            if (factory.tag > tag) {
-                sb.append(factory.fqName).append(": ")
-                factory.legacyToJson(sb)
-                sb.append('\n')
+    fun serialize(out: TomsonOutput, tag: Long) {
+        val values = buildJsonObject {
+            for (factory in this@IntegrationFactories) {
+               if (factory.tag > tag) {
+                   put(factory.fqName, factory.toJson())
+               }
             }
         }
-        return if (sb.isEmpty()) "" else "\n[integrations]\n\n$sb"
+        if (!values.isEmpty()) {
+            out.appendSection("integrations", values = values)
+        }
     }
 }
