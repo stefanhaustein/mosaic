@@ -2,11 +2,8 @@ package org.kobjects.mosaic.model.integration
 
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.ExpressionNode
 import org.kobjects.mosaic.model.ModificationToken
-import org.kobjects.mosaic.model.AbstractArtifactSpec.Modifier
 import org.kobjects.tomson.toJson
 
 class OutputPortHolder(

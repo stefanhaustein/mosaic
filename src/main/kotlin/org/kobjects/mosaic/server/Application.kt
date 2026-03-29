@@ -10,6 +10,7 @@ import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.html.dom.serialize
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -140,10 +141,11 @@ fun Application.module() {
             }
             val result = Model.applySynchronized {
                 val writer = StringWriter()
+                val tomson = TomsonOutput(writer)
                 if (forClient) {
-                    writer.write("tag = ${Model.modificationTag}\n\n")
+                    tomson.appendValue("tag", JsonPrimitive(Model.modificationTag))
                 }
-                Model.serialize(TomsonOutput(writer), forClient, tag)
+                Model.serialize(tomson, forClient, tag)
                 writer.close()
                 writer.toString()
             }

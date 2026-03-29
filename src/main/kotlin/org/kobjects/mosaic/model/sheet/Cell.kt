@@ -11,7 +11,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
-import org.kobjects.mosaic.json.LegacyToJson
+import org.kobjects.tomson.ToJson
 import org.kobjects.mosaic.json.quote
 import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.ExpressionNode
@@ -22,7 +22,7 @@ import org.kobjects.mosaic.model.Namespace
 class Cell(
     val sheet: Sheet,
     val id: String
-) : ExpressionNode(sheet), Iterable<Cell>, LegacyToJson {
+) : ExpressionNode(sheet), Iterable<Cell>, ToJson {
 
     val column: Int
         get() = getColumn(id)

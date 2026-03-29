@@ -3,7 +3,6 @@ package org.kobjects.mosaic.model
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import org.kobjects.mosaic.json.LegacyToJson
 import org.kobjects.tomson.ToJson
 import org.kobjects.tomson.toJson
 
@@ -18,8 +17,7 @@ abstract class AbstractArtifactSpec(
     val modifiers: Set<Modifier>,
     val tag: Long,
     val displayName: String?,
-) : LegacyToJson, ToJson {
-
+) : ToJson {
     val fqName
         get() = if (namespace != null) namespace.name + "." + name else name
 

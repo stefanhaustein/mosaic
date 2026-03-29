@@ -2,7 +2,6 @@ package org.kobjects.mosaic.model
 
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import org.kobjects.mosaic.json.LegacyToJson
 import org.kobjects.tomson.ToJson
 import org.kobjects.tomson.genericToJson
 import org.kobjects.tomson.toJson
@@ -12,7 +11,7 @@ data class ParameterSpec(
     val type: Type,
     val defaultValue: Any?,
     val modifiers: Set<Modifier> = emptySet()
-) : LegacyToJson, ToJson {
+) : ToJson {
 
     override fun toJson() = buildJsonObject {
         put ("name", JsonPrimitive(name))

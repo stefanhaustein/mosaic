@@ -176,7 +176,7 @@ object Model : ModelInterface {
                     if (oldSheet != null) {
                         for (oldCell in oldSheet.cells.values) {
                             val newCell = newSheet.getOrCreateCell(oldCell.id)
-                            newCell.setJson(Json.parseToJsonElement(oldCell.legacyToJson()).jsonObject, token)
+                            newCell.setJson(oldCell.toJson(), token)
                         }
                     }
                     sheets[previousName]?.delete(token)

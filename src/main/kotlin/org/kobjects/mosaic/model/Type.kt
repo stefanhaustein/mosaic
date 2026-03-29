@@ -8,14 +8,12 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
-import org.kobjects.mosaic.json.LegacyToJson
-import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.tomson.ToJson
 import org.kobjects.tomson.toJson
 import kotlin.enums.EnumEntries
 
 /** This looks odd because it used to be an enum */
-interface Type : LegacyToJson, ToJson {
+interface Type : ToJson {
     object INT: Type {
         override fun toString() = "Int"
         override fun valueFromString(s: String) = s.toInt()
@@ -70,7 +68,7 @@ interface Type : LegacyToJson, ToJson {
         override fun toJson() = JsonArray(fields.map { it.toJson() })
     }
 
-    class Field(val name: String, val type: Type) : LegacyToJson {
+    class Field(val name: String, val type: Type) : ToJson {
         override fun toJson() = buildJsonObject {
             put("name", JsonPrimitive(name))
             put("type", type.toJson())

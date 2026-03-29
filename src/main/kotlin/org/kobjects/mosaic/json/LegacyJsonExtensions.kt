@@ -1,5 +1,8 @@
 package org.kobjects.mosaic.json
 
+import kotlinx.serialization.json.Json
+import org.kobjects.tomson.ToJson
+
 fun String.escape(sb: StringBuilder) {
     for (c in this) {
         when (c) {
@@ -22,7 +25,9 @@ fun Any?.legacyToJson() = StringBuilder().also { this.legacyToJson(it) }.toStrin
 fun Any?.legacyToJson(sb: StringBuilder) {
     when (this) {
         null -> sb.append("null")
-        is LegacyToJson -> this.legacyToJson(sb)
+        is ToJson -> {
+            sb.append(Json.encodeToString(this.toJson()))
+        }
         is Double -> if (this.isFinite()) sb.append(this) else this.toString().legacyToJson(sb)
         is Float -> if (this.isFinite()) sb.append(this) else this.toString().legacyToJson(sb)
         is Number -> sb.append(this)
