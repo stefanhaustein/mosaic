@@ -11,7 +11,7 @@ import org.kobjects.mosaic.model.integration.OutputPortSpec
 class RestOut(val path: String) : OutputPortInstance {
 
     override fun detach() {
-        Model.restValues.remove(path)
+       // Model.restValues.remove(path)
     }
 
     override fun setValue(value: Any?) {
@@ -24,9 +24,9 @@ class RestOut(val path: String) : OutputPortInstance {
                     col += 2
                 }
             }
-            Model.restValues[path] = json
+         //   Model.restValues[path] = json
         } else {
-            Model.restValues[path] = value
+           // Model.restValues[path] = value
         }
     }
 

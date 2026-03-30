@@ -51,7 +51,6 @@ object Model : ModelInterface {
 
     val svgs = SvgManager(File("src/main/resources/static/img"))
 
-    val restValues = mutableMapOf<String, Any?>()
     var refreshRequested: Boolean = false
 
     private val lock = ReentrantLock()

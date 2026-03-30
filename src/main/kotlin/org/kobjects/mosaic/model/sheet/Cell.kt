@@ -12,8 +12,6 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.tomson.ToJson
-import org.kobjects.mosaic.json.quote
-import org.kobjects.mosaic.json.legacyToJson
 import org.kobjects.mosaic.model.ExpressionNode
 import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.ModificationToken
@@ -131,38 +129,6 @@ class Cell(
 
         } else if (valueTag > tag) {
             builder.put("$id.c", serializeValue())
-        }
-    }
-
-    fun serialize(sb: StringBuilder, tag: Long, forClient: Boolean) {
-        val id = id
-        if (formulaTag > tag) {
-            val properties = mutableListOf<String>()
-            if (!rawFormula.isNullOrEmpty()) {
-                properties.add("\"f\": ${rawFormula.quote()}")
-            }
-            if (validation?.isNotEmpty() == true) {
-                properties.add("\"v\": ${validation.legacyToJson()}")
-            }
-            if (!image.isNullOrBlank()) {
-                properties.add("\"i\": ${image!!.quote()}")
-            }
-            if (forClient) {
-                val inner = StringBuilder()
-                inner.append("\"c\":")
-                serializeValue(inner)
-                serializeDependencies(inner)
-                properties.add(inner.toString())
-            }
-            if (properties.isNotEmpty()) {
-                sb.append("$id = {")
-                sb.append(properties.joinToString(", "))
-                sb.append("}\n")
-            }
-        } else if (valueTag > tag) {
-            sb.append("$id.c: ")
-            serializeValue(sb)
-            sb.append('\n')
         }
     }
 

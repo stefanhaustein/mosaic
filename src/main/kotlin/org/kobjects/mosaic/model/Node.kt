@@ -3,8 +3,7 @@ package org.kobjects.mosaic.model
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonArray
-import org.kobjects.mosaic.json.quote
+
 
 // Can't be an abstract class becuase PortHolder needs to be a sub-interface
 interface Node {
@@ -23,16 +22,6 @@ interface Node {
 
     fun qualifiedId(): String
 
-    fun serializeDependencies(sb: StringBuilder) {
-        if (inputs.isNotEmpty()) {
-            sb.append(""", "inputs":[${inputs.joinToString(",") {
-                it.qualifiedId().quote() }}]""")
-        }
-        if (outputs.isNotEmpty()) {
-            sb.append(""", "outputs":[${outputs.joinToString(",") {
-                it.qualifiedId().quote() }}]""")
-        }
-    }
 
 
     fun serializeDependencies(builder: JsonObjectBuilder) {

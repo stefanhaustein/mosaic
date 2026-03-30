@@ -14,7 +14,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import org.kobjects.mosaic.json.legacyToJson
+import org.kobjects.tomson.toJson
 import org.kobjects.mosaic.model.sheet.CellRangeReference
 import org.kobjects.mosaic.model.Model
 import org.kobjects.tomson.TomsonOutput
@@ -153,8 +153,8 @@ fun Application.module() {
         }
         get("/rest/{path...}") {
             val path = call.parameters.getAll("path")!!.joinToString("/")
-            val json = Model.restValues[path].legacyToJson()
-            call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
+            //val json = Model.restValues[path]?.toJson()
+            call.respondText("null", ContentType.Application.Json, HttpStatusCode.OK)
         }
         get("img/{name...}") {
             val path = call.parameters.getAll("name")!!.joinToString("/")
