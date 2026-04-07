@@ -2,8 +2,9 @@ import {registerIntegration, registerPort, getPortFactory} from "./shared_model.
 import {addOption, insertById} from "./lib/dom.js";
 import {updateSpec} from "./artifacts.js";
 import {ensureCategory, post} from "./lib/utils.js";
-import {currentCell, currentSheet, portValues, showDependencies} from "./shared_state.js";
+import {currentCell, currentSheet, portValues, setCurrentCellFormula, showDependencies} from "./shared_state.js";
 import {showPortDialog} from "./port_editor.js";
+import {confirmDialog} from "./lib/dialogs.js";
 
 let integrationListElement = document.getElementById("integrationList")
 let integrationSpecListElement = document.getElementById("integrationSpecList")
@@ -82,25 +83,97 @@ export function processPortUpdate(integration, name, f) {
             console.log("Factory " + f.kind + " not found.")
             spec = {kind: "INPUT_PORT", type: "Bool"}
         }
+        let modifiers = spec["modifiers"] || []
 
-        let isExpandable = spec.kind == "INPUT_PORT" && f.type != null && typeof f.type != "string"
         let portElement = document.createElement("div")
         portElement.id = "port." + f.name
         portElement.className = "port"
-        let bulletElement = document.createElement("div")
-        let entryElement = document.createElement( "div")
-        portElement.append(bulletElement, entryElement)
-
         let containerName = "integration." + integration.key + ".ports"
-
-        console.log("determined container name ", containerName, " for ", f, "spec", spec)
-
         let containerElement = document.getElementById(containerName)
         let targetElement = ensureCategory(containerElement, f.category)
         insertById(targetElement, portElement)
 
-        let entryContentElement = document.createElement("div")
+        if (!(spec.name || "").endsWith("_out")) {
 
+            // Row 1 Icon: Config
+
+            let setFormulaIconDiv = document.createElement("div")
+            let setFormulaElement = document.createElement("img")
+            setFormulaElement.src = "/img/arrow_left_alt.svg"
+            setFormulaElement.className = "portConfig"
+            setFormulaElement.onclick = async () => {
+                if (currentCell.f == null || currentCell.f == "" || await confirmDialog("Overwrite Current Formula?", currentCell.key + ": '" + currentCell.f + "'")) {
+                    setCurrentCellFormula("=" + f.name)
+                }
+            }
+            setFormulaIconDiv.append(setFormulaElement)
+            portElement.append(setFormulaIconDiv)
+
+
+            // Row 1 Content: Title
+
+            let entryTitleElement = document.createElement("div")
+            entryTitleElement.className = "portTitle"
+            let nameElement = document.createElement("b")
+            nameElement.textContent = name
+            entryTitleElement.appendChild(nameElement)
+            if (f.kind != "NamedCells" && !f.name.startsWith(f.kind)) {
+                entryTitleElement.append(": ", f.kind)
+            }
+            portElement.append(entryTitleElement)
+        }
+
+        if (spec.kind == "OUTPUT_PORT") {
+            let sourceInput = document.createElement("input")
+
+            let setReferenceImg = document.createElement("img")
+            setReferenceImg.src = "/img/arrow_right_alt.svg"
+            setReferenceImg.className = "portConfig"
+            setReferenceImg.onclick = async () => {
+                sourceInput.value = "=" + currentSheet.name + "!" + currentCell.key
+            }
+            let setReferenceDiv = document.createElement("div")
+            setReferenceDiv.append(setReferenceImg)
+            portElement.append(setReferenceDiv)
+
+            sourceInput.value =  f.source
+            sourceInput.addEventListener("change", () => {
+                post("ports/" + f.fqName.replace(".", "/"), {source: sourceElement.value})
+            })
+            let sourceDiv = document.createElement("div")
+            sourceDiv.append(sourceInput)
+            portElement.append(sourceDiv)
+        }
+
+
+        // Row 2/3: Icon
+
+        let configDiv = document.createElement("div")
+        portElement.append(configDiv)
+
+        if ((spec.params || []).length > 0) {
+            let entryConfigElement = document.createElement("img")
+            entryConfigElement.src = "/img/settings.svg"
+            entryConfigElement.className = "portConfig"
+            entryConfigElement.onclick = () => {
+                showPortDialog(spec, f)
+            }
+            configDiv.append(entryConfigElement)
+        }
+
+
+        // Row 2/3: Value
+
+        let entryValueElement = document.createElement("span")
+        entryValueElement.id = "port." + f.fqName + ".value"
+        entryValueElement.className = "portValue"
+        entryValueElement.textContent = f.value
+        portElement.appendChild(entryValueElement)
+
+
+
+        /*
+        let isExpandable = spec.kind == "INPUT_PORT" && f.type != null && typeof f.type != "string"
         if (isExpandable) {
             let showDetailsElement = document.createElement("img")
             showDetailsElement.src = "/img/unfold_more.svg"
@@ -116,79 +189,23 @@ export function processPortUpdate(integration, name, f) {
                 }
             }
             entryElement.appendChild(showDetailsElement)
-        }
+        }*/
 
         console.log("spec: ", spec)
 
-        if (!(spec.name || "").endsWith("_out")) {
-            let entryTitleElement = document.createElement("div")
-            entryTitleElement.className = "portTitle"
-            let nameElement = document.createElement("b")
-            nameElement.textContent = name
-            entryTitleElement.appendChild(nameElement)
-            if (f.kind != "NamedCells" && !f.name.startsWith(f.kind)) {
-                entryTitleElement.append(": ", f.kind)
-            }
-            entryElement.append(entryTitleElement)
-        }
 
-        let modifiers = spec["modifiers"] || []
+
         // console.log("adding port", f, spec)
-
-        switch (spec.kind) {
-            case "INPUT_PORT":
-                let entryValueElement = document.createElement("span")
-                entryValueElement.id = "port." + f.fqName + ".value"
-                entryValueElement.className = "portValue"
-                entryContentElement.appendChild(entryValueElement)
-
-                let setFormulaElement = document.createElement("img")
-                setFormulaElement.src = "/img/variable_insert.svg"
-                setFormulaElement.className = "portConfig"
-                setFormulaElement.onclick = async () => {
-                    if (currentCell.f == null || currentCell.f == "" || await confirmDialog("Overwrite Current Formula?", currentCell.key + ": '" + currentCell.f + "'")) {
-                        setCurrentCellFormula("=" + f.name)
-                    }
-                }
-                bulletElement.append(setFormulaElement)
-                break;
-
-            case "OUTPUT_PORT":
-                let sourceElement = document.createElement("input")
-                sourceElement.value =  f.source
-                sourceElement.addEventListener("change", () => {
-                    post("ports/" + f.fqName.replace(".", "/"), {source: sourceElement.value})
-                })
-                entryContentElement.append(sourceElement)
-
-                let setReferenceElement = document.createElement("img")
-                setReferenceElement.src = "/img/arrow_right_alt.svg"
-                setReferenceElement.className = "portConfig"
-                setReferenceElement.onclick = async () => {
-                    sourceElement.value = "=" + currentSheet.name + "!" + currentCell.key
-                }
-                bulletElement.append(setReferenceElement)
-                break
-        }
-
-        if ((spec.params || []).length > 0) {
-            let entryConfigElement = document.createElement("img")
-            entryConfigElement.src = "/img/settings.svg"
-            entryConfigElement.className = "portConfig"
-            entryConfigElement.onclick = () => {
-                showPortDialog(spec, f)
-            }
-            bulletElement.append(entryConfigElement)
-        }
+/*
 
 
-        entryElement.appendChild(entryContentElement)
-
-        entryElement.onclick = (event) => {
+        portElement.onclick = (event) => {
             if (event.target.localName.toUpperCase() == "DIV") {
                 showDependencies(f.name)
             }
         }
+
+ */
     }
 }
 
