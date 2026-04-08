@@ -76,34 +76,6 @@ class Cell(
         }
     }
 
-    fun serializeValue(): JsonElement {
-        val value = this.value
-        return when (value) {
-            null,
-            is Unit -> JsonNull
-            is Exception -> buildJsonObject {
-                put("type", JsonPrimitive("err"))
-                put ("msg", JsonPrimitive(value::class.simpleName.toString() + value.message))
-            }
-            is Instant -> buildJsonObject {
-                val localDateTime = value.toLocalDateTime(TimeZone.currentSystemDefault())
-                put("type", JsonPrimitive("instant"))
-                put("rendered", JsonPrimitive(localDateTime.time.format(TIME_FORMAT_SECONDS)))
-            }
-            is Number -> JsonPrimitive(value)
-            is String -> JsonPrimitive(value)
-            is Boolean -> JsonPrimitive(value)
-            else -> buildJsonObject {
-                put("type", JsonPrimitive("err"))
-                put ("msg", JsonPrimitive("Unrecognized value type: '${value.javaClass}' for $value"))
-            }
-        }
-    }
-
-    fun serializeValue(sb: StringBuilder) {
-        sb.append(Json.encodeToString(serializeValue()))
-    }
-
     fun serialize(builder: JsonObjectBuilder, tag: Long, forClient: Boolean) {
         val id = id
         if (formulaTag > tag) {

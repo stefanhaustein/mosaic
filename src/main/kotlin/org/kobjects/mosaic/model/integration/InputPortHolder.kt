@@ -10,7 +10,7 @@ open class InputPortHolder(
     override val owner: Integration,
     override val name: String,
     override val specification: InputPortSpec,
-    val configuration: Map<String, Any?>,
+    override val configuration: Map<String, Any?>,
     override val displayName: String? = null,
     override val category: String? = null,
     override val tag: Long
@@ -74,24 +74,6 @@ open class InputPortHolder(
         valueTag = tag
         value = newValue
         return true
-    }
-
-    override fun toJson(forClient: Boolean) = buildJsonObject {
-        put("kind", JsonPrimitive(specification.name))
-        val type = specification.type
-        if (type != null) {
-            put("type", type.toJson())
-        }
-        if (category != null) {
-            put("category", JsonPrimitive(category))
-        }
-        if (displayName != null) {
-            put("displayName", JsonPrimitive(displayName))
-        }
-        put("configuration", configuration.toJson())
-        if (forClient) {
-          serializeDependencies(this)
-        }
     }
 
 

@@ -1,5 +1,6 @@
 package org.kobjects.mosaic.model.integration
 
+import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.mosaic.model.ExpressionNode
@@ -10,7 +11,7 @@ class OutputPortHolder(
     override val owner: Integration,
     override val name: String,
     override val specification: OutputPortSpec,
-    val configuration: Map<String, Any?>,
+    override val configuration: Map<String, Any?>,
     rawFormula: String,
     override val displayName: String? = null,
     override val category: String? = null,
@@ -55,23 +56,9 @@ class OutputPortHolder(
     }
 
 
-    override fun toJson(forClient: Boolean) = buildJsonObject {
-        put("kind", JsonPrimitive(specification.name))
-        val type = specification.type
-        if (type != null) {
-            put("type", type.toJson())
-        }
-        if (category != null) {
-            put("category", JsonPrimitive(category))
-        }
-        if (displayName != null) {
-            put("displayName", JsonPrimitive(displayName))
-        }
-        put("configuration", configuration.toJson())
-        if (forClient) {
-          serializeDependencies(this)
-        }
-        put("source", JsonPrimitive(rawFormula))
+    override fun serialize(builder: JsonObjectBuilder, forClient: Boolean) {
+        super.serialize(builder, forClient)
+        builder.put("source", JsonPrimitive(rawFormula))
     }
 
 

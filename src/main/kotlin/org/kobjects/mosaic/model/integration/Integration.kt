@@ -32,7 +32,7 @@ abstract class Integration(
                 out.appendSection("integration.$name.factories", factoriesToJson())
             }
         }
-        out.appendSection("integration.$name.ports", portsToJson(forClient))
+        out.appendSection("integration.$name.ports", portsToJson(forClient, tag))
     }
 
     fun configToJson(): JsonObject =
@@ -47,10 +47,12 @@ abstract class Integration(
         }
     }
 
-    fun portsToJson(forClient: Boolean): JsonObject = buildJsonObject {
+    fun portsToJson(forClient: Boolean, tag: Long): JsonObject = buildJsonObject {
         for (port in nodes.values) {
             if (forClient || !port.specification.modifiers.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE)) {
-                put(port.name, port.toJson(forClient))
+                if (!forClient || port.tag > tag || port.valueTag > tag) {
+                    put(port.name, port.toJson(forClient))
+                }
             }
         }
     }
