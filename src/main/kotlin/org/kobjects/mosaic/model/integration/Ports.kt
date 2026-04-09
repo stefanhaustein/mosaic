@@ -52,7 +52,7 @@ class Ports : Iterable<PortHolder> {
 
     // The name is separate because it's typically the key of the spec map
     fun definePort(integrationName: String, portName: String, jsonSpec: JsonObject, token: ModificationToken) {
-        token.symbolsChanged = true
+
         val fqName = "$integrationName.$portName"
 
         if (jsonSpec["deleted"]?.jsonPrimitive?.booleanOrNull != true && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
@@ -61,9 +61,13 @@ class Ports : Iterable<PortHolder> {
                 port.rawFormula = jsonSpec["source"]?.jsonPrimitive?.content ?: ""
                 port.reparse()
                 port.tag = token.tag
+                token.addRefresh(port)
+                token.formulaChanged = true
             }
             return
         }
+
+        token.symbolsChanged = true
 
         // Always delete what's there.
         val previousName = jsonSpec["previousName"]?.jsonPrimitive?.contentOrNull ?: fqName

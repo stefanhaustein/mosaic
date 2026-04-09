@@ -1,10 +1,8 @@
 package org.kobjects.mosaic.model.integration
 
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
+
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Node
-import org.kobjects.tomson.toJson
 
 open class InputPortHolder(
     override val owner: Integration,
