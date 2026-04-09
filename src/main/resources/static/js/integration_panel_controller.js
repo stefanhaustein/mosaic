@@ -103,7 +103,7 @@ export function processPortUpdate(integration, name, f) {
             setFormulaElement.className = "portConfig"
             setFormulaElement.onclick = async () => {
                 if (currentCell.f == null || currentCell.f == "" || await confirmDialog("Overwrite Current Formula?", currentCell.key + ": '" + currentCell.f + "'")) {
-                    setCurrentCellFormula("=" + f.name)
+                    setCurrentCellFormula("=" + f.fqName)
                 }
             }
             setFormulaIconDiv.append(setFormulaElement)
