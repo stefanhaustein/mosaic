@@ -49,7 +49,7 @@ abstract class Integration(
 
     fun portsToJson(forClient: Boolean, tag: Long): JsonObject = buildJsonObject {
         for (port in nodes.values) {
-            if (forClient || !port.specification.modifiers.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE)) {
+            if (forClient || port.needsSaving()) {
                 if (!forClient || port.tag > tag || port.valueTag > tag) {
                     put(port.name, port.toJson(forClient))
                 }

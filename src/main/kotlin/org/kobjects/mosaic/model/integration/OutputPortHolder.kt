@@ -43,6 +43,8 @@ class OutputPortHolder(
 
     }
 
+    override fun needsSaving() = super.needsSaving() || rawFormula.isNotEmpty()
+
     override fun detach() {
 
         if (instance != null) {

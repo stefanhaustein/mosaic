@@ -131,6 +131,7 @@ export function processPortUpdate(integration, name, f) {
             setReferenceImg.className = "portConfig"
             setReferenceImg.onclick = async () => {
                 sourceInput.value = "=" + currentSheet.name + "!" + currentCell.key
+                post("ports/" + f.fqName.replace(".", "/"), {source: sourceInput.value})
             }
             let setReferenceDiv = document.createElement("div")
             setReferenceDiv.append(setReferenceImg)

@@ -30,6 +30,8 @@ interface PortHolder: Node {
 
     fun attach(token: ModificationToken)
 
+    fun needsSaving() = !specification.modifiers.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE)
+
     override fun qualifiedId() = if (owner == null) name else owner?.name + "." + name
 
     fun serialize(builder: JsonObjectBuilder, forClient: Boolean) {

@@ -5,6 +5,7 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.kobjects.mosaic.model.AbstractArtifactSpec
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Type
@@ -55,14 +56,11 @@ class Ports : Iterable<PortHolder> {
 
         val fqName = "$integrationName.$portName"
 
-        if (jsonSpec["deleted"]?.jsonPrimitive?.booleanOrNull != true && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
+        if (this[fqName]?.specification?.modifiers?.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE) ?: false ||
+            jsonSpec["deleted"]?.jsonPrimitive?.booleanOrNull != true && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
             val port = this[fqName]
             if (port is OutputPortHolder) {
-                port.rawFormula = jsonSpec["source"]?.jsonPrimitive?.content ?: ""
-                port.reparse()
-                port.tag = token.tag
-                token.addRefresh(port)
-                token.formulaChanged = true
+                port.setFormula(jsonSpec["source"]?.jsonPrimitive?.content ?: "", token)
             }
             return
         }

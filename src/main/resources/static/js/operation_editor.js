@@ -81,7 +81,7 @@ function updateParameterTab() {
 
     currentParameters = cut === -1 ? {} : extractParameters(currentInput.substring(cut + 1), currentFunction.params)
 
-    currentController.setValues(currentParameters)
+    currentController.setValue(currentParameters)
 
     return true
 }
