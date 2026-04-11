@@ -1,8 +1,8 @@
-import {registerPort, getPortFactory} from "./shared_model.js";
+import {getPortFactory} from "./shared_model.js";
 import {addOption, insertById} from "./lib/dom.js";
 import {updateSpec} from "./artifacts.js";
 import {ensureCategory, post} from "./lib/utils.js";
-import {currentCell, currentSheet, portValues, setCurrentCellFormula, showDependencies} from "./shared_state.js";
+import {currentCell, currentSheet, portValues, setCurrentCellFormula} from "./shared_state.js";
 import {showPortDialog} from "./port_editor.js";
 import {confirmDialog} from "./lib/dialogs.js";
 import {Integration} from "./Integration.js";
@@ -49,7 +49,7 @@ export function updateIntegrationFactory(spec) {
 
 
 export function processPortUpdate(integration, name, f) {
-    if (!registerPort(integration, name, f)) {
+    if (!(integration.updatePort(name, f) != null)) {
         let entryElement = document.getElementById("port." + f.fqName)
         if (entryElement != null) {
             entryElement.parentElement.removeChild(entryElement)

@@ -1,5 +1,5 @@
 import {renderCell} from "./cell_renderer.js"
-import {model, registerIntegrationFactory, registerPortFactory} from "./shared_model.js"
+import {model, registerIntegrationFactory} from "./shared_model.js"
 import {
     currentCell,
     currentSheet,
@@ -269,7 +269,7 @@ function processIntegrationFactoryUpdate(name, f) {
 
 
 function processPortFactoryUpdate(integration, name, f) {
-    registerPortFactory(integration, name, f)
+    integration.updatePortFactory(name, f) != null
     processPortFactory(integration, f)
 }
 

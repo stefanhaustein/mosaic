@@ -57,13 +57,3 @@ export function registerFunction(name, f) {
     functions[key] = f
 }
 
-
-export function registerPortFactory(integration, name, spec) {
-    return integration.updatePortFactory(name, spec) != null
-}
-
-export function registerPort(integration, name, port) {
-    return integration.updatePort(name, port) != null
-}
-
-
