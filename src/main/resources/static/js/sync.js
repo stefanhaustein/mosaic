@@ -1,22 +1,26 @@
 import {renderCell} from "./cell_renderer.js"
-import {getIntegration, model} from "./shared_model.js"
+import {model, registerIntegrationFactory, registerPortFactory} from "./shared_model.js"
 import {
-    currentCell, currentSheet,
-    portValues, selectCell, selectionRangeX, selectionRangeY,
-    selectSheet, setRunMode,
+    currentCell,
+    currentSheet,
+    portValues,
+    selectCell,
+    selectionRangeX,
+    selectionRangeY,
+    selectSheet,
+    setRunMode,
 } from "./shared_state.js";
-import { registerIntegrationFactory, registerPortFactory } from "./shared_model.js"
-import { blink } from "./lib/dom.js";
-import {addOption} from "./lib/dom.js";
+import {addOption, blink} from "./lib/dom.js";
 import {processFunction} from "./operation_panel_controller.js";
 import {
     processIntegrationUpdate,
-    processPortUpdate,
-    updateIntegrationFactory,
     processPortFactory,
+    processPortUpdate,
     processPortValue,
+    updateIntegrationFactory,
 } from "./integration_panel_controller.js";
 import {getColumn, getRow, iterateKeys, toCellId} from "./lib/utils.js";
+import {Integration} from "./Integration.js";
 
 let sheetSelectElement = document.getElementById("sheetSelect")
 
@@ -99,7 +103,7 @@ function processSection(sectionName, map) {
             if (parts.length == 2) {
                 processIntegrationUpdate(integrationName, map)
             } else if (parts.length == 3) {
-                let integration = getIntegration(integrationName)
+                let integration = Integration.map[integrationName.toLowerCase()]
                 if (parts[2] == "factories") {
                     for (let portName in map) {
                         processPortFactoryUpdate(integration, portName, map[portName])

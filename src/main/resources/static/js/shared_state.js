@@ -1,6 +1,6 @@
 import {getColumn, getRow, nullToEmtpy, post, toRangeKey} from "./lib/utils.js";
 import {renderCell} from "./cell_renderer.js";
-import {getPortFactory, getPort, model, getFqPort} from "./shared_model.js";
+import {getPortFactory, model, getFqPort} from "./shared_model.js";
 import {removeClasses, renderDependencies, renderRangeHighlight} from "./shared_state_internal_renderer.js";
 
 export let portValues = {}

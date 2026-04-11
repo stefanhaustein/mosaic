@@ -28,3 +28,4 @@ for (let cell of cells) {
     cell.addEventListener("focus", () => selectCell(cell.id))
 }
 
+

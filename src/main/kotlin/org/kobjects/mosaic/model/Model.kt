@@ -1,6 +1,5 @@
 package org.kobjects.mosaic.model
 
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
@@ -12,7 +11,6 @@ import org.kobjects.mosaic.model.integration.IntegrationFactories
 import org.kobjects.mosaic.model.integration.IntegrationFactory
 import org.kobjects.mosaic.model.integration.Integrations
 import org.kobjects.mosaic.model.integration.OutputPortHolder
-import org.kobjects.mosaic.model.integration.Ports
 import org.kobjects.mosaic.model.integration.Root
 import org.kobjects.mosaic.model.sheet.Cell
 import org.kobjects.mosaic.model.sheet.Sheet
@@ -24,7 +22,6 @@ import org.kobjects.tomson.TomsonOutput
 import java.io.File
 import java.io.FileWriter
 import org.kobjects.tomson.TomsonParser
-import java.io.Writer
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.contracts.ExperimentalContracts
@@ -46,7 +43,6 @@ object Model : ModelInterface {
 
     val functions = Functions()
     val factories = IntegrationFactories()
-    val ports = Ports()
     val integrations = Integrations()
 
     val svgs = SvgManager(File("src/main/resources/static/img"))
@@ -110,8 +106,13 @@ object Model : ModelInterface {
                         integrations.configureIntegration(name, map, token)
                     } else if (parts.size == 3 && parts[0] == "integration" && parts[2] == "ports") {
                         val integrationName = parts[1]
-                        for ((portName, portSpec) in map) {
-                            Model.ports.definePort(integrationName, portName, portSpec.jsonObject, token)
+                        val intergation = integrations[integrationName]
+                        if (intergation == null) {
+                            System.err.println("Integration '$integrationName' not found.")
+                        } else {
+                            for ((portName, portSpec) in map) {
+                                intergation.definePort(portName, portSpec.jsonObject, token)
+                            }
                         }
                     } else {
                         System.err.println("Unrecognized toml section: $key")
@@ -224,8 +225,10 @@ object Model : ModelInterface {
             action(modificationToken)
 
             if (modificationToken.symbolsChanged) {
-                for (port in ports.filterIsInstance<OutputPortHolder>()) {
-                    port.reparse()
+                for (integration in integrations.integrationMap.values) {
+                    for (port in integration.nodes.values.filterIsInstance<OutputPortHolder>()) {
+                        port.reparse()
+                    }
                 }
                 for (sheet in sheets.values) {
                     for (cell in sheet.cells.values) {
@@ -247,8 +250,10 @@ object Model : ModelInterface {
                         modificationToken.addRefresh(cell)
                     }
                 }
-                for (port in ports.filterIsInstance<OutputPortHolder>()) {
-                    modificationToken.addRefresh(port)
+                for (integration in integrations.integrationMap.values) {
+                    for (port in integration.nodes.values.filterIsInstance<OutputPortHolder>()) {
+                        modificationToken.addRefresh(port)
+                    }
                 }
             }
 

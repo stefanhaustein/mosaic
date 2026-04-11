@@ -1,6 +1,8 @@
+import {Integration} from "./Integration.js";
+
 let integrationFactories = {}
 let functions = {}
-let integrations = {}
+
 
 export var model = {
     sheets: {}
@@ -22,10 +24,6 @@ export function getFunction(name) {
     return functions[name.toLowerCase()]
 }
 
-export function getIntegration(name) {
-    return integrations[name.toLowerCase()]
-}
-
 export function getIntegrationFactory(name) {
     return integrationFactories[name.toLowerCase()]
 }
@@ -35,15 +33,11 @@ export function getFqPort(name) {
     if (cut == -1) {
         return null
     }
-    let integration = getIntegration(name.substring(0, cut))
+    let integration = Integration.map[name.substring(0, cut).toLowerCase()]
     if (integration == null) {
         return null
     }
-    return getPort(integration, name.substring(cut + 1))
-}
-
-export function getPort(integration, name) {
-    return integration.ports[name.toLowerCase()]
+    return integration.getPort(name.substring(cut + 1))
 }
 
 export function registerIntegrationFactory(name, factory) {
@@ -63,56 +57,13 @@ export function registerFunction(name, f) {
     functions[key] = f
 }
 
-export function registerIntegration(name, instance) {
-
-    let existing = getIntegration(name)
-
-    instance.name = name
-    let key = name.toLowerCase()
-
-    if (instance.type == "TOMBSTONE") {
-        delete integrations[key]
-        return false
-    }
-
-    instance.key = key
-    if (instance.ports == null) {
-        instance.ports = existing == null ? [] : existing.ports
-    }
-    if (instance.factories == null) {
-        instance.factories = existing == null ? [] : existing.factories
-    }
-
-
-    integrations[key] = instance
-    return true
-}
-
 
 export function registerPortFactory(integration, name, spec) {
-    spec.name = name
-    spec.fqName = integration.name + "." + name
-    let key = name.toLowerCase()
-    spec.key = key
-    if (spec.kind == "TOMBSTONE") {
-        delete integration.ports[key]
-        return false
-    }
-    integration.factories[key] = spec
-    return true
+    return integration.updatePortFactory(name, spec) != null
 }
 
 export function registerPort(integration, name, port) {
-    port.name = name
-    port.fqName = integration.name + "." + name
-    let key = name.toLowerCase()
-    port.key = key
-    if (port.kind == "TOMBSTONE") {
-        delete integration.ports[key]
-        return false
-    }
-    integration.ports[key] = port
-    return true
+    return integration.updatePort(name, port) != null
 }
 
 

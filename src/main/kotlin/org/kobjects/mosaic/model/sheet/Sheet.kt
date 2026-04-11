@@ -12,9 +12,9 @@ import org.kobjects.tomson.toJson
 import kotlin.collections.iterator
 
 class Sheet(
-    override val name: String,
+    name: String,
     var tag: Long = 0L
-) : Namespace {
+) : Namespace(name) {
     val highlighted = mutableSetOf<CellRangeReference>()
     var highlightTag: Long = 0L
     val cells = mutableMapOf<String, Cell>()

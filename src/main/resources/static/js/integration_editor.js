@@ -1,7 +1,6 @@
 import {FormController} from "./forms/form_builder.js";
 
 import {post, transformSchema} from "./lib/utils.js";
-import {getIntegrationFactory, getIntegration, getPort} from "./shared_model.js";
 import {promptDialog} from "./lib/dialogs.js";
 
 let dialogElement = document.getElementById("dialog")

@@ -1,22 +1,24 @@
-import {registerIntegration, registerPort, getPortFactory} from "./shared_model.js";
+import {registerPort, getPortFactory} from "./shared_model.js";
 import {addOption, insertById} from "./lib/dom.js";
 import {updateSpec} from "./artifacts.js";
 import {ensureCategory, post} from "./lib/utils.js";
 import {currentCell, currentSheet, portValues, setCurrentCellFormula, showDependencies} from "./shared_state.js";
 import {showPortDialog} from "./port_editor.js";
 import {confirmDialog} from "./lib/dialogs.js";
+import {Integration} from "./Integration.js";
 
 let integrationListElement = document.getElementById("integrationList")
 let integrationSpecListElement = document.getElementById("integrationSpecList")
 let sidePanel = document.getElementById("sidePanel")
 let panelSelectElement = document.getElementById("panelSelect")
 
-export function processIntegrationUpdate(name, integration) {
+export function processIntegrationUpdate(name, data) {
     let key = name.toLowerCase()
     let elementId = "integration." + key
     let element = document.getElementById(elementId)
 
-    if (!registerIntegration(name, integration)) {
+    let integration = Integration.update(name, data)
+    if (integration == null) {
         if (element != null) {
             integrationListElement.removeChild(element)
         }
@@ -33,30 +35,7 @@ export function processIntegrationUpdate(name, integration) {
             let portElement = document.createElement("div")
             portElement.id = elementId + ".ports"
             element.append(factoryElement, portElement)
-            /*
 
-            let ops = integration["operations"] || []
-            console.log ("operations: ", integration["operations"])
-
-            for (const op of ops) {
-                console.log("op: ", op, "Modifiers: ", op.modifiers)
-                if ((op.modifiers || []).indexOf("UNINSTANTIABLE") == -1) {
-                    updateSpec(element, elementId + ".", op)
-                }
-            }
-            let nameSpan = document.createElement("span")
-            nameSpan.textContent = name
-            nameSpan.style.fontWeight = "bold"
-
-            element.append(nameSpan, " (" + integration.type + ")")
-
-
-            element.onclick = () => {
-                let spec = getFactory(integration.type)
-                showIntegrationInstanceConfigurationDialog(spec, integration)
-            }
-
-             */
         }
     }
 }

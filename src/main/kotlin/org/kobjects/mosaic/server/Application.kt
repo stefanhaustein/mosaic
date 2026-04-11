@@ -81,8 +81,9 @@ fun Application.module() {
             val jsonText = call.receiveText()
             println("/ports/$integrationName/$portName: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
+            val integration = Model.integrations[integrationName] ?: throw IllegalArgumentException("Integration '$integrationName' not found")
             Model.applySynchronizedWithToken { token ->
-                Model.ports.definePort(integrationName, portName, jsonSpec, token)
+                integration.definePort(portName, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
         }

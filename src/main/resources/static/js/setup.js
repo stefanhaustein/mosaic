@@ -1,6 +1,8 @@
 // Generate the spreadsheet content
 // Needs to be loaded first, so shared_state can select the first cell
 
+import {setDragHandler} from "./lib/dom.js";
+
 let thead = document.getElementById("spreadsheetTHead")
 for (let col = 0; col < 27; col++) {
     let th = document.createElement("th")
@@ -32,3 +34,10 @@ for (let row = 1; row < 100; row++) {
         tr.appendChild(td)
     }
 }
+
+let sidePanelWidth = 200;
+
+setDragHandler(document.getElementById("divider"), (dx, dy) => {
+    sidePanelWidth -= dx
+    document.getElementById("sidePanel").style.flexBasis = sidePanelWidth + "px"
+})
