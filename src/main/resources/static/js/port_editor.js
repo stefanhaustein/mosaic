@@ -1,7 +1,7 @@
 import {FormController} from "./forms/form_builder.js";
-import {getFunction, getIntegrationFactory} from "./shared_model.js";
 import {post, transformSchema} from "./lib/utils.js";
 import {Integration} from "./Integration.js";
+import {Operation} from "./Operation.js";
 
 
 function hidePortDialog() {
@@ -44,8 +44,8 @@ export function showPortDialog(constructorSpec, portSpec) {
         "modifiers": ["CONSTANT"],
         "validation": {
             "Integration name conflict": (name) => Integration.map[name.toLowerCase()] == null,
-            "Factory name conflict": (name) => getIntegrationFactory(name) == null,
-            "Function name conflict": (name) => getFunction(name) == null,
+            "Factory name conflict": (name) => IntegrationFactory.get(name) == null,
+            "Function name conflict": (name) => Operation.get(name) == null,
             "Valid: letters, '_', digits after '_'": /^[a-zA-Z]+(_[a-zA-Z0-9_]*)?$/
         }}]
 

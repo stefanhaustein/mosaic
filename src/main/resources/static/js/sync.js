@@ -1,8 +1,7 @@
 import {renderCell} from "./cell_renderer.js"
-import {model, registerIntegrationFactory} from "./shared_model.js"
 import {
     currentCell,
-    currentSheet,
+    currentSheet, model,
     portValues,
     selectCell,
     selectionRangeX,
@@ -21,6 +20,7 @@ import {
 } from "./integration_panel_controller.js";
 import {getColumn, getRow, iterateKeys, toCellId} from "./lib/utils.js";
 import {Integration} from "./Integration.js";
+import {IntegrationFactory} from "./IntegrationFactory.js";
 
 let sheetSelectElement = document.getElementById("sheetSelect")
 
@@ -262,7 +262,7 @@ function processSheetCellsUpdate(name, map) {
 
 
 function processIntegrationFactoryUpdate(name, f) {
-    registerIntegrationFactory(name, f)
+    IntegrationFactory.register(name, f) != null
     updateIntegrationFactory(f)
 }
 

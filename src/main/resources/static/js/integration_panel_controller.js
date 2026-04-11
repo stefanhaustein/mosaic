@@ -1,4 +1,3 @@
-import {getPortFactory} from "./shared_model.js";
 import {addOption, insertById} from "./lib/dom.js";
 import {updateSpec} from "./artifacts.js";
 import {ensureCategory, post} from "./lib/utils.js";
@@ -57,7 +56,7 @@ export function processPortUpdate(integration, name, f) {
     } else {
         // General setup
 
-        let spec = getPortFactory(integration, f.kind)
+        let spec = integration.getPortFactory(f.kind)
         if (spec == null) {
             console.log("Factory " + f.kind + " not found.")
             spec = {kind: "INPUT_PORT", type: "Bool"}

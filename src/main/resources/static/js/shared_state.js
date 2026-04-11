@@ -1,7 +1,11 @@
 import {getColumn, getRow, nullToEmtpy, post, toRangeKey} from "./lib/utils.js";
 import {renderCell} from "./cell_renderer.js";
-import {getPortFactory, model, getFqPort} from "./shared_model.js";
 import {removeClasses, renderDependencies, renderRangeHighlight} from "./shared_state_internal_renderer.js";
+import {Integration} from "./Integration.js";
+
+export var model = {
+    sheets: {}
+}
 
 export let portValues = {}
 export let currentCell = null
@@ -101,8 +105,6 @@ export function setCurrentCellValidation(value) {
     currentCell["v"] = value
     commitCurrentCell()
 }
-
-
 
 export function selectSheet(name) {
     let cellId = currentCell != null ? currentCell.key : "A1"
@@ -215,9 +217,9 @@ export function selectCell(id, rangeX = 0, rangeY = 0) {
         let formula = currentCell.f?.toString() || ""
         if (formula.startsWith("=")) {
             let name = formula.substring(1)
-            let type = getFqPort(name)?.type
+            let type = Integration.getFqPort(name)?.type
             if (type != null) {
-                let spec = getPortFactory(type)
+                let spec = type.getPortFactory(undefined)
                 if (spec.kind == "INPUT_PORT") {
                     targetKey = name
                 }

@@ -1,6 +1,5 @@
-import {model} from "./shared_model.js";
-
 import {getColumn, getRow, toCellId} from "./lib/utils.js";
+import {model} from "./shared_state.js";
 
 // Use via sharedState.showDependencies(name)
 

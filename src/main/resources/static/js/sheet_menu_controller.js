@@ -1,6 +1,6 @@
-import {model} from "./shared_model.js"
+
 import {post} from "./lib/utils.js"
-import {currentSheet, runMode, selectSheet} from "./shared_state.js";
+import {currentSheet, model, runMode, selectSheet} from "./shared_state.js";
 
 let sheetDialogElement = document.getElementById("sheetDialog")
 let sheetSelectElement = document.getElementById("sheetSelect")
