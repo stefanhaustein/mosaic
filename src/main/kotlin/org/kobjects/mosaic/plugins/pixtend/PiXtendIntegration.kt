@@ -4,7 +4,7 @@ import com.pi4j.Pi4J
 import com.pi4j.context.Context
 import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.model.AbstractArtifactSpec
-import org.kobjects.mosaic.model.AbstractFactorySpec
+import org.kobjects.mosaic.model.AbstractPortFactorySpec
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
@@ -16,7 +16,7 @@ class PiXtendIntegration(
     kind: String,
     name: String,
     tag: Long,
-    var pixtendModel: PiXtendDriver.Model
+
 
 ): Integration(kind, name, tag) {
     var pi4j: Context? = null
@@ -24,10 +24,8 @@ class PiXtendIntegration(
     var error: Exception? = null
     val inputPorts = mutableSetOf<PiXtendInputPortInstance>()
     var invocationId = 0
+    var pixtendModel = PiXtendDriver.Model.V2S
 
-    init {
-       attach()
-    }
 
     private fun attach() {
 
@@ -71,12 +69,12 @@ class PiXtendIntegration(
             description = "PiXtend PLC Integration",
             parameters = listOf(ParameterSpec("model", piXtendModel, PiXtendDriver.Model.V2S)),
             modifiers = setOf(AbstractArtifactSpec.Modifier.SINGLETON),
-        ) { kind, name, tag, config ->
-            PiXtendIntegration(model, kind, name, tag, config["model"] as PiXtendDriver.Model)
+        ) { kind, name, tag,  ->
+            PiXtendIntegration(model, kind, name, tag)
         }
     }
 
-    override val operationSpecs: List<AbstractFactorySpec>
+    override val portFactories: List<AbstractPortFactorySpec>
         get() = listOf(
             PiXtendAnalogInputPort.spec(this),
             PiXtendAnalogOutputPort.spec(this),
@@ -87,10 +85,7 @@ class PiXtendIntegration(
             PiXtendRelayPort.spec(this),
         )
 
-    override val configuration: Map<String, Any?>
-        get() = mapOf("model" to pixtendModel.name)
-
-    override fun detach() {
+    override fun close() {
         invocationId++
         pi4j?.shutdown()
         pi4j = null
@@ -98,7 +93,7 @@ class PiXtendIntegration(
     }
 
 
-    override fun reconfigure(configuration: Map<String, Any?>) {
+    override fun configure(configuration: Map<String, Any?>) {
         invocationId++
         this@PiXtendIntegration.pixtendModel = configuration["model"] as PiXtendDriver.Model
         attach()

@@ -1,11 +1,11 @@
 package org.kobjects.mosaic.model.expression;
 
 import org.kobjects.mosaic.model.*
-import org.kobjects.mosaic.model.integration.PortHolder
+import org.kobjects.mosaic.model.integration.PortNode
 
 class PortExpression(
     owner: Node,
-    val port: PortHolder
+    val port: PortNode
 
 ) : Expression() {
 

@@ -2,6 +2,8 @@ import {FormController} from "./forms/form_builder.js";
 
 import {post, transformSchema} from "./lib/utils.js";
 import {promptDialog} from "./lib/dialogs.js";
+import {Integration} from "./Integration.js";
+import {IntegrationFactory} from "./IntegrationFactory.js";
 
 let dialogElement = document.getElementById("dialog")
 
@@ -76,8 +78,8 @@ export async function showIntegrationCreationDialog(spec) {
             label: "Name",
             modifiers: ["CONSTANT"],
             validation: {
-                "Integration name conflict": (name) => getIntegrationInstance(name) == null && (getFactory(name) == null || getFactory(name) == spec),
-                "Port name conflict": (name) => getPortInstance(name) == null,
+                "Integration name conflict": (name) => Integration.get(name) == null && (IntegrationFactory.get(name) == null || IntegrationFactory.get(name) == spec),
+                "Port name conflict": (name) => Integration.getFqPort(name) == null,
                 "Valid: letters, non-leading '_' or digits": /^[a-zA-Z][a-zA-Z_0-9]*$/
             }
         })

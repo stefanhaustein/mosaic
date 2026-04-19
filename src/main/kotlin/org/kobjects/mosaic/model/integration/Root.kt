@@ -1,13 +1,13 @@
 package org.kobjects.mosaic.model.integration
 
-import kotlinx.serialization.json.JsonObject
+import org.kobjects.mosaic.model.ModelInterface
 
 class Root : Integration(
     "Root",
     "root",
     0
 ) {
-    override val operationSpecs = listOf(
+    override val portFactories = listOf(
         OutputPortSpec(
             this,
             category = "",
@@ -25,13 +25,19 @@ class Root : Integration(
         )
     )
 
-    override val configuration = emptyMap<String, Any?>()
-
-    override fun detach() {
+    override fun close() {
 
     }
 
-    override fun reconfigure(configuration: Map<String, Any?>) {
+    override fun configure(configuration: Map<String, Any?>) {
 
+    }
+
+    companion object {
+        fun spec(model: ModelInterface) = IntegrationFactory(
+            "", "Root", "", emptyList()) {
+            _, _, _ -> throw UnsupportedOperationException()
+
+        }
     }
 }

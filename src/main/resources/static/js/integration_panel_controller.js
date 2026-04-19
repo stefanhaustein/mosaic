@@ -23,7 +23,7 @@ export function processIntegrationUpdate(name, data) {
         }
     } else {
         if (element == null) {
-            addOption(panelSelectElement, "- " + name + " (" + integration.type + ")", elementId);
+            addOption(panelSelectElement, "- " + name + " (" + integration.kind + ")", elementId);
 
             element = document.createElement("div")
             element.id = elementId

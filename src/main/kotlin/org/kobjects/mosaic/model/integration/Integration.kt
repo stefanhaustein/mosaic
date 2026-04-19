@@ -8,45 +8,57 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.AbstractArtifactSpec
-import org.kobjects.mosaic.model.AbstractFactorySpec
+import org.kobjects.mosaic.model.AbstractPortFactorySpec
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
 import org.kobjects.mosaic.model.Type
 import org.kobjects.tomson.TomsonOutput
-import org.kobjects.tomson.toJson
 
 
 abstract class Integration(
-    // The name of the IntegrationSpec
-    val kind: String,
-    // The name of this instance.
+    // The name of the factory
+    kind: String,
+    // The name of this instance
     name: String,
     val tag: Long,
 ) : Namespace(name) {
-    val nodes = mutableMapOf<String, PortHolder>()
 
-    abstract val operationSpecs: List<AbstractArtifactSpec>
+    // Values
 
-    abstract val configuration: Map<String, Any?>
+    val factory = Model.integrationFactories[kind]!!
 
-    abstract fun detach()
+    // Variables
+
+    var jsonConfiguration: JsonObject = JsonObject(mapOf("kind" to JsonPrimitive(kind)))
+    val nodes = mutableMapOf<String, PortNode>()
+
+    // Abstract stuff
+
+    // Should this be a ctor param instead?
+    abstract val portFactories: List<AbstractPortFactorySpec>
+
+    abstract fun close()
+
+    protected abstract fun configure(configuration: Map<String, Any?>)
+
+    // Base implementation
+
+    fun configure(json: JsonObject) {
+        jsonConfiguration = json
+        val config = factory.convertConfiguration(json)
+        configure(config)
+    }
 
     fun serialize(out: TomsonOutput, forClient: Boolean, tag: Long) {
         if (this.tag > tag && (forClient || (this !is Tombstone && this !is Root))) {
-            out.appendSection("integration.$name", configToJson())
+            out.appendSection("integration.$name", jsonConfiguration)
             if (forClient) {
                 out.appendSection("integration.$name.factories", factoriesToJson())
             }
         }
         out.appendSection("integration.$name.ports", portsToJson(forClient, tag))
     }
-
-    fun configToJson(): JsonObject =
-        buildJsonObject {
-            put("type", JsonPrimitive(kind))
-            put("configuration", configuration.toJson())
-        }
 
 
     // The name is separate because it's typically the key of the spec map
@@ -55,7 +67,7 @@ abstract class Integration(
         if (nodes[portName]?.specification?.modifiers?.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE) ?: false ||
             jsonSpec["deleted"]?.jsonPrimitive?.booleanOrNull != true && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
             val port = nodes[portName]
-            if (port is OutputPortHolder) {
+            if (port is OutputPortNode) {
                 port.setFormula(jsonSpec["source"]?.jsonPrimitive?.content ?: "", token)
             }
             return
@@ -76,15 +88,15 @@ abstract class Integration(
             val kind = jsonSpec["kind"]!!.jsonPrimitive.content
 
 
-            val specification = operationSpecs.find { it.name == kind } ?: throw IllegalArgumentException("'$kind' not found in integration $this.")
+            val specification = portFactories.find { it.name == kind } ?: throw IllegalArgumentException("'$kind' not found in integration $this.")
 
             nodes[portName]?.detach()
 
             val resolvedConfiguration = specification.convertConfiguration(jsonSpec["configuration"]?.jsonObject)
 
             val port = when (specification) {
-                is InputPortSpec -> InputPortHolder(this, portName, specification, resolvedConfiguration, tag = token.tag)
-                is OutputPortSpec -> OutputPortHolder(
+                is InputPortSpec -> InputPortNode(this, portName, specification, resolvedConfiguration, tag = token.tag)
+                is OutputPortSpec -> OutputPortNode(
                     this,
                     portName,
                     specification,
@@ -107,7 +119,7 @@ abstract class Integration(
             val localName = name.substring(cut + 1)
             token.symbolsChanged = true
             port.detach()
-            nodes[localName] = InputPortHolder(
+            nodes[localName] = InputPortNode(
                 port.owner, localName, InputPortSpec(
                     port.owner,
                     "TOMBSTONE",
@@ -118,8 +130,10 @@ abstract class Integration(
                     emptySet(),
                     token.tag
                 ) { _, _ ->
-                    object : InputPortInstance {
-                        override val value = Unit
+                    object : InputPortInstance(object : InputPortListener {
+                        override fun portValueChanged(newValue: Any?) {}
+                        override fun portValueChanged(newValue: Any?, token: ModificationToken) {}
+                    }) {
                         override fun detach() {}
                     }
                 }, emptyMap(), tag = token.tag
@@ -130,7 +144,7 @@ abstract class Integration(
 
 
     fun factoriesToJson(): JsonObject = buildJsonObject {
-        for (operationSpec in operationSpecs) {
+        for (operationSpec in portFactories) {
             put(operationSpec.name,operationSpec.toJson())
         }
     }
@@ -145,8 +159,6 @@ abstract class Integration(
         }
     }
 
-    abstract fun reconfigure(configuration: Map<String, Any?>)
-
     class Tombstone(
         deletedInstance: Integration,
         tag: Long
@@ -155,11 +167,11 @@ abstract class Integration(
         deletedInstance.name,
         tag
     ) {
-        override val configuration = emptyMap<String, Any>()
-        override fun reconfigure(configuration: Map<String, Any?>) {}
-        override val operationSpecs = emptyList<AbstractFactorySpec>()
 
-        override fun detach() {}
+        override fun configure(configuration: Map<String, Any?>) {}
+        override val portFactories = emptyList<AbstractPortFactorySpec>()
+
+        override fun close() {}
     }
 
 }

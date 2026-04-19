@@ -6,11 +6,11 @@ export class IntegrationFactory {
         this.key = name.toLowerCase()
     }
 
-    get(name) {
-        return map[name.toLowerCase()]
-    }
-
     // Statics
+
+    static get(name) {
+        return IntegrationFactory.map[name.toLowerCase()]
+    }
 
     static register(name, data) {
         let factory = new IntegrationFactory(name)

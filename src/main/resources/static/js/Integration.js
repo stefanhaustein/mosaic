@@ -52,7 +52,7 @@ export class Integration {
 
 
     static get(name) {
-        return map[name.toLowerCase()]
+        return Integration.map[name.toLowerCase()]
     }
 
     static getFqPort(name) {
@@ -68,7 +68,7 @@ export class Integration {
     }
 
     static update(name, data) {
-        if (data.type == "TOMBSTONE") {
+        if (data.kind == "TOMBSTONE") {
             delete Integration.map[name.toLowerCase()]
             return null
         }

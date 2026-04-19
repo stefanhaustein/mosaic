@@ -17,7 +17,7 @@ class Bmp280Port(
     bus: Int,
     address: Int
 
-) : InputPortInstance {
+) : InputPortInstance(host) {
 
     val i2c = plugin.pi4j!!.create(
         I2C.newConfigBuilder(plugin.pi4j)
@@ -35,7 +35,7 @@ class Bmp280Port(
         }, 0, 10000)
     }
 
-    override var value = emptyMap<String, Double?>()
+    var value = emptyMap<String, Double?>()
 
 
     fun poll() {

@@ -7,8 +7,8 @@ export class Operation {
 
     }
 
-    get(name) {
-        return map[name.toLowerCase()]
+    static get(name) {
+        return Operation.map[name.toLowerCase()]
     }
 
     // Statics

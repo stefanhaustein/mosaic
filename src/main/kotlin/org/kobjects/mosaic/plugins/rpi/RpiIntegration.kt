@@ -3,6 +3,7 @@ package org.kobjects.mosaic.plugins.rpi
 import com.pi4j.Pi4J
 import com.pi4j.context.Context
 import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractPortFactorySpec
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationFactory
@@ -32,7 +33,7 @@ class RpiIntegration(
         }
     }
 
-    override val operationSpecs = listOf<AbstractArtifactSpec>(
+    override val portFactories = listOf<AbstractPortFactorySpec>(
         DigitalInputPort.spec(this),
         PwmInput.spec(this),
         DigitalOutputPort.spec(this),
@@ -41,14 +42,12 @@ class RpiIntegration(
         Scd4xPort.spec(this),
     //    PiXtendIntegration.spec(this),
     )
-    override val configuration: Map<String, Any?>
-        get() = emptyMap()
 
-    override fun detach() {
+    override fun close() {
 
     }
 
-    override fun reconfigure(configuration: Map<String, Any?>) {
+    override fun configure(configuration: Map<String, Any?>) {
 
     }
 
@@ -60,7 +59,7 @@ class RpiIntegration(
             emptyList(),
             setOf(AbstractArtifactSpec.Modifier.SINGLETON)
 
-        ) { _, _, tag, _ ->
+        ) { _, _, tag ->
             RpiIntegration(model, tag)
         }
     }

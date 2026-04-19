@@ -12,12 +12,12 @@ class DigitalInputPort(
     val host: InputPortListener,
     val plugin: RpiIntegration,
     val address: Int
-) : InputPortInstance, DigitalStateChangeListener {
+) : InputPortInstance(host), DigitalStateChangeListener {
 
     val digitalInput: DigitalInput = plugin.pi4j!!.create(
         DigitalInputConfig.newBuilder(plugin.pi4j).address(address).build())
 
-    override var value: Boolean = digitalInput.isHigh
+    var value: Boolean = digitalInput.isHigh
 
 
     override fun onDigitalStateChange(event: DigitalStateChangeEvent<out Digital<*, *, *>>?) {

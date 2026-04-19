@@ -2,12 +2,10 @@ package org.kobjects.mosaic.model.integration
 
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.mosaic.model.ExpressionNode
 import org.kobjects.mosaic.model.ModificationToken
-import org.kobjects.tomson.toJson
 
-class OutputPortHolder(
+class OutputPortNode(
     override val owner: Integration,
     override val name: String,
     override val specification: OutputPortSpec,
@@ -16,7 +14,7 @@ class OutputPortHolder(
     override val displayName: String? = null,
     override val category: String? = null,
     override var tag: Long
-) : ExpressionNode(owner),  PortHolder {
+) : ExpressionNode(owner),  PortNode {
     var instance: OutputPortInstance? = null
     var error: Exception? = null
 

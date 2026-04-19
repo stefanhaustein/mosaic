@@ -12,11 +12,11 @@ class PwmInput(
     val host: InputPortListener,
     val plugin: RpiIntegration,
     val address: Int
-) : InputPortInstance, DigitalStateChangeListener {
+) : InputPortInstance(host), DigitalStateChangeListener {
 
     val digitalInput: DigitalInput = plugin.pi4j!!.create(DigitalInputConfig.newBuilder(plugin.pi4j).address(address).build())
     var t0: Long = 0
-    override var value: Double = 0.0
+    var value: Double = 0.0
 
     override fun onDigitalStateChange(event: DigitalStateChangeEvent<out Digital<*, *, *>>?) {
         when (event!!.state().isHigh()) {

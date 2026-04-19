@@ -1,8 +1,7 @@
 package org.kobjects.mosaic.model.integration
 
-interface InputPortInstance {
-    val value: Any
-
-    fun detach()
-
+abstract class InputPortInstance(
+    val listener: InputPortListener
+) {
+    abstract fun detach()
 }

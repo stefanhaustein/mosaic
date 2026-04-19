@@ -15,7 +15,7 @@ class Scd4xPort(
     val plugin: RpiIntegration,
     bus: Int,
 
-    ) : InputPortInstance {
+    ) : InputPortInstance(host) {
 
     val i2c = plugin.pi4j!!.create(
         I2C.newConfigBuilder(plugin.pi4j)
@@ -38,7 +38,7 @@ class Scd4xPort(
         }, 0, 30000)
     }
 
-    override var value = emptyMap<String, Double?>()
+    var value = emptyMap<String, Double?>()
 
 
     fun poll() {

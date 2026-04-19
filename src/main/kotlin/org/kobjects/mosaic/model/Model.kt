@@ -10,7 +10,7 @@ import org.kobjects.mosaic.model.integration.InputPortListener
 import org.kobjects.mosaic.model.integration.IntegrationFactories
 import org.kobjects.mosaic.model.integration.IntegrationFactory
 import org.kobjects.mosaic.model.integration.Integrations
-import org.kobjects.mosaic.model.integration.OutputPortHolder
+import org.kobjects.mosaic.model.integration.OutputPortNode
 import org.kobjects.mosaic.model.integration.Root
 import org.kobjects.mosaic.model.sheet.Cell
 import org.kobjects.mosaic.model.sheet.Sheet
@@ -42,7 +42,7 @@ object Model : ModelInterface {
     val updateListeners = mutableSetOf<UpdateListenerData>()
 
     val functions = Functions()
-    val factories = IntegrationFactories()
+    val integrationFactories = IntegrationFactories()
     val integrations = Integrations()
 
     val svgs = SvgManager(File("src/main/resources/static/img"))
@@ -56,6 +56,7 @@ object Model : ModelInterface {
         addIntegration(RpiIntegration.spec(this))
         addIntegration(PiXtendIntegration.spec(this))
         addIntegration(HomeAssistantIntegration.spec(this))
+        addIntegration(Root.spec(this))
         // addPlugin(MqttPlugin)
 
         integrations.integrationMap["root"] = Root()
@@ -77,7 +78,7 @@ object Model : ModelInterface {
     }
 
     fun addIntegration(spec: IntegrationFactory) {
-        factories.add(spec)
+        integrationFactories.add(spec)
     }
 
 
@@ -142,7 +143,7 @@ object Model : ModelInterface {
 
         if (forClient) {
             functions.serialize(out, tag)
-            factories.serialize(out, tag)
+            integrationFactories.serialize(out, tag)
         }
 
         integrations.serialize(out, forClient, tag)
@@ -226,7 +227,7 @@ object Model : ModelInterface {
 
             if (modificationToken.symbolsChanged) {
                 for (integration in integrations.integrationMap.values) {
-                    for (port in integration.nodes.values.filterIsInstance<OutputPortHolder>()) {
+                    for (port in integration.nodes.values.filterIsInstance<OutputPortNode>()) {
                         port.reparse()
                     }
                 }
@@ -251,7 +252,7 @@ object Model : ModelInterface {
                     }
                 }
                 for (integration in integrations.integrationMap.values) {
-                    for (port in integration.nodes.values.filterIsInstance<OutputPortHolder>()) {
+                    for (port in integration.nodes.values.filterIsInstance<OutputPortNode>()) {
                         modificationToken.addRefresh(port)
                     }
                 }
@@ -381,7 +382,7 @@ object Model : ModelInterface {
 
     override fun setPortValue(port: InputPortListener, value: Any?) {
         requestSynchronizedWithToken {
-            port.portValueChanged(it, value)
+            port.portValueChanged(value, it)
         }
     }
 }

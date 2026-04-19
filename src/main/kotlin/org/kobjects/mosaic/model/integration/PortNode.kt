@@ -1,6 +1,5 @@
 package org.kobjects.mosaic.model.integration
 
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -10,7 +9,7 @@ import org.kobjects.mosaic.model.Node
 import org.kobjects.tomson.toJson
 
 // Can't be an abstract class because ExpressionNode already is a superclass of OutputPortHolder.
-interface PortHolder: Node {
+interface PortNode: Node {
 
     val name: String
     val tag: Long

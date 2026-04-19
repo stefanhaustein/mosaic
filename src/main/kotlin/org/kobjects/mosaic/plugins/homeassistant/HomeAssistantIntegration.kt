@@ -1,7 +1,7 @@
 package org.kobjects.mosaic.plugins.homeassistant
 
-import org.kobjects.mosaic.model.integration.InputPortHolder
-import org.kobjects.mosaic.model.integration.OutputPortHolder
+import org.kobjects.mosaic.model.integration.InputPortNode
+import org.kobjects.mosaic.model.integration.OutputPortNode
 import org.kobjects.mosaic.model.AbstractArtifactSpec
 import org.kobjects.mosaic.model.integration.InputPortSpec
 import org.kobjects.mosaic.model.integration.Integration
@@ -20,14 +20,14 @@ class HomeAssistantIntegration(
     kind: String,
     name: String,
     tag: Long,
-    var host: String,
-    var port: Int,
-    var token: String,
+
 ) : Integration(kind, name, tag) {
     var client: HomeAssistantClient? = null
+    var host = ""
+    var port = -1
+    var token = ""
 
-
-    override val operationSpecs = Kind.values().map {
+    override val portFactories = Kind.values().map {
         val type = getType(it)
         if (type == null) null else InputPortSpec(
             namespace = this,
@@ -58,16 +58,12 @@ class HomeAssistantIntegration(
     }
 
     private fun getInputSpec(kind: Kind): InputPortSpec? =
-        operationSpecs.find { it.name == kind.name.lowercase() } as InputPortSpec?
+        portFactories.find { it.name == kind.name.lowercase() } as InputPortSpec?
 
 
     private fun getOutputSpec(kind: Kind): OutputPortSpec? =
-        operationSpecs.find { it.name == kind.name.lowercase() + "_out" } as OutputPortSpec?
+        portFactories.find { it.name == kind.name.lowercase() + "_out" } as OutputPortSpec?
 
-
-    init {
-        attach()
-    }
 
 
     private fun attach() {
@@ -79,7 +75,7 @@ class HomeAssistantIntegration(
             val inputPortSpec = getInputSpec(entity.kind)
             if (inputPortSpec != null) {
 
-                val inputPortHolder = InputPortHolder(
+                val inputPortHolder = InputPortNode(
                     this,
                     name = name,
                     specification = inputPortSpec,
@@ -95,7 +91,7 @@ class HomeAssistantIntegration(
                 nodes.put(name, inputPortHolder)
 
                 if (entity.kind == Kind.LIGHT) {
-                    val outputPortHolder = OutputPortHolder(
+                    val outputPortHolder = OutputPortNode(
                         this,
                         name = name + "_out",
                         specification = getOutputSpec(entity.kind) ?: throw RuntimeException("OuputPortSpec not found for ${entity.kind}"),
@@ -113,17 +109,12 @@ class HomeAssistantIntegration(
         }
     }
 
-        // emptyList<AbstractArtifactSpec>() // client?.entities?.values?.filter { it.disabledBy == null }?.map { entityOperationSpec(it) } ?: emptyList()
-
-    override val configuration: Map<String, Any?>
-        get() = mapOf("host" to host, "port" to port, "token" to token)
-
-    override fun detach() {
+    override fun close() {
         client?.close()
     }
 
-    override fun reconfigure(configuration: Map<String, Any?>) {
-        detach()
+    override fun configure(configuration: Map<String, Any?>) {
+        close()
         this.host = configuration["host"] as String
         this.port = configuration["port"].toString().toDouble().toInt()
         this.token = configuration["token"] as String
@@ -163,15 +154,12 @@ class HomeAssistantIntegration(
                 ParameterSpec(name = "token", type = Type.STRING, defaultValue = null),
             ),
             modifiers = setOf(AbstractArtifactSpec.Modifier.UNINSTANTIABLE),
-        ) { kind, name, tag, config ->
+        ) { kind, name, tag ->
             HomeAssistantIntegration(
                 model,
                 kind,
                 name,
                 tag,
-                host = config["host"] as String,
-                port = config["port"].toString().toDouble().toInt(),
-                token = config["token"] as String
             )
         }
     }

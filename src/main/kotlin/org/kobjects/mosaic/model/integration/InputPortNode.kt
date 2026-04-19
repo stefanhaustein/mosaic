@@ -1,10 +1,11 @@
 package org.kobjects.mosaic.model.integration
 
 
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Node
 
-open class InputPortHolder(
+open class InputPortNode(
     override val owner: Integration,
     override val name: String,
     override val specification: InputPortSpec,
@@ -13,7 +14,7 @@ open class InputPortHolder(
     override val category: String? = null,
     override val tag: Long
 
-) : PortHolder, Node, InputPortListener {
+) : PortNode, Node, InputPortListener {
 
     override val outputs = mutableSetOf<Node>()
     override val inputs = mutableSetOf<Node>()
@@ -53,13 +54,18 @@ open class InputPortHolder(
         }
     }
 
-    // Implements the corresponding value change listener method.
-    override fun portValueChanged(token: ModificationToken, newValue: Any?) {
-        portValue = newValue
+    // Implements the corresponding value change listener methods.
 
-            token.addRefresh(this)
+    override fun portValueChanged(newValue: Any?) {
+        Model.requestSynchronizedWithToken {
+            portValueChanged(newValue, it)
         }
+    }
 
+    override fun portValueChanged(newValue: Any?, token: ModificationToken) {
+        portValue = newValue
+        token.addRefresh(this)
+    }
 
     override fun recalculateValue(tag: Long): Boolean {
         if (valueTag == tag) {
@@ -77,5 +83,6 @@ open class InputPortHolder(
 
 
     override fun toString() = name
+
 
 }
