@@ -1,5 +1,6 @@
 package org.kobjects.mosaic.model
 
+import com.pi4j.Pi4J
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
@@ -48,6 +49,8 @@ object Model : ModelInterface {
     val svgs = SvgManager(File("src/main/resources/static/img"))
 
     var refreshRequested: Boolean = false
+
+    val pi4J = Pi4J.newAutoContext()
 
     private val lock = ReentrantLock()
 
