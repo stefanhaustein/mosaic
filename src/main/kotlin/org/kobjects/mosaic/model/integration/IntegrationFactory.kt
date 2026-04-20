@@ -12,7 +12,7 @@ class IntegrationFactory(
     modifiers: Set<Modifier> = emptySet(),
     tag: Long = 0,
     displayName: String? = null,
-    val createFn: (kind: String, name: String, tag: Long) -> Integration,
+    val createFn: (name: String) -> Integration,
 ) : AbstractArtifactSpec(
     null,
     category,

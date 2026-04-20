@@ -8,24 +8,41 @@ import {IntegrationFactory} from "./IntegrationFactory.js";
 let dialogElement = document.getElementById("dialog")
 
 export function showIntegrationInstanceConfigurationDialog(spec, instance) {
-    let instanceConfiguration = instance["configuration"]
-    let isNewInstance = instanceConfiguration == null
-    if (isNewInstance) {
-        instanceConfiguration = {}
-    }
-
     dialogElement.textContent = ""
     let dialogTitleElement = document.createElement("div")
     dialogTitleElement.className = "dialogTitle"
-    dialogTitleElement.textContent = "Configure " + instance.name + (instance.name != instance.type ? " (" + instance.type + ")" : "")
     dialogElement.appendChild(dialogTitleElement)
 
     let inputDiv = document.createElement("div")
     inputDiv.className = "dialogFields"
 
-    let bindingFormController = FormController.create(inputDiv, transformSchema(spec["params"]))
+    let schema = transformSchema(spec["params"])
+    if (instance) {
+        dialogTitleElement.textContent = "Configure " + instance.name + (instance.name != instance.type ? " (" + instance.type + ")" : "")
+    } else {
+        dialogTitleElement.textContent = "Create " + spec.name
+        if (spec.modifiers != null && spec.modifiers.indexOf("SINGLETON") != -1) {
+            instance = {name: spec.name}
+        } else {
+            instance = {}
+            schema = [{
+                name: "name",
+                label: "Name",
+                type: "String",
+                modifiers: ["CONSTANT"],
+                validation: {
+                    "Integration name conflict": (name) => Integration.get(name) == null && (IntegrationFactory.get(name) == null || IntegrationFactory.get(name) == spec),
+                    "Port name conflict": (name) => Integration.getFqPort(name) == null,
+                    "Valid: letters, non-leading '_' or digits": /^[a-zA-Z][a-zA-Z_0-9]*$/
+                }
+            }, ...schema]
+            console.log(schema)
+        }
+    }
 
-    bindingFormController.setValue(instanceConfiguration)
+    let bindingFormController = FormController.create(inputDiv, schema)
+
+    bindingFormController.setValue(instance)
 
     dialogElement.appendChild(inputDiv)
 
@@ -35,8 +52,11 @@ export function showIntegrationInstanceConfigurationDialog(spec, instance) {
     okButton.textContent = "Ok"
     okButton.className = "dialogButton"
     okButton.addEventListener("click", () => {
-        instance["configuration"] = bindingFormController.getValue()
-        if (sendIntegration(instance)) {
+        let configuration = bindingFormController.getValue()
+        configuration.kind = spec.name
+        let name = instance.name || configuration.name
+        delete configuration.name
+        if (sendIntegration(name, configuration)) {
             dialogElement.close()
         }
     })
@@ -47,45 +67,13 @@ export function showIntegrationInstanceConfigurationDialog(spec, instance) {
     cancelButton.className = "dialogButton"
     cancelButton.addEventListener("click", () => { dialogElement.close() })
     buttonDiv.appendChild(cancelButton)
-
-    if (!isNewInstance) {
-        let deleteButton = document.createElement("button")
-        deleteButton.textContent = "Delete"
-        deleteButton.className = "dialogButton"
-        deleteButton.addEventListener("click", () => {
-            post("integrations/" + instance["name"], {deleted: true})
-            dialogElement.close()
-        })
-        buttonDiv.appendChild(deleteButton)
-    }
-
     dialogElement.appendChild(buttonDiv)
     dialogElement.showModal()
 }
 
 
-function sendIntegration(instance) {
-    post("integrations/" + instance["name"], instance)
+export function sendIntegration(name, data) {
+    post("integrations/" + name, data)
     return true
 }
 
-
-export async function showIntegrationCreationDialog(spec) {
-    let name = spec.name
-
-    if (spec.modifiers == null || spec.modifiers.indexOf("SINGLETON") == -1) {
-        name = await promptDialog("Add " + name, name, {
-            label: "Name",
-            modifiers: ["CONSTANT"],
-            validation: {
-                "Integration name conflict": (name) => Integration.get(name) == null && (IntegrationFactory.get(name) == null || IntegrationFactory.get(name) == spec),
-                "Port name conflict": (name) => Integration.getFqPort(name) == null,
-                "Valid: letters, non-leading '_' or digits": /^[a-zA-Z][a-zA-Z_0-9]*$/
-            }
-        })
-        if (name == null) {
-            return
-        }
-    }
-    showIntegrationInstanceConfigurationDialog(spec, {name: name, type: spec.name, kind: spec.name})
-}

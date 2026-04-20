@@ -1,10 +1,10 @@
 package org.kobjects.mosaic.plugins.pixtend
 
-import com.pi4j.Pi4J
-import com.pi4j.context.Context
 import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.model.AbstractArtifactSpec
+
 import org.kobjects.mosaic.model.AbstractPortFactorySpec
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.ParameterSpec
@@ -14,13 +14,7 @@ import org.kobjects.mosaic.model.integration.IntegrationFactory
 
  class PiXtendIntegration(
     val model: ModelInterface,
-    kind: String,
-    name: String,
-    tag: Long,
-
-
-): Integration(kind, name, tag) {
-    var pi4j: Context? = null
+): Integration("pixt", "pixt") {
     var driver: PiXtendDriver? = null
     var error: Exception? = null
     val inputPorts = mutableSetOf<PiXtendInputPortInstance>()
@@ -31,8 +25,7 @@ import org.kobjects.mosaic.model.integration.IntegrationFactory
     private fun attach() {
 
             try {
-                pi4j = Pi4J.newAutoContext()
-                driver = PiXtendDriver(pi4j, this@PiXtendIntegration.pixtendModel)
+                driver = PiXtendDriver(Model.pi4J, this@PiXtendIntegration.pixtendModel)
                 error = null
                 model.runAsync { syncState(driver!!, ++invocationId) }
             } catch (e: Exception) {
@@ -70,9 +63,7 @@ import org.kobjects.mosaic.model.integration.IntegrationFactory
             description = "PiXtend PLC Integration",
             parameters = listOf(ParameterSpec("model", piXtendModel, PiXtendDriver.Model.V2S)),
             modifiers = setOf(AbstractArtifactSpec.Modifier.SINGLETON),
-        ) { kind, name, tag,  ->
-            PiXtendIntegration(model, kind, name, tag)
-        }
+        ) { _ -> PiXtendIntegration(model) }
     }
 
     override val portFactories: List<AbstractPortFactorySpec>
@@ -88,9 +79,6 @@ import org.kobjects.mosaic.model.integration.IntegrationFactory
 
     override fun close() {
         invocationId++
-        pi4j?.shutdown()
-        pi4j = null
-
     }
 
 

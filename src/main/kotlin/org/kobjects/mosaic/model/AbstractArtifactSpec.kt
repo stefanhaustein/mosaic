@@ -29,7 +29,7 @@ abstract class AbstractArtifactSpec(
             val rawValue = rawConfig?.get(paramName)
             if (rawValue == null) {
                 require (paramSpec.modifiers.contains(ParameterSpec.Modifier.OPTIONAL)) {
-                    "Missing mandatory configuration parameter: $paramName for $fqName"
+                    "Missing mandatory configuration parameter: $paramName for $fqName in $rawConfig"
                 }
             } else if (paramSpec.modifiers.contains(ParameterSpec.Modifier.REFERENCE)) {
                 throw RuntimeException("References NYI (config param $paramName for $fqName")

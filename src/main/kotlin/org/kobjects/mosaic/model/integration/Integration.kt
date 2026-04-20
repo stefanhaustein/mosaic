@@ -2,6 +2,7 @@ package org.kobjects.mosaic.model.integration
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -21,17 +22,18 @@ abstract class Integration(
     kind: String,
     // The name of this instance
     name: String,
-    val tag: Long,
 ) : Namespace(name) {
-
     // Values
 
     val factory = Model.integrationFactories[kind]!!
 
     // Variables
 
+    var tag = 0L
     var jsonConfiguration: JsonObject = JsonObject(mapOf("kind" to JsonPrimitive(kind)))
     val nodes = mutableMapOf<String, PortNode>()
+    val deleted: Boolean
+        get() = jsonConfiguration["deleted"]?.jsonPrimitive?.booleanOrNull == true
 
     // Abstract stuff
 
@@ -46,14 +48,24 @@ abstract class Integration(
 
     fun configure(json: JsonObject, token: ModificationToken) {
         jsonConfiguration = json
-        val config = factory.convertConfiguration(json)
-        configureInternal(config, token)
+        tag = token.tag
+        if (deleted) {
+            close()
+            token.symbolsChanged = true
+        } else {
+            try {
+                val config = factory.convertConfiguration(json)
+                configureInternal(config, token)
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun serialize(out: TomsonOutput, forClient: Boolean, tag: Long) {
-        if (this.tag > tag && (forClient || (this !is Tombstone && this !is Root))) {
+        if (this.tag > tag && (!deleted || forClient)) {
             out.appendSection("integration.$name", jsonConfiguration)
-            if (forClient) {
+            if (forClient && !deleted) {
                 out.appendSection("integration.$name.factories", factoriesToJson())
             }
         }
@@ -158,20 +170,4 @@ abstract class Integration(
             }
         }
     }
-
-    class Tombstone(
-        deletedInstance: Integration,
-        tag: Long
-    ) : Integration(
-        "TOMBSTONE",
-        deletedInstance.name,
-        tag
-    ) {
-
-        override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {}
-        override val portFactories = emptyList<AbstractPortFactorySpec>()
-
-        override fun close() {}
-    }
-
 }

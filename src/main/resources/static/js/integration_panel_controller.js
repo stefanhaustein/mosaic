@@ -5,6 +5,8 @@ import {currentCell, currentSheet, portValues, setCurrentCellFormula} from "./sh
 import {showPortDialog} from "./port_editor.js";
 import {confirmDialog} from "./lib/dialogs.js";
 import {Integration} from "./Integration.js";
+import {sendIntegration, showIntegrationInstanceConfigurationDialog} from "./integration_editor.js";
+import {IntegrationFactory} from "./IntegrationFactory.js";
 
 let integrationListElement = document.getElementById("integrationList")
 let integrationSpecListElement = document.getElementById("integrationSpecList")
@@ -19,15 +21,39 @@ export function processIntegrationUpdate(name, data) {
     let integration = Integration.update(name, data)
     if (integration == null) {
         if (element != null) {
-            integrationListElement.removeChild(element)
+            element.parentElement.removeChild(element)
+            let option = document.getElementById(("option." + elementId))
+            panelSelectElement.value = "Integration"
+            panelSelectElement.removeChild(option)
+            panelSelectElement.dispatchEvent(new Event('change'))
         }
     } else {
         if (element == null) {
-            addOption(panelSelectElement, "- " + name + " (" + integration.kind + ")", elementId);
+            let option = addOption(panelSelectElement, "- " + name + " (" + integration.kind + ")", elementId);
+            option.id = "option." + elementId
 
             element = document.createElement("div")
             element.id = elementId
             sidePanel.appendChild(element)
+
+            let editButton = document.createElement("button")
+            editButton.style.margin = "10px 0 10px 10px"
+            editButton.append("Edit")
+            editButton.addEventListener("click", () => {
+                console.log("click", integration)
+                showIntegrationInstanceConfigurationDialog(IntegrationFactory.get(integration.kind), integration)
+            })
+            element.append(editButton)
+
+            let deleteButton = document.createElement("button")
+            deleteButton.append("Delete")
+            deleteButton.style.margin = "10px 0 10px 10px"
+            element.append(deleteButton)
+            deleteButton.addEventListener("click", async () => {
+                if (await confirmDialog("Delete " + name)) {
+                    sendIntegration(name, {kind: integration.kind, deleted: true})
+                }
+            })
 
             let factoryElement = document.createElement("div")
             factoryElement.id = elementId + ".factories"

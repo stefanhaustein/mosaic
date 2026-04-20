@@ -5,6 +5,7 @@ import com.pi4j.drivers.sensor.SensorDescriptor
 import com.pi4j.drivers.sensor.environment.bmx280.Bmx280Driver
 import com.pi4j.io.i2c.I2C
 import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractArtifactSpec.Modifier
 import org.kobjects.mosaic.model.AbstractPortFactorySpec
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModelInterface
@@ -21,17 +22,28 @@ import org.kobjects.mosaic.plugins.rpi.devices.Bmp280Port
 class I2cSensorIntegration(
     val model: ModelInterface,
     name: String,
-    tag: Long,
     val sensorDescriptor: SensorDescriptor
-) : Integration(INTEGRATION_NAME, name, tag) {
+) : Integration(INTEGRATION_NAME, name) {
 
     var i2c: I2C? = null
     var sensor: Sensor? = null
+    var run = 0
 
-    override val portFactories: List<AbstractPortFactorySpec>
-        get() = emptyList()
+    override val portFactories = listOf(
+        InputPortSpec(
+            this,
+            "",
+            "Measurement",
+            Type.REAL,
+            "",
+            emptyList(),
+            modifiers = setOf(Modifier.UNINSTANTIABLE),
+            createFn = { _, _ -> throw UnsupportedOperationException()}
+        )
+    )
 
     override fun close() {
+        run++
         sensor?.close()
     }
 
@@ -45,19 +57,10 @@ class I2cSensorIntegration(
         sensor = sensorDescriptor.detect(i2c)
 
         for (value in sensor?.descriptor?.values ?: emptyList()) {
-            val inputPortSpec = InputPortSpec(
-                this,
-                "",
-                value.kind.name.lowercase(),
-                Type.REAL,
-                "",
-                emptyList(),
-                createFn = { _, _ -> throw UnsupportedOperationException()}
-            )
             val inputPortNode = InputPortNode(
                 this,
                 value.kind.name.lowercase(),
-                specification = inputPortSpec,
+                specification = portFactories[0],
                 configuration = emptyMap(),
                 displayName = null,
                 category = null,
@@ -65,16 +68,20 @@ class I2cSensorIntegration(
             )
             nodes[value.kind.name.lowercase()] = inputPortNode
         }
-    }
-
-    inner class SensorInputPort(
-        val index: Int,
-        inputPortNode: InputPortNode,
-    ) : InputPortInstance(
-        inputPortNode
-    ) {
-        override fun detach() {
-            TODO("Not yet implemented")
+        val localRun = ++run
+        Model.scheduleAsync(5000) {
+            if (localRun != run) {
+                false
+            } else {
+                val measurements = DoubleArray(sensorDescriptor.values.size)
+                sensor?.readMeasurement(measurements)
+                Model.requestSynchronizedWithToken { token ->
+                    for (value in sensorDescriptor.values) {
+                        (nodes[value.kind.name.lowercase()] as? InputPortNode)?.portValueChanged(measurements[value.index], token)
+                    }
+                }
+                true
+            }
         }
     }
 
@@ -90,8 +97,8 @@ class I2cSensorIntegration(
                 ParameterSpec("address", Type.INT, 0)),
             modifiers = emptySet(),
 
-        ) { _, name, tag->
-            I2cSensorIntegration(model, name, tag, Bmx280Driver.DESCRIPTOR_BME_280)
+        ) { name ->
+            I2cSensorIntegration(model, name, Bmx280Driver.DESCRIPTOR_BME_280)
         }
     }
 }

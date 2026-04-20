@@ -17,7 +17,7 @@ export class IntegrationFactory {
         for (const key in data) {
             factory[key] = data[key]
         }
-        IntegrationFactory.map[name] = factory
+        IntegrationFactory.map[name.toLowerCase()] = factory
         return factory
     }
 }

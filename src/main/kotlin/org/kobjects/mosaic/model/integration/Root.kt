@@ -6,7 +6,6 @@ import org.kobjects.mosaic.model.ModificationToken
 class Root : Integration(
     "Root",
     "root",
-    0
 ) {
     override val portFactories = listOf(
         OutputPortSpec(
@@ -37,7 +36,7 @@ class Root : Integration(
     companion object {
         fun spec(model: ModelInterface) = IntegrationFactory(
             "", "Root", "", emptyList()) {
-            _, _, _ -> throw UnsupportedOperationException()
+            _ -> throw UnsupportedOperationException()
 
         }
     }

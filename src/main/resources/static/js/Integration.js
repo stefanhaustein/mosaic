@@ -68,7 +68,7 @@ export class Integration {
     }
 
     static update(name, data) {
-        if (data.kind == "TOMBSTONE") {
+        if (data.deleted) {
             delete Integration.map[name.toLowerCase()]
             return null
         }

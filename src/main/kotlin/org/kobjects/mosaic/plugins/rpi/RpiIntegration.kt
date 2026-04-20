@@ -13,8 +13,7 @@ import org.kobjects.mosaic.plugins.rpi.devices.Scd4xPort
 
 class RpiIntegration(
     val model: ModelInterface,
-    tag: Long
-) : Integration("rpi", "rpi", tag) {
+) : Integration("rpi", "rpi") {
     var pi4j: Context? = null
     var error: Throwable? = null
 
@@ -60,8 +59,7 @@ class RpiIntegration(
             emptyList(),
             setOf(AbstractArtifactSpec.Modifier.SINGLETON)
 
-        ) { _, _, tag ->
-            RpiIntegration(model, tag)
+        ) { _ -> RpiIntegration(model)
         }
     }
 

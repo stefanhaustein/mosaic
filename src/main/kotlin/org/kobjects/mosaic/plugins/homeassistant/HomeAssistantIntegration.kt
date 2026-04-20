@@ -18,11 +18,9 @@ import org.kobjects.mosaic.plugins.homeassistant.client.HomeAssistantClient
 
 class HomeAssistantIntegration(
     val model: ModelInterface,
-    kind: String,
     name: String,
-    tag: Long,
 
-) : Integration(kind, name, tag) {
+) : Integration("HomeAssistant", name) {
     var client: HomeAssistantClient? = null
     var host = ""
     var port = -1
@@ -155,12 +153,10 @@ class HomeAssistantIntegration(
                 ParameterSpec(name = "token", type = Type.STRING, defaultValue = null),
             ),
             modifiers = setOf(AbstractArtifactSpec.Modifier.UNINSTANTIABLE),
-        ) { kind, name, tag ->
+        ) { name ->
             HomeAssistantIntegration(
                 model,
-                kind,
                 name,
-                tag,
             )
         }
     }
