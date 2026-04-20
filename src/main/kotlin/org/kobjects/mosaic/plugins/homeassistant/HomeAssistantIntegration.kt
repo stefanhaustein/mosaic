@@ -7,6 +7,7 @@ import org.kobjects.mosaic.model.integration.InputPortSpec
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationFactory
 import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.integration.OutputPortSpec
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
@@ -113,7 +114,7 @@ class HomeAssistantIntegration(
         client?.close()
     }
 
-    override fun configure(configuration: Map<String, Any?>) {
+    override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {
         close()
         this.host = configuration["host"] as String
         this.port = configuration["port"].toString().toDouble().toInt()

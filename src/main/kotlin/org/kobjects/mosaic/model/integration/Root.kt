@@ -1,6 +1,7 @@
 package org.kobjects.mosaic.model.integration
 
 import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.ModificationToken
 
 class Root : Integration(
     "Root",
@@ -29,7 +30,7 @@ class Root : Integration(
 
     }
 
-    override fun configure(configuration: Map<String, Any?>) {
+    override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {
 
     }
 

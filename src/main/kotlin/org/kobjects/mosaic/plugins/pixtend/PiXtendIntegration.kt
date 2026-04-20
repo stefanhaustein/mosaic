@@ -6,12 +6,13 @@ import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.model.AbstractArtifactSpec
 import org.kobjects.mosaic.model.AbstractPortFactorySpec
 import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationFactory
 
-class PiXtendIntegration(
+ class PiXtendIntegration(
     val model: ModelInterface,
     kind: String,
     name: String,
@@ -93,7 +94,7 @@ class PiXtendIntegration(
     }
 
 
-    override fun configure(configuration: Map<String, Any?>) {
+    override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {
         invocationId++
         this@PiXtendIntegration.pixtendModel = configuration["model"] as PiXtendDriver.Model
         attach()

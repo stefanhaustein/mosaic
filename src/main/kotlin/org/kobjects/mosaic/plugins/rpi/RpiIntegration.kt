@@ -5,6 +5,7 @@ import com.pi4j.context.Context
 import org.kobjects.mosaic.model.AbstractArtifactSpec
 import org.kobjects.mosaic.model.AbstractPortFactorySpec
 import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationFactory
 import org.kobjects.mosaic.plugins.rpi.devices.Bmp280Port
@@ -47,7 +48,7 @@ class RpiIntegration(
 
     }
 
-    override fun configure(configuration: Map<String, Any?>) {
+    override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {
 
     }
 

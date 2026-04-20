@@ -40,7 +40,7 @@ class Integrations : Iterable<Integration> {
             integrationMap[name] = integration
             token.symbolsChanged = true
         }
-        integration.configure(jsonSpec)
+        integration.configure(jsonSpec, token)
     }
 
 

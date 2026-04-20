@@ -8,8 +8,12 @@ import org.kobjects.mosaic.model.AbstractArtifactSpec
 import org.kobjects.mosaic.model.AbstractPortFactorySpec
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
+import org.kobjects.mosaic.model.integration.InputPortInstance
+import org.kobjects.mosaic.model.integration.InputPortNode
+import org.kobjects.mosaic.model.integration.InputPortSpec
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationFactory
 import org.kobjects.mosaic.plugins.rpi.devices.Bmp280Port
@@ -31,16 +35,48 @@ class I2cSensorIntegration(
         sensor?.close()
     }
 
-    override fun configure(configuration: Map<String, Any?>) {
+    override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {
         sensor?.close()
 
         val bus = configuration["bus"] as Int
         val address = configuration["address"] as Int
 
-        i2c = Model.pi4J.create(I2C.newConfigBuilder(Model.pi4J).bus(bus).device(address))
+        i2c = Model.pi4J?.create(I2C.newConfigBuilder(Model.pi4J).bus(bus).device(address))
         sensor = sensorDescriptor.detect(i2c)
+
+        for (value in sensor?.descriptor?.values ?: emptyList()) {
+            val inputPortSpec = InputPortSpec(
+                this,
+                "",
+                value.kind.name.lowercase(),
+                Type.REAL,
+                "",
+                emptyList(),
+                createFn = { _, _ -> throw UnsupportedOperationException()}
+            )
+            val inputPortNode = InputPortNode(
+                this,
+                value.kind.name.lowercase(),
+                specification = inputPortSpec,
+                configuration = emptyMap(),
+                displayName = null,
+                category = null,
+                tag = token.tag
+            )
+            nodes[value.kind.name.lowercase()] = inputPortNode
+        }
     }
 
+    inner class SensorInputPort(
+        val index: Int,
+        inputPortNode: InputPortNode,
+    ) : InputPortInstance(
+        inputPortNode
+    ) {
+        override fun detach() {
+            TODO("Not yet implemented")
+        }
+    }
 
     companion object {
         const val INTEGRATION_NAME = "I2cSensor"

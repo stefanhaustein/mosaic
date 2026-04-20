@@ -1,6 +1,7 @@
 package org.kobjects.mosaic.model
 
 import com.pi4j.Pi4J
+import com.pi4j.context.Context
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
@@ -16,6 +17,7 @@ import org.kobjects.mosaic.model.integration.Root
 import org.kobjects.mosaic.model.sheet.Cell
 import org.kobjects.mosaic.model.sheet.Sheet
 import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
+import org.kobjects.mosaic.plugins.i2csensor.I2cSensorIntegration
 import org.kobjects.mosaic.plugins.pixtend.PiXtendIntegration
 import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 import org.kobjects.mosaic.svg.SvgManager
@@ -50,7 +52,14 @@ object Model : ModelInterface {
 
     var refreshRequested: Boolean = false
 
-    val pi4J = Pi4J.newAutoContext()
+    val pi4J: Context? = run {
+        try {
+            Pi4J.newAutoContext()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+           null
+        }
+    }
 
     private val lock = ReentrantLock()
 
@@ -60,6 +69,7 @@ object Model : ModelInterface {
         addIntegration(PiXtendIntegration.spec(this))
         addIntegration(HomeAssistantIntegration.spec(this))
         addIntegration(Root.spec(this))
+        addIntegration(I2cSensorIntegration.spec(this))
         // addPlugin(MqttPlugin)
 
         integrations.integrationMap["root"] = Root()

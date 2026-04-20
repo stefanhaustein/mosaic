@@ -40,14 +40,14 @@ abstract class Integration(
 
     abstract fun close()
 
-    protected abstract fun configure(configuration: Map<String, Any?>)
+    protected abstract fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken)
 
     // Base implementation
 
-    fun configure(json: JsonObject) {
+    fun configure(json: JsonObject, token: ModificationToken) {
         jsonConfiguration = json
         val config = factory.convertConfiguration(json)
-        configure(config)
+        configureInternal(config, token)
     }
 
     fun serialize(out: TomsonOutput, forClient: Boolean, tag: Long) {
@@ -168,7 +168,7 @@ abstract class Integration(
         tag
     ) {
 
-        override fun configure(configuration: Map<String, Any?>) {}
+        override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {}
         override val portFactories = emptyList<AbstractPortFactorySpec>()
 
         override fun close() {}
