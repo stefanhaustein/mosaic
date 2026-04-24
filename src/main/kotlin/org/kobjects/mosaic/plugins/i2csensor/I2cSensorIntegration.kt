@@ -40,7 +40,7 @@ class I2cSensorIntegration(
             modifiers = setOf(Modifier.UNINSTANTIABLE),
             createFn = { _, _ -> throw UnsupportedOperationException()}
         )
-    )
+    ).associateBy { it.name }
 
     override fun close() {
         run++
@@ -60,7 +60,7 @@ class I2cSensorIntegration(
             val inputPortNode = InputPortNode(
                 this,
                 value.kind.name.lowercase(),
-                specification = portFactories[0],
+                specification = portFactories.values.first(),
                 configuration = emptyMap(),
                 displayName = null,
                 category = null,

@@ -37,8 +37,8 @@ abstract class Integration(
 
     // Abstract stuff
 
-    // Should this be a ctor param instead?
-    abstract val portFactories: List<AbstractPortFactorySpec>
+    // A ctor param would be tricky as these should be tied to this instance.
+    abstract val portFactories: Map<String, AbstractPortFactorySpec>
 
     abstract fun close()
 
@@ -100,7 +100,7 @@ abstract class Integration(
             val kind = jsonSpec["kind"]!!.jsonPrimitive.content
 
 
-            val specification = portFactories.find { it.name == kind } ?: throw IllegalArgumentException("'$kind' not found in integration $this.")
+            val specification = portFactories[kind] ?: throw IllegalArgumentException("'$kind' not found in integration $this.")
 
             nodes[portName]?.detach()
 
@@ -156,7 +156,7 @@ abstract class Integration(
 
 
     fun factoriesToJson(): JsonObject = buildJsonObject {
-        for (operationSpec in portFactories) {
+        for (operationSpec in portFactories.values) {
             put(operationSpec.name,operationSpec.toJson())
         }
     }

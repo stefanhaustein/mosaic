@@ -41,7 +41,7 @@ class RpiIntegration(
         Bmp280Port.spec(this),
         Scd4xPort.spec(this),
     //    PiXtendIntegration.spec(this),
-    )
+    ).associateBy { it.name }
 
     override fun close() {
 

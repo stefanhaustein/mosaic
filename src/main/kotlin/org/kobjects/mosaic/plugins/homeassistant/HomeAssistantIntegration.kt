@@ -26,7 +26,7 @@ class HomeAssistantIntegration(
     var port = -1
     var token = ""
 
-    override val portFactories = Kind.values().map {
+    override val portFactories = (Kind.values().map {
         val type = getType(it)
         if (type == null) null else InputPortSpec(
             namespace = this,
@@ -54,15 +54,14 @@ class HomeAssistantIntegration(
                 throw UnsupportedOperationException()
             }
         )
-    }
+    }).associateBy { it.name }
 
     private fun getInputSpec(kind: Kind): InputPortSpec? =
-        portFactories.find { it.name == kind.name.lowercase() } as InputPortSpec?
+        portFactories[kind.name.lowercase()] as InputPortSpec?
 
 
     private fun getOutputSpec(kind: Kind): OutputPortSpec? =
-        portFactories.find { it.name == kind.name.lowercase() + "_out" } as OutputPortSpec?
-
+        portFactories[kind.name.lowercase() + "_out"] as OutputPortSpec?
 
 
     private fun attach() {

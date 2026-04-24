@@ -23,7 +23,7 @@ class Root : Integration(
                 }
             }
         )
-    )
+    ).associateBy { it.name }
 
     override fun close() {
 

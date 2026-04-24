@@ -66,8 +66,7 @@ import org.kobjects.mosaic.model.integration.IntegrationFactory
         ) { _ -> PiXtendIntegration(model) }
     }
 
-    override val portFactories: List<AbstractPortFactorySpec>
-        get() = listOf(
+    override val portFactories = listOf(
             PiXtendAnalogInputPort.spec(this),
             PiXtendAnalogOutputPort.spec(this),
             PiXtendDigitalInputPort.spec(this),
@@ -75,7 +74,7 @@ import org.kobjects.mosaic.model.integration.IntegrationFactory
             PiXtendGpioDigitalInputPort.spec(this),
             PiXtendGpioDigitalOutputPort.spec(this),
             PiXtendRelayPort.spec(this),
-        )
+        ).associateBy { it.name }
 
     override fun close() {
         invocationId++
