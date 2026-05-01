@@ -3,7 +3,6 @@ package org.kobjects.mosaic.plugins.pixtend
 import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.model.AbstractArtifactSpec
 
-import org.kobjects.mosaic.model.AbstractPortFactorySpec
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
@@ -76,7 +75,7 @@ import org.kobjects.mosaic.model.integration.IntegrationFactory
             PiXtendRelayPort.spec(this),
         ).associateBy { it.name }
 
-    override fun close() {
+    override fun detach(token: ModificationToken) {
         invocationId++
     }
 

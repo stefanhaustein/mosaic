@@ -13,7 +13,7 @@ import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.mosaic.model.sheet.Cell.Companion.TIME_FORMAT_SECONDS
 
 
-// Can't be an abstract class becuase PortHolder needs to be a sub-interface
+// Can't be an abstract class because PortHolder needs to be a sub-interface
 interface Node {
     val value: Any?
     /** Used to track when the value was changed last. */

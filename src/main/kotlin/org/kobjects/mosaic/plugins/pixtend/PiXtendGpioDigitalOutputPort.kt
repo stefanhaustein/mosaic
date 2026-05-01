@@ -4,7 +4,7 @@ import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.OutputPortInstance
-import org.kobjects.mosaic.model.integration.OutputPortSpec
+import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 
 class PiXtendGpioDigitalOutputPort(
     val integration: PiXtendIntegration,
@@ -24,7 +24,7 @@ class PiXtendGpioDigitalOutputPort(
     }
 
     companion object {
-        fun spec(integration: PiXtendIntegration) = OutputPortSpec(
+        fun spec(integration: PiXtendIntegration) = OutputPortDescriptor(
             integration,
             "PiXtend",
             "gpio_dout",

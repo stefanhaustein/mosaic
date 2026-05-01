@@ -3,7 +3,7 @@ package org.kobjects.mosaic.plugins.pixtend
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.InputPortListener
-import org.kobjects.mosaic.model.integration.InputPortSpec
+import org.kobjects.mosaic.model.integration.InputPortDescriptor
 
 class PiXtendDigitalInputPort(
     integration: PiXtendIntegration,
@@ -19,7 +19,7 @@ class PiXtendDigitalInputPort(
     }
 
     companion object {
-        fun spec(integration: PiXtendIntegration): InputPortSpec = InputPortSpec(
+        fun spec(integration: PiXtendIntegration): InputPortDescriptor = InputPortDescriptor(
             integration,
             "PiXtend",
             "din",

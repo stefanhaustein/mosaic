@@ -4,7 +4,7 @@ import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.InputPortListener
-import org.kobjects.mosaic.model.integration.InputPortSpec
+import org.kobjects.mosaic.model.integration.InputPortDescriptor
 
 class PiXtendGpioDigitalInputPort(
     integration: PiXtendIntegration,
@@ -24,7 +24,7 @@ class PiXtendGpioDigitalInputPort(
     }
 
     companion object {
-        fun spec(integration: PiXtendIntegration): InputPortSpec = InputPortSpec(
+        fun spec(integration: PiXtendIntegration): InputPortDescriptor = InputPortDescriptor(
             integration,
             "PiXtend",
             "gpio_din",

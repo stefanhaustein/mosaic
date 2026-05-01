@@ -4,20 +4,17 @@ import com.pi4j.drivers.sensor.Sensor
 import com.pi4j.drivers.sensor.SensorDescriptor
 import com.pi4j.drivers.sensor.environment.bmx280.Bmx280Driver
 import com.pi4j.io.i2c.I2C
-import org.kobjects.mosaic.model.AbstractArtifactSpec
+import kotlinx.serialization.json.JsonObject
 import org.kobjects.mosaic.model.AbstractArtifactSpec.Modifier
-import org.kobjects.mosaic.model.AbstractPortFactorySpec
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
-import org.kobjects.mosaic.model.integration.InputPortInstance
 import org.kobjects.mosaic.model.integration.InputPortNode
-import org.kobjects.mosaic.model.integration.InputPortSpec
+import org.kobjects.mosaic.model.integration.InputPortDescriptor
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationFactory
-import org.kobjects.mosaic.plugins.rpi.devices.Bmp280Port
 
 class I2cSensorIntegration(
     val model: ModelInterface,
@@ -30,7 +27,7 @@ class I2cSensorIntegration(
     var run = 0
 
     override val portFactories = listOf(
-        InputPortSpec(
+        InputPortDescriptor(
             this,
             "",
             "Measurement",
@@ -42,7 +39,7 @@ class I2cSensorIntegration(
         )
     ).associateBy { it.name }
 
-    override fun close() {
+    override fun detach(token: ModificationToken) {
         run++
         sensor?.close()
     }
@@ -61,12 +58,11 @@ class I2cSensorIntegration(
                 this,
                 value.kind.name.lowercase(),
                 specification = portFactories.values.first(),
-                configuration = emptyMap(),
                 displayName = null,
                 category = null,
-                tag = token.tag
             )
             nodes[value.kind.name.lowercase()] = inputPortNode
+            inputPortNode.configure(JsonObject(emptyMap()), token)
         }
         val localRun = ++run
         Model.scheduleAsync(5000) {

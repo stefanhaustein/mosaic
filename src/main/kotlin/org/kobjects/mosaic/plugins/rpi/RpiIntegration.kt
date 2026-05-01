@@ -3,7 +3,7 @@ package org.kobjects.mosaic.plugins.rpi
 import com.pi4j.Pi4J
 import com.pi4j.context.Context
 import org.kobjects.mosaic.model.AbstractArtifactSpec
-import org.kobjects.mosaic.model.AbstractPortFactorySpec
+import org.kobjects.mosaic.model.AbstractPortDescriptor
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.integration.Integration
@@ -33,7 +33,7 @@ class RpiIntegration(
         }
     }
 
-    override val portFactories = listOf<AbstractPortFactorySpec>(
+    override val portFactories = listOf<AbstractPortDescriptor>(
         DigitalInputPort.spec(this),
         PwmInput.spec(this),
         DigitalOutputPort.spec(this),
@@ -43,7 +43,7 @@ class RpiIntegration(
     //    PiXtendIntegration.spec(this),
     ).associateBy { it.name }
 
-    override fun close() {
+    override fun detach(token: ModificationToken) {
 
     }
 

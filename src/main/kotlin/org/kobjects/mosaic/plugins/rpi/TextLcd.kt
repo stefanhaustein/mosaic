@@ -8,7 +8,7 @@ import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.RangeValues
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.OutputPortInstance
-import org.kobjects.mosaic.model.integration.OutputPortSpec
+import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 import kotlin.math.min
 
 class TextLcd(
@@ -55,7 +55,7 @@ class TextLcd(
 
 
     companion object {
-        fun spec(plugin: RpiIntegration) = OutputPortSpec(
+        fun spec(plugin: RpiIntegration) = OutputPortDescriptor(
             null,
             "Drivers",
             "Lcd",

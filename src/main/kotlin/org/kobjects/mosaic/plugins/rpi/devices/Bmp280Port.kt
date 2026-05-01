@@ -6,7 +6,7 @@ import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.InputPortInstance
 import org.kobjects.mosaic.model.integration.InputPortListener
-import org.kobjects.mosaic.model.integration.InputPortSpec
+import org.kobjects.mosaic.model.integration.InputPortDescriptor
 // import org.kobjects.pi4jdriver.sensor.bmx280.Bmx280Driver
 import org.kobjects.mosaic.plugins.rpi.RpiIntegration
 import java.util.*
@@ -61,7 +61,7 @@ class Bmp280Port(
             Type.Field("humidity", Type.REAL),
         ))
 
-        fun spec(plugin: RpiIntegration) = InputPortSpec(
+        fun spec(plugin: RpiIntegration) = InputPortDescriptor(
             null,
             category = "Driver",
             "Bmp280",

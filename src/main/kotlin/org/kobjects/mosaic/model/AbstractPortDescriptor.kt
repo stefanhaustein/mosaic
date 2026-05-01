@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model
 
-abstract class AbstractPortFactorySpec(
+abstract class AbstractPortDescriptor(
     namespace: Namespace?,
     category: String,
     kind: OperationKind,

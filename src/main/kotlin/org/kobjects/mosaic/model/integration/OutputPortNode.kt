@@ -1,5 +1,6 @@
 package org.kobjects.mosaic.model.integration
 
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
 import org.kobjects.mosaic.model.ExpressionNode
@@ -8,15 +9,16 @@ import org.kobjects.mosaic.model.ModificationToken
 class OutputPortNode(
     override val owner: Integration,
     override val name: String,
-    override val specification: OutputPortSpec,
-    override val configuration: Map<String, Any?>,
+    override val specification: OutputPortDescriptor,
     rawFormula: String,
     override val displayName: String? = null,
-    override val category: String? = null,
-    override var tag: Long
+    override val category: String? = null
 ) : ExpressionNode(owner),  PortNode {
     var instance: OutputPortInstance? = null
     var error: Exception? = null
+    override var tag = 0L
+    override var jsonConfiguration = JsonObject(emptyMap())
+    override var deleted = false
 
     override var value: Any? = null
     override var valueTag: Long = tag
@@ -26,19 +28,8 @@ class OutputPortNode(
         this.rawFormula = rawFormula
     }
 
-    override fun attach(token: ModificationToken) {
-        detach()
-
-        reparse()
-
-
-            try {
-                instance = specification.createFn(configuration)
-            } catch (exception: Exception) {
-                error = exception
-                exception.printStackTrace()
-            }
-
+    override fun configureInternal(config: Map<String, Any?>, token: ModificationToken) {
+        instance = specification.createFn(config)
     }
 
     override fun needsSaving() = super.needsSaving() || rawFormula.isNotEmpty()

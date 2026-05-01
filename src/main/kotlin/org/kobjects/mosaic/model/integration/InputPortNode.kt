@@ -1,6 +1,7 @@
 package org.kobjects.mosaic.model.integration
 
 
+import kotlinx.serialization.json.JsonObject
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Node
@@ -8,13 +9,15 @@ import org.kobjects.mosaic.model.Node
 open class InputPortNode(
     override val owner: Integration,
     override val name: String,
-    override val specification: InputPortSpec,
-    override val configuration: Map<String, Any?>,
+    override val specification: InputPortDescriptor,
     override val displayName: String? = null,
-    override val category: String? = null,
-    override val tag: Long
+    override val category: String? = null
 
 ) : PortNode, Node, InputPortListener {
+
+    override var jsonConfiguration = JsonObject(emptyMap())
+    override var tag: Long = 0
+    override var deleted = false
 
     override val outputs = mutableSetOf<Node>()
     override val inputs = mutableSetOf<Node>()
@@ -23,22 +26,16 @@ open class InputPortNode(
 
     override var valueTag  = 0L
     override var value: Any? = null
-
     var portValue: Any? = null
+
 
     init {
         require(!name.contains(".")) { "Port name '$name' must not contain '.'" }
     }
 
 
-    override fun attach(token: ModificationToken) {
-        detach()
-        try {
-            instance = specification.createFn(configuration, this)
-        } catch (e: Exception) {
-            portValue = e
-            e.printStackTrace()
-        }
+    override fun configureInternal(config: Map<String, Any?>, token: ModificationToken) {
+        instance = specification.createFn(config, this)
     }
 
     override fun detach() {
@@ -80,9 +77,5 @@ open class InputPortNode(
         return true
     }
 
-
-
     override fun toString() = name
-
-
 }

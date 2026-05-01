@@ -8,7 +8,7 @@ class Root : Integration(
     "root",
 ) {
     override val portFactories = listOf(
-        OutputPortSpec(
+        OutputPortDescriptor(
             this,
             category = "",
             name = "NamedCell",
@@ -25,7 +25,7 @@ class Root : Integration(
         )
     ).associateBy { it.name }
 
-    override fun close() {
+    override fun detach(token: ModificationToken) {
 
     }
 

@@ -3,7 +3,7 @@ package org.kobjects.mosaic.plugins.pixtend
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.OutputPortInstance
-import org.kobjects.mosaic.model.integration.OutputPortSpec
+import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 
 class PiXtendAnalogOutputPort(
     val integration: PiXtendIntegration,
@@ -23,7 +23,7 @@ class PiXtendAnalogOutputPort(
     }
 
     companion object {
-        fun spec(integration: PiXtendIntegration) = OutputPortSpec(
+        fun spec(integration: PiXtendIntegration) = OutputPortDescriptor(
             integration,
             "PiXtend",
             "aout",

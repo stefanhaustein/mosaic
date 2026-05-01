@@ -2,14 +2,13 @@ package org.kobjects.mosaic.model.integration
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.AbstractArtifactSpec
-import org.kobjects.mosaic.model.AbstractPortFactorySpec
+import org.kobjects.mosaic.model.AbstractPortDescriptor
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
@@ -38,9 +37,9 @@ abstract class Integration(
     // Abstract stuff
 
     // A ctor param would be tricky as these should be tied to this instance.
-    abstract val portFactories: Map<String, AbstractPortFactorySpec>
+    abstract val portFactories: Map<String, AbstractPortDescriptor>
 
-    abstract fun close()
+    abstract fun detach(token: ModificationToken)
 
     protected abstract fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken)
 
@@ -50,7 +49,7 @@ abstract class Integration(
         jsonConfiguration = json
         tag = token.tag
         if (deleted) {
-            close()
+            detach(token)
             token.symbolsChanged = true
         } else {
             try {
@@ -75,84 +74,48 @@ abstract class Integration(
 
     // The name is separate because it's typically the key of the spec map
     fun definePort(portName: String, jsonSpec: JsonObject, token: ModificationToken) {
+        val existing = nodes[portName]
+        val deleted = jsonSpec["deleted"]?.jsonPrimitive?.booleanOrNull == true
 
-        if (nodes[portName]?.specification?.modifiers?.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE) ?: false ||
-            jsonSpec["deleted"]?.jsonPrimitive?.booleanOrNull != true && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
-            val port = nodes[portName]
-            if (port is OutputPortNode) {
-                port.setFormula(jsonSpec["source"]?.jsonPrimitive?.content ?: "", token)
+        if (existing != null) {
+            // TODO: Make sure this is a dedicated request instead.
+            if (existing.specification.modifiers.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE) ||
+                !deleted && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
+                (existing as? OutputPortNode)?.setFormula(jsonSpec["source"]?.jsonPrimitive?.content ?: "", token)
+                return
             }
+
+            if (existing.specification.name == jsonSpec["kind"]?.jsonPrimitive?.content || deleted) {
+                existing.configure(jsonSpec, token)
+                return
+            }
+
+            // Will be overwritten...
+            existing.detach()
+        }
+
+        if (jsonSpec["deleted"]?.jsonPrimitive?.booleanOrNull == true) {
             return
         }
 
-        token.symbolsChanged = true
+        val kind = jsonSpec["kind"]!!.jsonPrimitive.content
+        val descriptor = portFactories[kind] ?: throw IllegalArgumentException("'$kind' not found in integration $this.")
+        val displayName =  jsonSpec["displayName"]?.jsonPrimitive?.contentOrNull
 
-        // Always delete what's there.
-        val previousName = jsonSpec["previousName"]?.jsonPrimitive?.contentOrNull ?: portName
-        try {
-            deletePort(previousName, token)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        val port = when (descriptor) {
+            is InputPortDescriptor -> InputPortNode(this, portName, descriptor, displayName)
+            is OutputPortDescriptor -> OutputPortNode(
+                this,
+                portName,
+                    descriptor,
+                displayName = displayName,
+                rawFormula = jsonSpec["source"]?.jsonPrimitive?.contentOrNull ?: jsonSpec["expression"]?.jsonPrimitive?.contentOrNull ?: "")
+            else -> throw IllegalArgumentException("Operation specification $descriptor does not specify a port.")
         }
+        nodes[portName] = port
+        port.configure(jsonSpec, token)
 
-        if (jsonSpec["deleted"] as Boolean? != true) {
-
-            val kind = jsonSpec["kind"]!!.jsonPrimitive.content
-
-
-            val specification = portFactories[kind] ?: throw IllegalArgumentException("'$kind' not found in integration $this.")
-
-            nodes[portName]?.detach()
-
-            val resolvedConfiguration = specification.convertConfiguration(jsonSpec["configuration"]?.jsonObject)
-
-            val port = when (specification) {
-                is InputPortSpec -> InputPortNode(this, portName, specification, resolvedConfiguration, tag = token.tag)
-                is OutputPortSpec -> OutputPortNode(
-                    this,
-                    portName,
-                    specification,
-                    resolvedConfiguration,
-                    displayName = jsonSpec["displayName"]?.jsonPrimitive?.contentOrNull,
-                    rawFormula = jsonSpec["source"]?.jsonPrimitive?.contentOrNull ?: jsonSpec["expression"]?.jsonPrimitive?.contentOrNull ?: "",
-                    tag = token.tag)
-                else -> throw IllegalArgumentException("Operation specification $specification does not specify a port.")
-            }
-            nodes[portName] = port
-            port.attach(token)
-        }
     }
-
-
-    fun deletePort(name: String, token: ModificationToken) {
-        val port = nodes[name]
-        if (port != null) {
-            val cut = name.indexOf('.')
-            val localName = name.substring(cut + 1)
-            token.symbolsChanged = true
-            port.detach()
-            nodes[localName] = InputPortNode(
-                port.owner, localName, InputPortSpec(
-                    port.owner,
-                    "TOMBSTONE",
-                    localName,
-                    Type.VOID,
-                    "",
-                    emptyList(),
-                    emptySet(),
-                    token.tag
-                ) { _, _ ->
-                    object : InputPortInstance(object : InputPortListener {
-                        override fun portValueChanged(newValue: Any?) {}
-                        override fun portValueChanged(newValue: Any?, token: ModificationToken) {}
-                    }) {
-                        override fun detach() {}
-                    }
-                }, emptyMap(), tag = token.tag
-            )
-        }
-    }
-
 
 
     fun factoriesToJson(): JsonObject = buildJsonObject {

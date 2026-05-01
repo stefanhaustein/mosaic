@@ -1,14 +1,15 @@
 package org.kobjects.mosaic.plugins.homeassistant
 
+import kotlinx.serialization.json.JsonObject
 import org.kobjects.mosaic.model.integration.InputPortNode
 import org.kobjects.mosaic.model.integration.OutputPortNode
 import org.kobjects.mosaic.model.AbstractArtifactSpec
-import org.kobjects.mosaic.model.integration.InputPortSpec
+import org.kobjects.mosaic.model.integration.InputPortDescriptor
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationFactory
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
-import org.kobjects.mosaic.model.integration.OutputPortSpec
+import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
@@ -28,7 +29,7 @@ class HomeAssistantIntegration(
 
     override val portFactories = (Kind.values().map {
         val type = getType(it)
-        if (type == null) null else InputPortSpec(
+        if (type == null) null else InputPortDescriptor(
             namespace = this,
             category = "",
             name = it.toString().lowercase(),
@@ -42,7 +43,7 @@ class HomeAssistantIntegration(
             }
         )
     }.filterNotNull() + listOf(Kind.LIGHT).map {
-        OutputPortSpec(
+        OutputPortDescriptor(
             namespace = this,
             category = "",
             name = it.name.lowercase() + "_out",
@@ -56,15 +57,15 @@ class HomeAssistantIntegration(
         )
     }).associateBy { it.name }
 
-    private fun getInputSpec(kind: Kind): InputPortSpec? =
-        portFactories[kind.name.lowercase()] as InputPortSpec?
+    private fun getInputSpec(kind: Kind): InputPortDescriptor? =
+        portFactories[kind.name.lowercase()] as InputPortDescriptor?
 
 
-    private fun getOutputSpec(kind: Kind): OutputPortSpec? =
-        portFactories[kind.name.lowercase() + "_out"] as OutputPortSpec?
+    private fun getOutputSpec(kind: Kind): OutputPortDescriptor? =
+        portFactories[kind.name.lowercase() + "_out"] as OutputPortDescriptor?
 
 
-    private fun attach() {
+    private fun attach(modificationToken: ModificationToken) {
         client = HomeAssistantClient(host, port, token)
 
         for (entity in client?.entities?.values ?: emptyList()) {
@@ -77,10 +78,8 @@ class HomeAssistantIntegration(
                     this,
                     name = name,
                     specification = inputPortSpec,
-                    configuration = emptyMap(),
                     displayName = getDisplayName(entity),
                     category = getCategory(entity),
-                    tag = tag
                 )
 
                 inputPortHolder.instance = HAEntityInputPortInstance(entity, inputPortHolder)
@@ -94,29 +93,29 @@ class HomeAssistantIntegration(
                         name = name + "_out",
                         specification = getOutputSpec(entity.kind) ?: throw RuntimeException("OuputPortSpec not found for ${entity.kind}"),
                         rawFormula = "",
-                        configuration = emptyMap(),
+
                         displayName = getDisplayName(entity) + "_out",
                         category = getCategory(entity),
-                        tag = tag
-                    )
 
+                    )
                     outputPortHolder.instance = EntityOutputPortInstance(this, entity)
                     nodes.put(name + "_out", outputPortHolder)
+                    outputPortHolder.configure(JsonObject(emptyMap()),modificationToken)
                 }
             }
         }
     }
 
-    override fun close() {
+    override fun detach(token: ModificationToken) {
         client?.close()
     }
 
     override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {
-        close()
+        detach(token)
         this.host = configuration["host"] as String
         this.port = configuration["port"].toString().toDouble().toInt()
         this.token = configuration["token"] as String
-        attach()
+        attach(token)
     }
 
     companion object {

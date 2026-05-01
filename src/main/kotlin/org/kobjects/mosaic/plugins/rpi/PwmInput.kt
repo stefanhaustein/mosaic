@@ -6,7 +6,7 @@ import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.InputPortInstance
 import org.kobjects.mosaic.model.integration.InputPortListener
-import org.kobjects.mosaic.model.integration.InputPortSpec
+import org.kobjects.mosaic.model.integration.InputPortDescriptor
 
 class PwmInput(
     val host: InputPortListener,
@@ -44,7 +44,7 @@ class PwmInput(
     }
 
     companion object {
-        fun spec(plugin: RpiIntegration) = InputPortSpec(
+        fun spec(plugin: RpiIntegration) = InputPortDescriptor(
             null,
             category = "GPIO",
             "pwmin",
