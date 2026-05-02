@@ -5,14 +5,12 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.AbstractPortDescriptor
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
-import org.kobjects.mosaic.model.Type
 import org.kobjects.tomson.TomsonOutput
 
 
@@ -79,7 +77,7 @@ abstract class Integration(
 
         if (existing != null) {
             // TODO: Make sure this is a dedicated request instead.
-            if (existing.specification.modifiers.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE) ||
+            if (existing.specification.modifiers.contains(AbstractDescriptor.Modifier.UNINSTANTIABLE) ||
                 !deleted && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
                 (existing as? OutputPortNode)?.setFormula(jsonSpec["source"]?.jsonPrimitive?.content ?: "", token)
                 return

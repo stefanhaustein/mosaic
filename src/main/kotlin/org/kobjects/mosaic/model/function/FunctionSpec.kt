@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model.function
 
-import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.Namespace
 import org.kobjects.mosaic.model.OperationKind
 import org.kobjects.mosaic.model.ParameterSpec
@@ -18,7 +18,7 @@ open class FunctionSpec(
     displayName: String? = null,
     kind: OperationKind = OperationKind.FUNCTION,
     val createFn: (configuration: Map<String, Any?>) -> FunctionInstance,
-) : AbstractArtifactSpec(
+) : AbstractDescriptor(
     namespace,
     category,
     kind,

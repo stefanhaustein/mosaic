@@ -57,7 +57,6 @@ class TextLcd(
     companion object {
         fun spec(plugin: RpiIntegration) = OutputPortDescriptor(
             null,
-            "Drivers",
             "Lcd",
             "An LCD text display",
             listOf(

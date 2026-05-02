@@ -17,10 +17,12 @@ import org.kobjects.mosaic.model.sheet.Cell.Companion.TIME_FORMAT_SECONDS
 interface Node {
     val value: Any?
     /** Used to track when the value was changed last. */
-    val valueTag: Long
+    var valueTag: Long
     val outputs: MutableSet<Node>
     val inputs: MutableSet<Node>
     val owner: Namespace
+    var tag: Long
+
     /**
      * Re-calculates the value bases on inputs.
      * Input port values will be refreshed from the port value here.

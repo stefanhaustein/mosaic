@@ -8,24 +8,34 @@ import org.kobjects.mosaic.model.Type
 
 class InputPortDescriptor(
     namespace: Namespace?,
-    category: String,
     name: String,
     type: Type,
     description: String,
     parameters: List<ParameterSpec>,
     modifiers: Set<Modifier> = emptySet(),
-    tag: Long = 0,
-    displayName: String? = null,
     val createFn: (configuration: Map<String, Any?>, listener: InputPortListener) -> InputPortInstance,
 ) : AbstractPortDescriptor(
     namespace,
-    category,
     OperationKind.INPUT_PORT,
     name,
     type,
     description,
     parameters,
     modifiers,
-    tag,
-    displayName,
-)
+) {
+    companion object {
+        fun createUninstantiable(
+            namespace: Namespace?,
+            name: String,
+            type: Type,
+            description: String,
+        ) = InputPortDescriptor(
+            namespace,
+            name,
+            type,
+            description,
+            parameters = emptyList(),
+            modifiers = setOf(Modifier.UNINSTANTIABLE),
+            createFn = { configuration, _ -> throw UnsupportedOperationException("$name is Uninstantiable (configuration: $configuration)") })
+    }
+}

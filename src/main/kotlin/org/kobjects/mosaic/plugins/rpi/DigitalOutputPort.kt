@@ -38,7 +38,6 @@ class DigitalOutputPort(
     companion object {
         fun spec(plugin: RpiIntegration) = OutputPortDescriptor(
             null,
-            "GPIO",
             "dout",
             "Configures the given pin address for digital output and sets it to 'high' for a TRUE value and to 'low' for a FALSE or 0 value.",
             listOf(ParameterSpec("address", Type.INT, null, setOf(ParameterSpec.Modifier.CONSTANT))),

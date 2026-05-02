@@ -3,7 +3,7 @@ package org.kobjects.mosaic.plugins.mqtt
 import io.github.davidepianca98.MQTTClient
 import io.github.davidepianca98.mqtt.MQTTVersion
 import io.github.davidepianca98.mqtt.Subscription
-import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.function.FunctionSpec
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
@@ -37,7 +37,7 @@ class MqttPort(
         }.start()
     }
 
-    val operationSpecs: List<AbstractArtifactSpec> = listOf(
+    val operationSpecs: List<AbstractDescriptor> = listOf(
         FunctionSpec(
             null,
 

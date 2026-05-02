@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model.integration
 
-import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.OperationKind
 import org.kobjects.mosaic.model.ParameterSpec
 
@@ -13,7 +13,7 @@ class IntegrationFactory(
     tag: Long = 0,
     displayName: String? = null,
     val createFn: (name: String) -> Integration,
-) : AbstractArtifactSpec(
+) : AbstractDescriptor(
     null,
     category,
     OperationKind.INTEGRATION,

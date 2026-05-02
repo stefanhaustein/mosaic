@@ -26,20 +26,17 @@ open class InputPortNode(
 
     override var valueTag  = 0L
     override var value: Any? = null
-    var portValue: Any? = null
-
 
     init {
         require(!name.contains(".")) { "Port name '$name' must not contain '.'" }
     }
-
 
     override fun configureInternal(config: Map<String, Any?>, token: ModificationToken) {
         instance = specification.createFn(config, this)
     }
 
     override fun detach() {
-        // This doesn't really need to do anything about dependencies -- dependencies will be updatend in their reset
+        // This doesn't really need to do anything about dependencies -- dependencies will be updated in their reset
         // methods.
         if (instance != null) {
             try {
@@ -60,21 +57,15 @@ open class InputPortNode(
     }
 
     override fun portValueChanged(newValue: Any?, token: ModificationToken) {
-        portValue = newValue
-        token.addRefresh(this)
+        if (value != newValue) {
+            value = newValue
+            token.addRefresh(this)
+            valueTag = token.tag
+        }
     }
 
     override fun recalculateValue(tag: Long): Boolean {
-        if (valueTag == tag) {
-            return false
-        }
-        val newValue = portValue
-        if (value == newValue) {
-            return false
-        }
-        valueTag = tag
-        value = newValue
-        return true
+        return valueTag == tag
     }
 
     override fun toString() = name

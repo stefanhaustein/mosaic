@@ -63,7 +63,6 @@ class Bmp280Port(
 
         fun spec(plugin: RpiIntegration) = InputPortDescriptor(
             null,
-            category = "Driver",
             "Bmp280",
             TYPE,
             "BMP 280 sensor port.",
@@ -81,9 +80,8 @@ class Bmp280Port(
                     setOf(ParameterSpec.Modifier.CONSTANT, ParameterSpec.Modifier.OPTIONAL)
                 )
             ),
-            createFn = { config, host ->
-                Bmp280Port(host, plugin, config["bus"] as? Int ?: 1, config["address"] as? Int ?: 0x77)
-            },
-        )
+        ) { config, host ->
+            Bmp280Port(host, plugin, config["bus"] as? Int ?: 1, config["address"] as? Int ?: 0x77)
+        }
     }
 }

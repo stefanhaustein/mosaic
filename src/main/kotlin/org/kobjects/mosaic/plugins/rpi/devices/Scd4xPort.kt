@@ -66,7 +66,6 @@ class Scd4xPort(
 
         fun spec(plugin: RpiIntegration) = InputPortDescriptor(
             null,
-            category = "Driver",
             "Scd4x",
             TYPE,
             "SCD 4x sensor port.",
@@ -78,9 +77,8 @@ class Scd4xPort(
                     setOf(ParameterSpec.Modifier.CONSTANT, ParameterSpec.Modifier.OPTIONAL)
                 ),
             ),
-            createFn = { config, host ->
-                Scd4xPort(host, plugin, config["bus"] as? Int ?: 1)
-            },
-        )
+        ) { config, host ->
+            Scd4xPort(host, plugin, config["bus"] as? Int ?: 1)
+        }
     }
 }

@@ -46,15 +46,13 @@ class PwmInput(
     companion object {
         fun spec(plugin: RpiIntegration) = InputPortDescriptor(
             null,
-            category = "GPIO",
             "pwmin",
             Type.REAL,
             "Configures the given pin address for input and reports the pulse width in seconds.",
             listOf(ParameterSpec("address", Type.INT, null, setOf(ParameterSpec.Modifier.CONSTANT))),
-            createFn = { config, host ->
-                PwmInput(host, plugin, config["address"] as Int)
-            },
-        )
+        ) { config, host ->
+            PwmInput(host, plugin, config["address"] as Int)
+        }
     }
 
 }

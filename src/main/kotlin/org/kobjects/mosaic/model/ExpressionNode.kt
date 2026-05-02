@@ -17,7 +17,7 @@ abstract class ExpressionNode(
     override var value: Any? = null
 
     override var valueTag = 0L
-    var formulaTag = 0L
+    override var tag = 0L
 
     override val outputs = mutableSetOf<Node>()
     override val inputs = mutableSetOf<Node>()
@@ -38,7 +38,7 @@ abstract class ExpressionNode(
         if (value != rawFormula) {
             rawFormula = value
             reparse()
-            formulaTag = modificationToken.tag
+            tag = modificationToken.tag
             modificationToken.formulaChanged = true
             modificationToken.addRefresh(this)
         }

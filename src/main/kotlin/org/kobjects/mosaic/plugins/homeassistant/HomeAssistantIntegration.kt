@@ -3,7 +3,7 @@ package org.kobjects.mosaic.plugins.homeassistant
 import kotlinx.serialization.json.JsonObject
 import org.kobjects.mosaic.model.integration.InputPortNode
 import org.kobjects.mosaic.model.integration.OutputPortNode
-import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.integration.InputPortDescriptor
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationFactory
@@ -29,31 +29,17 @@ class HomeAssistantIntegration(
 
     override val portFactories = (Kind.values().map {
         val type = getType(it)
-        if (type == null) null else InputPortDescriptor(
+        if (type == null) null else InputPortDescriptor.createUninstantiable(
             namespace = this,
-            category = "",
             name = it.toString().lowercase(),
-            description = "",
             type = type,
-            parameters = emptyList(),
-            modifiers = setOf(AbstractArtifactSpec.Modifier.UNINSTANTIABLE),
-            tag = tag,
-            createFn = { _, _ ->
-                throw UnsupportedOperationException()
-            }
+            description = "",
         )
     }.filterNotNull() + listOf(Kind.LIGHT).map {
-        OutputPortDescriptor(
+        OutputPortDescriptor.createUninstantiable(
             namespace = this,
-            category = "",
             name = it.name.lowercase() + "_out",
             description = "",
-            parameters = emptyList(),
-            modifiers = setOf(AbstractArtifactSpec.Modifier.UNINSTANTIABLE),
-            tag = tag,
-            createFn = {
-                throw UnsupportedOperationException()
-            }
         )
     }).associateBy { it.name }
 
@@ -150,7 +136,6 @@ class HomeAssistantIntegration(
                 ParameterSpec(name = "port", type = Type.INT, defaultValue = 8123),
                 ParameterSpec(name = "token", type = Type.STRING, defaultValue = null),
             ),
-            modifiers = setOf(AbstractArtifactSpec.Modifier.UNINSTANTIABLE),
         ) { name ->
             HomeAssistantIntegration(
                 model,

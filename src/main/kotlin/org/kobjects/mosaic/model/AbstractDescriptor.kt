@@ -6,7 +6,7 @@ import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.tomson.ToJson
 import org.kobjects.tomson.toJson
 
-abstract class AbstractArtifactSpec(
+abstract class AbstractDescriptor(
     val namespace: Namespace?,
     val category: String,
     val kind: OperationKind,

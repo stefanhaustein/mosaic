@@ -7,7 +7,7 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.AbstractPortDescriptor
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Node
@@ -15,7 +15,6 @@ import org.kobjects.mosaic.model.Node
 // Can't be an abstract class because ExpressionNode already is a superclass of OutputPortHolder.
 interface PortNode: Node {
     val name: String
-    var tag: Long
     val fqName: String
         get() = owner.name + "." + name
 
@@ -35,7 +34,7 @@ interface PortNode: Node {
     fun configure(json: JsonObject, token: ModificationToken) {
         jsonConfiguration =  json["configuration"]?.jsonObject ?: JsonObject(emptyMap())
         tag = token.tag
-        val unmodifiable = specification.modifiers.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE)
+        val unmodifiable = specification.modifiers.contains(AbstractDescriptor.Modifier.UNINSTANTIABLE)
         if (!unmodifiable) {
             detach()
         }
@@ -54,7 +53,7 @@ interface PortNode: Node {
 
     fun configureInternal(config: Map<String, Any?>, token: ModificationToken)
 
-    fun needsSaving() = !specification.modifiers.contains(AbstractArtifactSpec.Modifier.UNINSTANTIABLE)
+    fun needsSaving() = !specification.modifiers.contains(AbstractDescriptor.Modifier.UNINSTANTIABLE)
 
     override fun qualifiedId() = if (owner == null) name else owner?.name + "." + name
 

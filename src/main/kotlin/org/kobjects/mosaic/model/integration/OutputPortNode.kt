@@ -16,12 +16,10 @@ class OutputPortNode(
 ) : ExpressionNode(owner),  PortNode {
     var instance: OutputPortInstance? = null
     var error: Exception? = null
-    override var tag = 0L
+
     override var jsonConfiguration = JsonObject(emptyMap())
     override var deleted = false
 
-    override var value: Any? = null
-    override var valueTag: Long = tag
 
     init {
         require(!name.contains(".")) { "Port name '$name' must not contain '.'" }

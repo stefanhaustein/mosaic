@@ -1,7 +1,7 @@
 package org.kobjects.mosaic.plugins.pixtend
 
 import com.pi4j.drivers.plc.pixtend.PiXtendDriver
-import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractDescriptor
 
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModelInterface
@@ -61,7 +61,7 @@ import org.kobjects.mosaic.model.integration.IntegrationFactory
             name = "pixt",
             description = "PiXtend PLC Integration",
             parameters = listOf(ParameterSpec("model", piXtendModel, PiXtendDriver.Model.V2S)),
-            modifiers = setOf(AbstractArtifactSpec.Modifier.SINGLETON),
+            modifiers = setOf(AbstractDescriptor.Modifier.SINGLETON),
         ) { _ -> PiXtendIntegration(model) }
     }
 

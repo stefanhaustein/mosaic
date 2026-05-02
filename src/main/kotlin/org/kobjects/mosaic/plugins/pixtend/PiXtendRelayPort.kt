@@ -22,13 +22,12 @@ class PiXtendRelayPort(
     companion object {
         fun spec(integration: PiXtendIntegration) = OutputPortDescriptor(
             null,
-            "PiXtend",
-            "pixt.relay",
+            "relay",
             //     Type.REAL,
             "PiXtend relay.",
             listOf(ParameterSpec("index", Type.INT, 0)),
             emptySet(),
-            integration.tag
+
         ) {
             PiXtendDigitalOutputPort(integration, it["index"] as Int)
         }

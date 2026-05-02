@@ -21,13 +21,10 @@ class PiXtendDigitalInputPort(
     companion object {
         fun spec(integration: PiXtendIntegration): InputPortDescriptor = InputPortDescriptor(
             integration,
-            "PiXtend",
             "din",
             Type.BOOL,
             "PiXtend digital input.",
-            listOf(ParameterSpec("index", Type.INT, 0)),
-            emptySet(),
-            integration.tag
+            listOf(ParameterSpec("index", Type.INT, 0))
         ) { config, listener ->
             PiXtendDigitalInputPort(integration, config["index"] as Int, listener).apply {
                 integration.inputPorts.add(

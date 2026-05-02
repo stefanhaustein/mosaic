@@ -5,7 +5,7 @@ import com.pi4j.drivers.sensor.SensorDescriptor
 import com.pi4j.drivers.sensor.environment.bmx280.Bmx280Driver
 import com.pi4j.io.i2c.I2C
 import kotlinx.serialization.json.JsonObject
-import org.kobjects.mosaic.model.AbstractArtifactSpec.Modifier
+import org.kobjects.mosaic.model.AbstractDescriptor.Modifier
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
@@ -29,14 +29,12 @@ class I2cSensorIntegration(
     override val portFactories = listOf(
         InputPortDescriptor(
             this,
-            "",
             "Measurement",
             Type.REAL,
             "",
             emptyList(),
-            modifiers = setOf(Modifier.UNINSTANTIABLE),
-            createFn = { _, _ -> throw UnsupportedOperationException()}
-        )
+            modifiers = setOf(Modifier.UNINSTANTIABLE)
+        ) { _, _ -> throw UnsupportedOperationException() }
     ).associateBy { it.name }
 
     override fun detach(token: ModificationToken) {

@@ -2,9 +2,6 @@ package org.kobjects.mosaic.model.sheet
 
 import kotlinx.datetime.*
 import kotlinx.datetime.format.char
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
@@ -47,7 +44,7 @@ class Cell(
 
     fun setImage(path: String, modificationToken: ModificationToken) {
         image = path
-        formulaTag = modificationToken.tag
+        tag = modificationToken.tag
         modificationToken.formulaChanged = true
     }
 
@@ -72,13 +69,13 @@ class Cell(
         if (validation != this.validation) {
             this.validation = validation
             modificationToken.formulaChanged = true
-            formulaTag = modificationToken.tag
+            tag = modificationToken.tag
         }
     }
 
     fun serialize(builder: JsonObjectBuilder, tag: Long, forClient: Boolean) {
         val id = id
-        if (formulaTag > tag) {
+        if (this@Cell.tag > tag) {
             val properties = buildJsonObject {
                 if (!rawFormula.isNullOrEmpty()) {
                     put("f", JsonPrimitive(rawFormula))

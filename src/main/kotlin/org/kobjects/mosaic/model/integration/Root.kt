@@ -10,19 +10,15 @@ class Root : Integration(
     override val portFactories = listOf(
         OutputPortDescriptor(
             this,
-            category = "",
             name = "NamedCell",
             description = "A named cell or range of cells",
-            parameters = emptyList(),
-            modifiers = emptySet(),
-            tag = 0,
-            createFn = { _ ->
-                object : OutputPortInstance {
-                    override fun setValue(value: Any?) {}
-                    override fun detach() {}
-                }
+            parameters = emptyList()
+        ) { _ ->
+            object : OutputPortInstance {
+                override fun setValue(value: Any?) {}
+                override fun detach() {}
             }
-        )
+        }
     ).associateBy { it.name }
 
     override fun detach(token: ModificationToken) {

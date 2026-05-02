@@ -1,5 +1,6 @@
 package org.kobjects.mosaic.plugins.pixtend
 
+import io.ktor.http.parameters
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.OutputPortInstance
@@ -25,13 +26,11 @@ class PiXtendAnalogOutputPort(
     companion object {
         fun spec(integration: PiXtendIntegration) = OutputPortDescriptor(
             integration,
-            "PiXtend",
             "aout",
             //     Type.REAL,
             "PiXtend analog output.",
             listOf(ParameterSpec("index", Type.INT, 0)),
             emptySet(),
-            integration.tag
         ) {
             PiXtendAnalogOutputPort(integration, it["index"] as Int)
         }

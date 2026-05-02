@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model.builtin
 
-import org.kobjects.mosaic.model.AbstractArtifactSpec
+import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.RangeValues
 import org.kobjects.mosaic.model.Type
@@ -32,7 +32,6 @@ class RestOut(val path: String) : OutputPortInstance {
     companion object {
         val SPEC = OutputPortDescriptor(
             null,
-            "Network",
             "rest_out",
             """Makes the given value(s) accessible via an JSON object under the '/rest/path' path of this server.""",
             listOf(
@@ -44,7 +43,7 @@ class RestOut(val path: String) : OutputPortInstance {
                     setOf(ParameterSpec.Modifier.CONSTANT, ParameterSpec.Modifier.OPTIONAL)
                 ),
             ),
-            setOf(AbstractArtifactSpec.Modifier.NO_SIMULATION)
+            setOf(AbstractDescriptor.Modifier.NO_SIMULATION)
         ) {
             RestOut(it["path"] as String)
         }

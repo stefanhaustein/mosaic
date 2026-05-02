@@ -38,12 +38,10 @@ class DigitalInputPort(
     companion object {
         fun spec(plugin: RpiIntegration) = InputPortDescriptor(
             null,
-            category = "GPIO",
             "din",
             Type.BOOL,
             "Configures the given pin address for digital input and reports a high value as TRUE and a low value as FALSE.",
             listOf(ParameterSpec("address", Type.INT, null, setOf(ParameterSpec.Modifier.CONSTANT))),
-            createFn = { config, listener -> DigitalInputPort(listener, plugin, config["address"] as Int) },
-        )
+        ) { config, listener -> DigitalInputPort(listener, plugin, config["address"] as Int) }
     }
 }

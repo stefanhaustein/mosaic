@@ -2,24 +2,21 @@ package org.kobjects.mosaic.model
 
 abstract class AbstractPortDescriptor(
     namespace: Namespace?,
-    category: String,
     kind: OperationKind,
     name: String,
     type: Type?,
     description: String,
     parameters: List<ParameterSpec>,
     modifiers: Set<Modifier>,
-    tag: Long,
-    displayName: String?,
-) : AbstractArtifactSpec(
+) : AbstractDescriptor(
     namespace,
-    category,
+    category = "",
     kind,
     type,
     name,
     description,
     parameters,
     modifiers,
-    tag,
-    displayName,
+    tag = 0,
+    displayName = null,
 )
