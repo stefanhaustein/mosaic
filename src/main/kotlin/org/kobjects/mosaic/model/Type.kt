@@ -55,6 +55,11 @@ interface Type : ToJson {
         if (value is JsonPrimitive) valueFromString(value.jsonPrimitive.content)
         else throw UnsupportedOperationException("Can't parse '$this' from JSON yet.")
 
+    class Options(val options: List<String>) : Type {
+        override fun toJson() = JsonArray(options.map { JsonPrimitive(it)})
+        override fun valueFromString(s: String) = s
+    }
+
     class ENUM<T : Enum<T>>(val entries: EnumEntries<T>) : Type {
 
         override fun toJson() = JsonArray(entries.toJson())

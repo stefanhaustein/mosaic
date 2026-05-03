@@ -9,7 +9,7 @@ import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.Integration
-import org.kobjects.mosaic.model.integration.IntegrationFactory
+import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 
  class PiXtendIntegration(
     val model: ModelInterface,
@@ -56,7 +56,7 @@ import org.kobjects.mosaic.model.integration.IntegrationFactory
     companion object {
         val piXtendModel = Type.ENUM(PiXtendDriver.Model.entries)
 
-        fun spec(model: ModelInterface) = IntegrationFactory(
+        fun spec(model: ModelInterface) = IntegrationDescriptor(
             category = "PLC",
             name = "pixt",
             description = "PiXtend PLC Integration",

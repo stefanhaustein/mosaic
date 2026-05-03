@@ -3,10 +3,9 @@ package org.kobjects.mosaic.plugins.homeassistant
 import kotlinx.serialization.json.JsonObject
 import org.kobjects.mosaic.model.integration.InputPortNode
 import org.kobjects.mosaic.model.integration.OutputPortNode
-import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.integration.InputPortDescriptor
 import org.kobjects.mosaic.model.integration.Integration
-import org.kobjects.mosaic.model.integration.IntegrationFactory
+import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.integration.OutputPortDescriptor
@@ -127,7 +126,7 @@ class HomeAssistantIntegration(
             }
         }
 
-        fun spec(model: ModelInterface) = IntegrationFactory(
+        fun spec(model: ModelInterface) = IntegrationDescriptor(
             category = "HomeAutomation",
             name = "HomeAssistant",
             "HomeAssistant integration",

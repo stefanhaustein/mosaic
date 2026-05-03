@@ -10,7 +10,7 @@ import org.kobjects.mosaic.model.builtin.BuiltinFunctions
 import org.kobjects.mosaic.model.function.Functions
 import org.kobjects.mosaic.model.integration.InputPortListener
 import org.kobjects.mosaic.model.integration.IntegrationFactories
-import org.kobjects.mosaic.model.integration.IntegrationFactory
+import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 import org.kobjects.mosaic.model.integration.Integrations
 import org.kobjects.mosaic.model.integration.OutputPortNode
 import org.kobjects.mosaic.model.integration.Root
@@ -69,7 +69,7 @@ object Model : ModelInterface {
         addIntegration(PiXtendIntegration.spec(this))
         addIntegration(HomeAssistantIntegration.spec(this))
         addIntegration(Root.spec(this))
-        addIntegration(I2cSensorIntegration.spec(this))
+        addIntegration(I2cSensorIntegration.descriptor(this))
         // addPlugin(MqttPlugin)
 
         integrations.integrationMap["root"] = Root()
@@ -90,7 +90,7 @@ object Model : ModelInterface {
         updateListeners.add(UpdateListenerData(permanent = permanent, onChangeOnly = onChangeOnly, listener = listener))
     }
 
-    fun addIntegration(spec: IntegrationFactory) {
+    fun addIntegration(spec: IntegrationDescriptor) {
         integrationFactories.add(spec)
     }
 

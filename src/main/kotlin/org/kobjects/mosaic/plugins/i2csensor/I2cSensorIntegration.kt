@@ -2,6 +2,9 @@ package org.kobjects.mosaic.plugins.i2csensor
 
 import com.pi4j.drivers.sensor.Sensor
 import com.pi4j.drivers.sensor.SensorDescriptor
+import com.pi4j.drivers.sensor.SensorDescriptor.Kind
+import com.pi4j.drivers.sensor.SensorDescriptor.MeasurementUnit
+import com.pi4j.drivers.sensor.SensorDetector
 import com.pi4j.drivers.sensor.environment.bmx280.Bmx280Driver
 import com.pi4j.io.i2c.I2C
 import kotlinx.serialization.json.JsonObject
@@ -14,28 +17,25 @@ import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.model.integration.InputPortNode
 import org.kobjects.mosaic.model.integration.InputPortDescriptor
 import org.kobjects.mosaic.model.integration.Integration
-import org.kobjects.mosaic.model.integration.IntegrationFactory
+import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 
 class I2cSensorIntegration(
     val model: ModelInterface,
     name: String,
-    val sensorDescriptor: SensorDescriptor
 ) : Integration(INTEGRATION_NAME, name) {
 
     var i2c: I2C? = null
     var sensor: Sensor? = null
     var run = 0
 
-    override val portFactories = listOf(
-        InputPortDescriptor(
+    override val portFactories = MeasurementUnit.values().associate { it.name to
+        InputPortDescriptor.createUninstantiable(
             this,
-            "Measurement",
+            it.name,
             Type.REAL,
             "",
-            emptyList(),
-            modifiers = setOf(Modifier.UNINSTANTIABLE)
-        ) { _, _ -> throw UnsupportedOperationException() }
-    ).associateBy { it.name }
+        )
+    }
 
     override fun detach(token: ModificationToken) {
         run++
@@ -45,9 +45,11 @@ class I2cSensorIntegration(
     override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {
         sensor?.close()
 
+        val sensorName = configuration["sensor"] as String
         val bus = configuration["bus"] as Int
         val address = configuration["address"] as Int
 
+        val sensorDescriptor = SensorDetector.DESCRIPTORS.first { it.sensorName == sensorName }
         i2c = Model.pi4J?.create(I2C.newConfigBuilder(Model.pi4J).bus(bus).device(address))
         sensor = sensorDescriptor.detect(i2c)
 
@@ -55,9 +57,7 @@ class I2cSensorIntegration(
             val inputPortNode = InputPortNode(
                 this,
                 value.kind.name.lowercase(),
-                specification = portFactories.values.first(),
-                displayName = null,
-                category = null,
+                specification = portFactories[value.kind.measurementUnit.name]!!
             )
             nodes[value.kind.name.lowercase()] = inputPortNode
             inputPortNode.configure(JsonObject(emptyMap()), token)
@@ -78,21 +78,24 @@ class I2cSensorIntegration(
             }
         }
     }
-
+    
     companion object {
         const val INTEGRATION_NAME = "I2cSensor"
 
-        fun spec(model: ModelInterface) = IntegrationFactory(
+        val sensorType: Type = Type.Options(SensorDetector.DESCRIPTORS.map{ it.sensorName } )
+
+        fun descriptor(model: ModelInterface) = IntegrationDescriptor(
             category = "Sensor",
             name = INTEGRATION_NAME,
             description = "I2c-Based Sensors",
             parameters = listOf(
-                ParameterSpec("bus", Type.INT, 0),
+                ParameterSpec("sensor", sensorType, null),
+                ParameterSpec("bus", Type.INT, 1),
                 ParameterSpec("address", Type.INT, 0)),
             modifiers = emptySet(),
 
         ) { name ->
-            I2cSensorIntegration(model, name, Bmx280Driver.DESCRIPTOR_BME_280)
+            I2cSensorIntegration(model, name)
         }
     }
 }

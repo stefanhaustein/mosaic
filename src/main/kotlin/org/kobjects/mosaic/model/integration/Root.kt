@@ -30,7 +30,7 @@ class Root : Integration(
     }
 
     companion object {
-        fun spec(model: ModelInterface) = IntegrationFactory(
+        fun spec(model: ModelInterface) = IntegrationDescriptor(
             "", "Root", "", emptyList()) {
             _ -> throw UnsupportedOperationException()
 

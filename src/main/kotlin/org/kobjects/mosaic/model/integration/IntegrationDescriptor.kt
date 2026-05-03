@@ -4,7 +4,7 @@ import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.OperationKind
 import org.kobjects.mosaic.model.ParameterSpec
 
-class IntegrationFactory(
+class IntegrationDescriptor(
     category: String,
     name: String,
     description: String,

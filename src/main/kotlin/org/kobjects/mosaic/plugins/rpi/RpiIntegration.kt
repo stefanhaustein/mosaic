@@ -7,7 +7,7 @@ import org.kobjects.mosaic.model.AbstractPortDescriptor
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.integration.Integration
-import org.kobjects.mosaic.model.integration.IntegrationFactory
+import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 import org.kobjects.mosaic.plugins.rpi.devices.Bmp280Port
 import org.kobjects.mosaic.plugins.rpi.devices.Scd4xPort
 
@@ -52,7 +52,7 @@ class RpiIntegration(
     }
 
     companion object {
-        fun spec(model: ModelInterface) = IntegrationFactory(
+        fun spec(model: ModelInterface) = IntegrationDescriptor(
             "",
             "rpi",
             "Raspberry Pi GPIO integration",

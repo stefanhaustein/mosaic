@@ -4,11 +4,11 @@ import kotlinx.serialization.json.buildJsonObject
 import org.kobjects.tomson.TomsonOutput
 
 
-class IntegrationFactories : Iterable<IntegrationFactory> {
+class IntegrationFactories : Iterable<IntegrationDescriptor> {
 
-    private val factoryMap = mutableMapOf<String, IntegrationFactory>()
+    private val factoryMap = mutableMapOf<String, IntegrationDescriptor>()
 
-    fun add(factory: IntegrationFactory) {
+    fun add(factory: IntegrationDescriptor) {
         factoryMap[factory.fqName] = factory
     }
 
