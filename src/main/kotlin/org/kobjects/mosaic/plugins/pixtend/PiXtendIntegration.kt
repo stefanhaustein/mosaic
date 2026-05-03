@@ -65,7 +65,7 @@ import org.kobjects.mosaic.model.integration.IntegrationDescriptor
         ) { _ -> PiXtendIntegration(model) }
     }
 
-    override val portFactories = listOf(
+    override val portDescriptors = listOf(
             PiXtendAnalogInputPort.spec(this),
             PiXtendAnalogOutputPort.spec(this),
             PiXtendDigitalInputPort.spec(this),

@@ -12,7 +12,6 @@ import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
-import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity.Kind
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntityState
 import org.kobjects.mosaic.plugins.homeassistant.client.HomeAssistantClient
 
@@ -26,7 +25,7 @@ class HomeAssistantIntegration(
     var port = -1
     var token = ""
 
-    override val portFactories = (Kind.values().map {
+    override val portDescriptors = (HAEntity.Kind.entries.map {
         val type = getType(it)
         if (type == null) null else InputPortDescriptor.createUninstantiable(
             namespace = this,
@@ -34,20 +33,21 @@ class HomeAssistantIntegration(
             type = type,
             description = "",
         )
-    }.filterNotNull() + listOf(Kind.LIGHT).map {
-        OutputPortDescriptor.createUninstantiable(
-            namespace = this,
-            name = it.name.lowercase() + "_out",
-            description = "",
-        )
-    }).associateBy { it.name }
+    } + HAEntity.Kind.entries.map {
+        if (supportsOutput(it)) {
+            OutputPortDescriptor.createUninstantiable(
+                namespace = this,
+                name = it.name.lowercase() + "_out",
+                description = "",
+            )
+        } else null
+    }).filterNotNull().associateBy { it.name }
 
-    private fun getInputSpec(kind: Kind): InputPortDescriptor? =
-        portFactories[kind.name.lowercase()] as InputPortDescriptor?
+    private fun getInputPortDescriptor(kind: HAEntity.Kind): InputPortDescriptor? =
+        portDescriptors[kind.name.lowercase()] as InputPortDescriptor?
 
-
-    private fun getOutputSpec(kind: Kind): OutputPortDescriptor? =
-        portFactories[kind.name.lowercase() + "_out"] as OutputPortDescriptor?
+    private fun getOutputPortDescriptor(kind: HAEntity.Kind): OutputPortDescriptor? =
+        portDescriptors[kind.name.lowercase() + "_out"] as OutputPortDescriptor?
 
 
     private fun attach(modificationToken: ModificationToken) {
@@ -56,34 +56,32 @@ class HomeAssistantIntegration(
         for (entity in client?.entities?.values ?: emptyList()) {
             val name =  entity.id.replace('.', '_')
 
-            val inputPortSpec = getInputSpec(entity.kind)
+            val inputPortSpec = getInputPortDescriptor(entity.kind)
             if (inputPortSpec != null) {
 
                 val inputPortHolder = InputPortNode(
                     this,
                     name = name,
-                    specification = inputPortSpec,
+                    descriptor = inputPortSpec,
                     displayName = getDisplayName(entity),
                     category = getCategory(entity),
                 )
 
-                inputPortHolder.instance = HAEntityInputPortInstance(entity, inputPortHolder)
+                inputPortHolder.instance = HaEntityInputPortInstance(entity, inputPortHolder)
                 inputPortHolder.value = getValue(entity)
 
                 nodes.put(name, inputPortHolder)
 
-                if (entity.kind == Kind.LIGHT) {
+                if (supportsOutput(entity.kind)) {
                     val outputPortHolder = OutputPortNode(
                         this,
                         name = name + "_out",
-                        specification = getOutputSpec(entity.kind) ?: throw RuntimeException("OuputPortSpec not found for ${entity.kind}"),
+                        descriptor = getOutputPortDescriptor(entity.kind) ?: throw RuntimeException("OuputPortSpec not found for ${entity.kind}"),
                         rawFormula = "",
-
                         displayName = getDisplayName(entity) + "_out",
                         category = getCategory(entity),
-
                     )
-                    outputPortHolder.instance = EntityOutputPortInstance(this, entity)
+                    outputPortHolder.instance = HaEntityOutputPortInstance(this, entity)
                     nodes.put(name + "_out", outputPortHolder)
                     outputPortHolder.configure(JsonObject(emptyMap()),modificationToken)
                 }
@@ -114,14 +112,19 @@ class HomeAssistantIntegration(
             }
         }
 
-        fun getValue(entity: HAEntity, state: HAEntityState = entity.state): Any? {
+        fun supportsOutput(kind: HAEntity.Kind): Boolean = when (kind) {
+            HAEntity.Kind.LIGHT -> true
+            else -> false
+        }
+
+        fun getValue(entity: HAEntity, state: HAEntityState = entity.state): Any {
             return when (entity.kind) {
-                Kind.BINARY_SENSOR,
-                    Kind.LIGHT -> when (state.state) {
-                        "on" -> true
-                       "off" -> false
-                        else -> IllegalStateException(state.state?.toString() ?: "null")
-                    }
+                HAEntity.Kind.BINARY_SENSOR,
+                HAEntity.Kind.LIGHT -> when (state.state) {
+                    "on" -> true
+                    "off" -> false
+                    else -> IllegalStateException(state.state?.toString() ?: "null")
+                }
                 else -> state
             }
         }
@@ -176,6 +179,4 @@ class HomeAssistantIntegration(
             if (suffix.startsWith("_")) suffix.substring(1) else suffix
         }
     }
-
-
 }

@@ -7,7 +7,7 @@ import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration.Compan
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntityState
 
-class HAEntityInputPortInstance(
+class HaEntityInputPortInstance(
     val entity: HAEntity,
     val portHolder: InputPortNode,
 ) : InputPortInstance(portHolder), HAEntity.StateChangeListener {

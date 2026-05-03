@@ -33,7 +33,7 @@ class RpiIntegration(
         }
     }
 
-    override val portFactories = listOf<AbstractPortDescriptor>(
+    override val portDescriptors = listOf<AbstractPortDescriptor>(
         DigitalInputPort.spec(this),
         PwmInput.spec(this),
         DigitalOutputPort.spec(this),

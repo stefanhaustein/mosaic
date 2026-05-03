@@ -35,7 +35,7 @@ abstract class Integration(
     // Abstract stuff
 
     // A ctor param would be tricky as these should be tied to this instance.
-    abstract val portFactories: Map<String, AbstractPortDescriptor>
+    abstract val portDescriptors: Map<String, AbstractPortDescriptor>
 
     abstract fun detach(token: ModificationToken)
 
@@ -77,13 +77,13 @@ abstract class Integration(
 
         if (existing != null) {
             // TODO: Make sure this is a dedicated request instead.
-            if (existing.specification.modifiers.contains(AbstractDescriptor.Modifier.UNINSTANTIABLE) ||
+            if (existing.descriptor.modifiers.contains(AbstractDescriptor.Modifier.UNINSTANTIABLE) ||
                 !deleted && !jsonSpec.containsKey("kind") && !jsonSpec.containsKey("configuration")) {
                 (existing as? OutputPortNode)?.setFormula(jsonSpec["source"]?.jsonPrimitive?.content ?: "", token)
                 return
             }
 
-            if (existing.specification.name == jsonSpec["kind"]?.jsonPrimitive?.content || deleted) {
+            if (existing.descriptor.name == jsonSpec["kind"]?.jsonPrimitive?.content || deleted) {
                 existing.configure(jsonSpec, token)
                 return
             }
@@ -97,7 +97,7 @@ abstract class Integration(
         }
 
         val kind = jsonSpec["kind"]!!.jsonPrimitive.content
-        val descriptor = portFactories[kind] ?: throw IllegalArgumentException("'$kind' not found in integration $this.")
+        val descriptor = portDescriptors[kind] ?: throw IllegalArgumentException("'$kind' not found in integration $this.")
         val displayName =  jsonSpec["displayName"]?.jsonPrimitive?.contentOrNull
 
         val port = when (descriptor) {
@@ -117,7 +117,7 @@ abstract class Integration(
 
 
     fun factoriesToJson(): JsonObject = buildJsonObject {
-        for (operationSpec in portFactories.values) {
+        for (operationSpec in portDescriptors.values) {
             put(operationSpec.name,operationSpec.toJson())
         }
     }

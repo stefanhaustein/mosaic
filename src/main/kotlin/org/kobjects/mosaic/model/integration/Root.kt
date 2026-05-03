@@ -7,7 +7,7 @@ class Root : Integration(
     "Root",
     "root",
 ) {
-    override val portFactories = listOf(
+    override val portDescriptors = listOf(
         OutputPortDescriptor(
             this,
             name = "NamedCell",

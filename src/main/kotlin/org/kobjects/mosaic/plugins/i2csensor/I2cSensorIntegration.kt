@@ -1,14 +1,10 @@
 package org.kobjects.mosaic.plugins.i2csensor
 
 import com.pi4j.drivers.sensor.Sensor
-import com.pi4j.drivers.sensor.SensorDescriptor
-import com.pi4j.drivers.sensor.SensorDescriptor.Kind
 import com.pi4j.drivers.sensor.SensorDescriptor.MeasurementUnit
 import com.pi4j.drivers.sensor.SensorDetector
-import com.pi4j.drivers.sensor.environment.bmx280.Bmx280Driver
 import com.pi4j.io.i2c.I2C
 import kotlinx.serialization.json.JsonObject
-import org.kobjects.mosaic.model.AbstractDescriptor.Modifier
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
@@ -28,7 +24,7 @@ class I2cSensorIntegration(
     var sensor: Sensor? = null
     var run = 0
 
-    override val portFactories = MeasurementUnit.values().associate { it.name to
+    override val portDescriptors = MeasurementUnit.values().associate { it.name to
         InputPortDescriptor.createUninstantiable(
             this,
             it.name,
@@ -57,7 +53,7 @@ class I2cSensorIntegration(
             val inputPortNode = InputPortNode(
                 this,
                 value.kind.name.lowercase(),
-                specification = portFactories[value.kind.measurementUnit.name]!!
+                descriptor = portDescriptors[value.kind.measurementUnit.name]!!
             )
             nodes[value.kind.name.lowercase()] = inputPortNode
             inputPortNode.configure(JsonObject(emptyMap()), token)

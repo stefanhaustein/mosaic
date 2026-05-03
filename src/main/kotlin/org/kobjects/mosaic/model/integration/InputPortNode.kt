@@ -9,7 +9,7 @@ import org.kobjects.mosaic.model.Node
 open class InputPortNode(
     override val owner: Integration,
     override val name: String,
-    override val specification: InputPortDescriptor,
+    override val descriptor: InputPortDescriptor,
     override val displayName: String? = null,
     override val category: String? = null
 
@@ -32,7 +32,7 @@ open class InputPortNode(
     }
 
     override fun configureInternal(config: Map<String, Any?>, token: ModificationToken) {
-        instance = specification.createFn(config, this)
+        instance = descriptor.createFn(config, this)
     }
 
     override fun detach() {

@@ -9,7 +9,7 @@ import org.kobjects.mosaic.model.ModificationToken
 class OutputPortNode(
     override val owner: Integration,
     override val name: String,
-    override val specification: OutputPortDescriptor,
+    override val descriptor: OutputPortDescriptor,
     rawFormula: String,
     override val displayName: String? = null,
     override val category: String? = null
@@ -27,7 +27,7 @@ class OutputPortNode(
     }
 
     override fun configureInternal(config: Map<String, Any?>, token: ModificationToken) {
-        instance = specification.createFn(config)
+        instance = descriptor.createFn(config)
     }
 
     override fun needsSaving() = super.needsSaving() || rawFormula.isNotEmpty()

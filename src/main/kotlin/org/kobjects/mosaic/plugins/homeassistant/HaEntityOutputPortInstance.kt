@@ -4,7 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.kobjects.mosaic.model.integration.OutputPortInstance
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
 
-class EntityOutputPortInstance(
+class HaEntityOutputPortInstance(
     val integration: HomeAssistantIntegration,
     val entity: HAEntity
 ) : OutputPortInstance {
