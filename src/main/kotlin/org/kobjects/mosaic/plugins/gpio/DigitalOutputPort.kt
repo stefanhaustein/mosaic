@@ -1,4 +1,4 @@
-package org.kobjects.mosaic.plugins.rpi
+package org.kobjects.mosaic.plugins.gpio
 
 
 import com.pi4j.io.gpio.digital.*
@@ -8,13 +8,11 @@ import org.kobjects.mosaic.model.integration.OutputPortInstance
 import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 
 class DigitalOutputPort(
-    val plugin: RpiIntegration,
-    val address: Int
-)  : OutputPortInstance {
+    plugin: GpioIntegration,
+    address: Int
+) : OutputPortInstance {
 
-    val digitalOutput= plugin.pi4j!!.create(DigitalOutputConfig.newBuilder(plugin.pi4j).address(address).build())
-
-
+    val digitalOutput = plugin.pi4j!!.create(DigitalOutputConfig.newBuilder(plugin.pi4j).bcm(address).build())
 
     override fun setValue(value: Any?) {
         val value = when(val raw = value) {
@@ -26,21 +24,16 @@ class DigitalOutputPort(
     }
 
     override fun detach() {
-        try {
-            plugin.pi4j!!.shutdown(digitalOutput.getId())
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw RuntimeException(e)
-        }
+        digitalOutput.close()
     }
 
 
     companion object {
-        fun spec(plugin: RpiIntegration) = OutputPortDescriptor(
+        fun descriptor(plugin: GpioIntegration) = OutputPortDescriptor(
             null,
-            "dout",
+            "Digital Output",
             "Configures the given pin address for digital output and sets it to 'high' for a TRUE value and to 'low' for a FALSE or 0 value.",
-            listOf(ParameterSpec("address", Type.INT, null, setOf(ParameterSpec.Modifier.CONSTANT))),
+            listOf(ParameterSpec("address", Type.INT, 1)),
         ) { DigitalOutputPort(plugin, it["address"] as Int) }
     }
 }

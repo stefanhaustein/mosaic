@@ -1,4 +1,4 @@
-package org.kobjects.mosaic.plugins.rpi
+package org.kobjects.mosaic.plugins.gpio
 
 import com.pi4j.io.gpio.digital.*
 import com.pi4j.io.gpio.digital.DigitalInput
@@ -9,12 +9,12 @@ import org.kobjects.mosaic.model.integration.InputPortListener
 import org.kobjects.mosaic.model.integration.InputPortDescriptor
 
 class PwmInput(
-    val host: InputPortListener,
-    val plugin: RpiIntegration,
-    val address: Int
-) : InputPortInstance(host), DigitalStateChangeListener {
+    listener: InputPortListener,
+    plugin: GpioIntegration,
+    address: Int
+) : InputPortInstance(listener), DigitalStateChangeListener {
 
-    val digitalInput: DigitalInput = plugin.pi4j!!.create(DigitalInputConfig.newBuilder(plugin.pi4j).address(address).build())
+    val digitalInput: DigitalInput = plugin.pi4j!!.create(DigitalInputConfig.newBuilder(plugin.pi4j).bcm(address).build())
     var t0: Long = 0
     var value: Double = 0.0
 
@@ -26,8 +26,7 @@ class PwmInput(
             false -> {
                 val newValue = (System.currentTimeMillis() - t0) / 1000.0
                 if (newValue != value && t0 != 0L) {
-                    value = newValue
-                    plugin.model.setPortValue(host, newValue)
+                    listener.portValueChanged(newValue)
                 }
             }
         }
@@ -35,21 +34,16 @@ class PwmInput(
 
     override fun detach() {
         digitalInput.removeListener(this)
-        try {
-            plugin.pi4j!!.shutdown(digitalInput.getId())
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw RuntimeException(e)
-        }
+        digitalInput.close()
     }
 
     companion object {
-        fun spec(plugin: RpiIntegration) = InputPortDescriptor(
+        fun descriptor(plugin: GpioIntegration) = InputPortDescriptor(
             null,
-            "pwmin",
+            "PWM Input",
             Type.REAL,
-            "Configures the given pin address for input and reports the pulse width in seconds.",
-            listOf(ParameterSpec("address", Type.INT, null, setOf(ParameterSpec.Modifier.CONSTANT))),
+            "Configures the given bcm pin address for input and reports the pulse width in seconds.",
+            listOf(ParameterSpec("address", Type.INT, 1)),
         ) { config, host ->
             PwmInput(host, plugin, config["address"] as Int)
         }

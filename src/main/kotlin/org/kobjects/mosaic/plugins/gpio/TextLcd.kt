@@ -1,4 +1,4 @@
-package org.kobjects.mosaic.plugins.rpi
+package org.kobjects.mosaic.plugins.gpio
 
 
 import com.pi4j.io.i2c.I2C
@@ -12,7 +12,7 @@ import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 import kotlin.math.min
 
 class TextLcd(
-    val plugin: RpiIntegration,
+    val plugin: GpioIntegration,
     bus: Int,
     address: Int,
     val width: Int,
@@ -55,7 +55,7 @@ class TextLcd(
 
 
     companion object {
-        fun spec(plugin: RpiIntegration) = OutputPortDescriptor(
+        fun descriptor(plugin: GpioIntegration) = OutputPortDescriptor(
             null,
             "Lcd",
             "An LCD text display",

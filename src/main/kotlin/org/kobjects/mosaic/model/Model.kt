@@ -19,7 +19,7 @@ import org.kobjects.mosaic.model.sheet.Sheet
 import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
 import org.kobjects.mosaic.plugins.i2csensor.I2cSensorIntegration
 import org.kobjects.mosaic.plugins.pixtend.PiXtendIntegration
-import org.kobjects.mosaic.plugins.rpi.RpiIntegration
+import org.kobjects.mosaic.plugins.gpio.GpioIntegration
 import org.kobjects.mosaic.svg.SvgManager
 import org.kobjects.tomson.TomsonOutput
 import java.io.File
@@ -65,7 +65,7 @@ object Model : ModelInterface {
 
     init {
         BuiltinFunctions.operationSpecs.forEach { functions.add(it) }
-        addIntegration(RpiIntegration.spec(this))
+        addIntegration(GpioIntegration.spec(this))
         addIntegration(PiXtendIntegration.spec(this))
         addIntegration(HomeAssistantIntegration.spec(this))
         addIntegration(Root.spec(this))

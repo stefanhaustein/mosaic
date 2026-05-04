@@ -1,5 +1,7 @@
 package org.kobjects.mosaic.plugins.homeassistant.client
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
@@ -16,6 +18,7 @@ class HAEntityState(
 
     fun update(update: JsonObject): HAEntityState {
         val state = update["+"]?.jsonObject["s"]?.jsonPrimitive?.contentOrNull
+        System.out.println("Entity $id state: ${Json.encodeToString(update)}")
         return HAEntityState(id, state, json)
     }
 }

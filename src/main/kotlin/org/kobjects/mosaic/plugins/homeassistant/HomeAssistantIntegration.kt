@@ -105,10 +105,11 @@ class HomeAssistantIntegration(
 
         fun getType(kind: HAEntity.Kind): Type? {
             return when (kind) {
-                HAEntity.Kind.LIGHT -> Type.BOOL
+                HAEntity.Kind.BUTTON,
+                HAEntity.Kind.LIGHT,
                 HAEntity.Kind.BINARY_SENSOR -> Type.BOOL
                 HAEntity.Kind.SENSOR -> Type.REAL
-                else -> null
+                else -> Type.STRING
             }
         }
 
@@ -125,7 +126,7 @@ class HomeAssistantIntegration(
                     "off" -> false
                     else -> IllegalStateException(state.state?.toString() ?: "null")
                 }
-                else -> state
+                else -> state.state?.toString() ?: ""
             }
         }
 

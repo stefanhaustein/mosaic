@@ -26,7 +26,10 @@ data class HAEntity(
     val id: String = json["entity_id"]!!.jsonPrimitive.content
 
     val kind: Kind
-        get() = Kind.entries.find { it.name.lowercase() == id.substring(0, id.indexOf('.')) } ?: Kind.UNRECOGNIZED
+        get() = Kind.entries.find { it.name.lowercase() == id.substring(0, id.indexOf('.')) } ?: let {
+            System.out.println("Unknown entity kind: $id")
+            Kind.UNRECOGNIZED
+        }
 
     val category: String?
         get() = json["entity_category"]?.jsonPrimitive?.contentOrNull
