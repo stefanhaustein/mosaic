@@ -39,7 +39,8 @@ class DigitalInputPort(
             type = Type.BOOL,
             description = "Configures the given pin bcm address for digital input and reports a high value as TRUE and a low value as FALSE.",
             parameters = listOf(ParameterSpec("address", Type.INT, 1)),
-            modifiers = setOf()
+            modifiers = setOf(),
+            nameTemplate = "din_{address}"
         ) { config, listener -> DigitalInputPort(listener, plugin, config["address"] as Int) }
     }
 }

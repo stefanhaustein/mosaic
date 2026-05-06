@@ -2,7 +2,7 @@ package org.kobjects.mosaic.model.function
 
 import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.Namespace
-import org.kobjects.mosaic.model.OperationKind
+import org.kobjects.mosaic.model.DescriptorKind
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 
@@ -16,7 +16,7 @@ open class FunctionSpec(
     modifiers: Set<Modifier> = emptySet(),
     tag: Long = 0,
     displayName: String? = null,
-    kind: OperationKind = OperationKind.FUNCTION,
+    kind: DescriptorKind = DescriptorKind.FUNCTION,
     val createFn: (configuration: Map<String, Any?>) -> FunctionInstance,
 ) : AbstractDescriptor(
     namespace,
@@ -29,4 +29,5 @@ open class FunctionSpec(
     modifiers,
     tag,
     displayName,
+    nameTemplate = null,
 )

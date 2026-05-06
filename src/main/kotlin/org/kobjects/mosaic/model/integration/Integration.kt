@@ -117,8 +117,8 @@ abstract class Integration(
 
 
     fun factoriesToJson(): JsonObject = buildJsonObject {
-        for (operationSpec in portDescriptors.values) {
-            put(operationSpec.name,operationSpec.toJson())
+        for (portDescriptor in portDescriptors.values) {
+            put(portDescriptor.name,portDescriptor.toJson())
         }
     }
 

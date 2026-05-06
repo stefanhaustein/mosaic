@@ -44,6 +44,7 @@ class PwmInput(
             Type.REAL,
             "Configures the given bcm pin address for input and reports the pulse width in seconds.",
             listOf(ParameterSpec("address", Type.INT, 1)),
+            nameTemplate = "pwmin_{address}"
         ) { config, host ->
             PwmInput(host, plugin, config["address"] as Int)
         }

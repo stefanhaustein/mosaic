@@ -9,14 +9,16 @@ function hidePortDialog() {
 }
 
 function renderBinding(targetDiv, constructorSpec, instanceSpec) {
-    targetDiv.textContent = constructorSpec.description
-    targetDiv.appendChild(document.createElement("p"))
+
 
     let bindingFormController = FormController.create(targetDiv, transformSchema(constructorSpec["params"]))
 
     if (instanceSpec != null) {
         bindingFormController.setValue(instanceSpec)
     }
+
+    let desc = targetDiv.appendChild(document.createElement("p"))
+    desc.textContent = constructorSpec.description
 
     return bindingFormController
 }
@@ -61,11 +63,13 @@ export function showPortDialog(constructorSpec, portSpec) {
 
     let portFormController = FormController.create(inputDiv, transformSchema(portSchema))
     portFormController.setValue(portSpec == null ? {name: ""} : portSpec)
+    portEditorContainer.appendChild(inputDiv)
+
     let bindingDiv = document.createElement("div")
 
     let bindingFormController = renderBinding(bindingDiv, constructorSpec, instanceSpec)
+    portEditorContainer.appendChild(bindingDiv)
 
-    portEditorContainer.appendChild(inputDiv)
 
     let buttonDiv = document.createElement("div")
 

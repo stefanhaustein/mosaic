@@ -1,7 +1,7 @@
 package org.kobjects.mosaic.model.integration
 
 import org.kobjects.mosaic.model.AbstractDescriptor
-import org.kobjects.mosaic.model.OperationKind
+import org.kobjects.mosaic.model.DescriptorKind
 import org.kobjects.mosaic.model.ParameterSpec
 
 class IntegrationDescriptor(
@@ -16,7 +16,7 @@ class IntegrationDescriptor(
 ) : AbstractDescriptor(
     null,
     category,
-    OperationKind.INTEGRATION,
+    DescriptorKind.INTEGRATION,
     null,
     name,
     description,
@@ -24,4 +24,5 @@ class IntegrationDescriptor(
     modifiers,
     tag,
     displayName,
+    nameTemplate = null,
 )

@@ -9,7 +9,7 @@ import org.kobjects.tomson.toJson
 abstract class AbstractDescriptor(
     val namespace: Namespace?,
     val category: String,
-    val kind: OperationKind,
+    val kind: DescriptorKind,
     val type: Type?,
     val name: String,
     val description: String,
@@ -17,6 +17,7 @@ abstract class AbstractDescriptor(
     val modifiers: Set<Modifier>,
     val tag: Long,
     val displayName: String?,
+    val nameTemplate: String?
 ) : ToJson {
     val fqName
         get() = if (namespace != null) namespace.name + "." + name else name
@@ -53,6 +54,9 @@ abstract class AbstractDescriptor(
         put("description", JsonPrimitive(description))
         put("params", parameters.toJson())
         put("modifiers", modifiers.toJson())
+        if (nameTemplate != null) {
+            put("nameTemplate", JsonPrimitive(nameTemplate))
+        }
     }
 
     enum class Modifier {

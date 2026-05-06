@@ -34,6 +34,7 @@ class DigitalOutputPort(
             "Digital Output",
             "Configures the given pin address for digital output and sets it to 'high' for a TRUE value and to 'low' for a FALSE or 0 value.",
             listOf(ParameterSpec("address", Type.INT, 1)),
+            nameTemplate = "din_{address}",
         ) { DigitalOutputPort(plugin, it["address"] as Int) }
     }
 }

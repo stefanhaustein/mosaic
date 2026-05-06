@@ -2,7 +2,7 @@ package org.kobjects.mosaic.model.integration
 
 import org.kobjects.mosaic.model.AbstractPortDescriptor
 import org.kobjects.mosaic.model.Namespace
-import org.kobjects.mosaic.model.OperationKind
+import org.kobjects.mosaic.model.DescriptorKind
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 
@@ -13,15 +13,17 @@ class InputPortDescriptor(
     description: String,
     parameters: List<ParameterSpec>,
     modifiers: Set<Modifier> = emptySet(),
+    nameTemplate: String? = null,
     val createFn: (configuration: Map<String, Any?>, listener: InputPortListener) -> InputPortInstance,
 ) : AbstractPortDescriptor(
     namespace,
-    OperationKind.INPUT_PORT,
+    DescriptorKind.INPUT_PORT,
     name,
     type,
     description,
     parameters,
     modifiers,
+    nameTemplate,
 ) {
     companion object {
         fun createUninstantiable(

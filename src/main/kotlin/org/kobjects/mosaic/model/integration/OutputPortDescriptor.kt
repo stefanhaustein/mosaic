@@ -2,9 +2,8 @@ package org.kobjects.mosaic.model.integration
 
 import org.kobjects.mosaic.model.AbstractPortDescriptor
 import org.kobjects.mosaic.model.Namespace
-import org.kobjects.mosaic.model.OperationKind
+import org.kobjects.mosaic.model.DescriptorKind
 import org.kobjects.mosaic.model.ParameterSpec
-import org.kobjects.mosaic.model.Type
 
 class OutputPortDescriptor(
     namespace: Namespace?,
@@ -12,15 +11,17 @@ class OutputPortDescriptor(
     description: String,
     parameters: List<ParameterSpec>,
     modifiers: Set<Modifier> = emptySet(),
+    nameTemplate: String? = null,
     val createFn: (configuration: Map<String, Any?>) -> OutputPortInstance,
 ) : AbstractPortDescriptor(
-    namespace,
-    OperationKind.OUTPUT_PORT,
-    name,
-    null,
-    description,
-    parameters,
-    modifiers,
+    namespace = namespace,
+    kind = DescriptorKind.OUTPUT_PORT,
+    name = name,
+    type =null,
+    description = description,
+    parameters = parameters,
+    modifiers = modifiers,
+    nameTemplate = nameTemplate,
 ) {
     companion object {
         fun createUninstantiable(
