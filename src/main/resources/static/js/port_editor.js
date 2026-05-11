@@ -10,15 +10,11 @@ function hidePortDialog() {
 
 function renderBinding(targetDiv, constructorSpec, instanceSpec) {
 
-
     let bindingFormController = FormController.create(targetDiv, transformSchema(constructorSpec["params"]))
 
     if (instanceSpec != null) {
         bindingFormController.setValue(instanceSpec)
     }
-
-    let desc = targetDiv.appendChild(document.createElement("p"))
-    desc.textContent = constructorSpec.description
 
     return bindingFormController
 }
@@ -38,9 +34,11 @@ export function showPortDialog(constructorSpec, portSpec) {
     dialogTitleElement.textContent = portSpec == null ? "Add " : "Edit "
 
     let inputDiv = document.createElement("div")
-    //inputDiv.className = "dialogFields"
+    inputDiv.classList.add("dialogFields")
 
-    let portSchema = [{
+    let nameTemplate = constructorSpec.nameTemplate
+
+    let portSchema = nameTemplate ? [] : [{
         "name": "name",
         "type": "String",
         "modifiers": ["CONSTANT"],
@@ -65,11 +63,11 @@ export function showPortDialog(constructorSpec, portSpec) {
     portFormController.setValue(portSpec == null ? {name: ""} : portSpec)
     portEditorContainer.appendChild(inputDiv)
 
-    let bindingDiv = document.createElement("div")
 
-    let bindingFormController = renderBinding(bindingDiv, constructorSpec, instanceSpec)
-    portEditorContainer.appendChild(bindingDiv)
+    let bindingFormController = renderBinding(inputDiv, constructorSpec, instanceSpec)
 
+    let desc = portEditorContainer.appendChild(document.createElement("p"))
+    desc.textContent = constructorSpec.description
 
     let buttonDiv = document.createElement("div")
 
@@ -79,12 +77,21 @@ export function showPortDialog(constructorSpec, portSpec) {
     okButton.className = "dialogButton"
     okButton.addEventListener("click", () => {
         let values = portFormController.getValue()
-        let source = values["source"]
+
         if (bindingFormController != null) {
             values["configuration"] = bindingFormController.getValue()
         }
         values["kind"] = constructorSpec.name
         values["previousName"] = previousName
+
+        if (nameTemplate) {
+            let name = nameTemplate
+            let config = bindingFormController.getValue()
+            for (let key in config) {
+                name = name.replace("{" + key + "}", config[key])
+            }
+            values["name"] = name
+        }
 
         let integrationName = constructorSpec.fqName.substring(0, constructorSpec.fqName.indexOf("."))
         post("ports/" + integrationName + "/" + values.name, values)
