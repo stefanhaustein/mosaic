@@ -57,10 +57,11 @@ export function processIntegrationUpdate(name, data) {
 
             let factoryElement = document.createElement("div")
             factoryElement.id = elementId + ".factories"
+
             let portElement = document.createElement("div")
             portElement.id = elementId + ".ports"
-            element.append(factoryElement, portElement)
 
+            element.append(portElement, factoryElement)
         }
     }
 }

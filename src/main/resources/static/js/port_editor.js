@@ -63,17 +63,16 @@ export function showPortDialog(constructorSpec, portSpec) {
     portFormController.setValue(portSpec == null ? {name: ""} : portSpec)
     portEditorContainer.appendChild(inputDiv)
 
-
     let bindingFormController = renderBinding(inputDiv, constructorSpec, instanceSpec)
 
     let desc = portEditorContainer.appendChild(document.createElement("p"))
     desc.textContent = constructorSpec.description
 
-    let buttonDiv = document.createElement("div")
+    let integrationName = constructorSpec.fqName.substring(0, constructorSpec.fqName.indexOf("."))
 
+    let buttonDiv = document.createElement("div")
     let okButton = document.createElement("button")
     okButton.textContent = portSpec == null ? "Create" : "Ok"
-
     okButton.className = "dialogButton"
     okButton.addEventListener("click", () => {
         let values = portFormController.getValue()
@@ -82,7 +81,6 @@ export function showPortDialog(constructorSpec, portSpec) {
             values["configuration"] = bindingFormController.getValue()
         }
         values["kind"] = constructorSpec.name
-        values["previousName"] = previousName
 
         if (nameTemplate) {
             let name = nameTemplate
@@ -93,7 +91,9 @@ export function showPortDialog(constructorSpec, portSpec) {
             values["name"] = name
         }
 
-        let integrationName = constructorSpec.fqName.substring(0, constructorSpec.fqName.indexOf("."))
+        if (previousName != null && previousName != values.name) {
+            post("ports/" + integrationName + "/" + previousName, {deleted: true})
+        }
         post("ports/" + integrationName + "/" + values.name, values)
         hidePortDialog()
     })
@@ -110,7 +110,7 @@ export function showPortDialog(constructorSpec, portSpec) {
         deleteButton.textContent = "Delete"
         deleteButton.className = "dialogButton"
         deleteButton.addEventListener("click", () => {
-            post("ports/" + previousName, {deleted: true})
+            post("ports/" + integrationName + "/" + previousName, {deleted: true})
             hidePortDialog()
         })
         buttonDiv.appendChild(deleteButton)
