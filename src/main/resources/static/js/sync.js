@@ -13,14 +13,12 @@ import {addOption, blink} from "./lib/dom.js";
 import {processFunction} from "./operation_panel_controller.js";
 import {
     processIntegrationUpdate,
-    processPortFactory,
-    processPortUpdate,
-    processPortValue,
     updateIntegrationFactory,
-} from "./integration_panel_controller.js";
+} from "./integration_controller.js";
 import {getColumn, getRow, iterateKeys, toCellId} from "./lib/utils.js";
 import {Integration} from "./Integration.js";
 import {IntegrationFactory} from "./IntegrationFactory.js";
+import {processPortFactory, processPortUpdate, processPortValue} from "./port_controller.js";
 
 let sheetSelectElement = document.getElementById("sheetSelect")
 

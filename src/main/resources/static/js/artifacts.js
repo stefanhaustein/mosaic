@@ -3,7 +3,7 @@ import {camelCase, ensureCategory, post} from "./lib/utils.js";
 import {showIntegrationInstanceConfigurationDialog} from "./integration_dialog.js";
 import {confirmDialog} from "./lib/dialogs.js";
 import {currentCell, setCurrentCellFormula} from "./shared_state.js";
-import {showPortDialog} from "./integration_port_dialog.js";
+import {showPortDialog} from "./port_dialog.js";
 
 export function updateSpec(parent, idPrefix, spec) {
     let id = idPrefix + spec.name

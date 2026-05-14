@@ -1,77 +1,9 @@
-import {addOption, insertById} from "./lib/dom.js";
-import {updateSpec} from "./artifacts.js";
 import {ensureCategory, post} from "./lib/utils.js";
+import {insertById} from "./lib/dom.js";
 import {currentCell, currentSheet, portValues, setCurrentCellFormula} from "./shared_state.js";
-import {showPortDialog} from "./integration_port_dialog.js";
 import {confirmDialog} from "./lib/dialogs.js";
-import {Integration} from "./Integration.js";
-import {sendIntegration, showIntegrationInstanceConfigurationDialog} from "./integration_dialog.js";
-import {IntegrationFactory} from "./IntegrationFactory.js";
-
-let integrationSpecListElement = document.getElementById("integrationSpecList")
-let sidePanel = document.getElementById("sidePanel")
-let panelSelectElement = document.getElementById("panelSelect")
-
-export function processIntegrationUpdate(name, data) {
-    let key = name.toLowerCase()
-    let elementId = "integration." + key
-    let element = document.getElementById(elementId)
-
-    let integration = Integration.update(name, data)
-    if (integration == null) {
-        if (element != null) {
-            element.parentElement.removeChild(element)
-            let option = document.getElementById(("option." + elementId))
-            panelSelectElement.value = "Integration"
-            panelSelectElement.removeChild(option)
-            panelSelectElement.dispatchEvent(new Event('change'))
-        }
-    } else {
-        if (element == null) {
-            let option = addOption(panelSelectElement, "- " + name + " (" + integration.kind + ")", elementId);
-            option.id = "option." + elementId
-
-            element = document.createElement("div")
-            element.id = elementId
-            sidePanel.appendChild(element)
-
-            let editButton = document.createElement("button")
-            editButton.style.margin = "10px 0 10px 10px"
-            editButton.append("Edit")
-            editButton.addEventListener("click", () => {
-                console.log("click", integration)
-                showIntegrationInstanceConfigurationDialog(IntegrationFactory.get(integration.kind), integration)
-            })
-            element.append(editButton)
-
-            let deleteButton = document.createElement("button")
-            deleteButton.append("Delete")
-            deleteButton.style.margin = "10px 0 10px 10px"
-            element.append(deleteButton)
-            deleteButton.addEventListener("click", async () => {
-                if (await confirmDialog("Delete " + name)) {
-                    sendIntegration(name, {kind: integration.kind, deleted: true})
-                }
-            })
-
-            let factoryElement = document.createElement("div")
-            factoryElement.id = elementId + ".factories"
-
-            let portElement = document.createElement("div")
-            portElement.id = elementId + ".ports"
-
-            element.append(portElement, factoryElement)
-        }
-    }
-}
-
-export function updateIntegrationFactory(spec) {
-    updateSpec(
-        integrationSpecListElement,
-        "integration.spec.",
-        spec)
-}
-
+import {showPortDialog} from "./port_dialog.js";
+import {updateSpec} from "./artifacts.js";
 
 export function processPortUpdate(integration, name, f) {
     if (integration.updatePort(name, f) == null) {
@@ -147,7 +79,7 @@ export function processPortUpdate(integration, name, f) {
             setReferenceDiv.append(setReferenceImg)
             portElement.append(setReferenceDiv)
 
-            sourceInput.value =  f.source
+            sourceInput.value = f.source
             sourceInput.addEventListener("change", () => {
                 post("ports/" + f.fqName.replace(".", "/"), {source: sourceInput.value})
             })
@@ -163,8 +95,6 @@ export function processPortUpdate(integration, name, f) {
         portElement.append(row3IconDiv)
 
 
-
-
         // Row 2/3: Value
 
         let entryValueElement = document.createElement("span")
@@ -172,7 +102,6 @@ export function processPortUpdate(integration, name, f) {
         entryValueElement.className = "portValue"
         entryValueElement.textContent = f.c
         portElement.appendChild(entryValueElement)
-
 
 
         /*
@@ -197,21 +126,19 @@ export function processPortUpdate(integration, name, f) {
         console.log("spec: ", spec)
 
 
-
         // console.log("adding port", f, spec)
-/*
+        /*
 
 
-        portElement.onclick = (event) => {
-            if (event.target.localName.toUpperCase() == "DIV") {
-                showDependencies(f.name)
-            }
-        }
+                portElement.onclick = (event) => {
+                    if (event.target.localName.toUpperCase() == "DIV") {
+                        showDependencies(f.name)
+                    }
+                }
 
- */
+         */
     }
 }
-
 
 export function processPortFactory(integration, spec) {
     if (spec.modifiers.indexOf("UNINSTANTIABLE") != -1) {
@@ -229,5 +156,3 @@ export function processPortValue(fqKey, map) {
         target.textContent = JSON.stringify(value)
     }
 }
-
-
