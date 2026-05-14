@@ -26,7 +26,7 @@ export class Integration {
         port.fqName = this.name + "." + name
         let key = name.toLowerCase()
         port.key = key
-        if (port.kind == "TOMBSTONE") {
+        if (port.deleted) {
             delete this.ports[key]
             return null
         }
@@ -39,7 +39,7 @@ export class Integration {
         spec.fqName = this.name + "." + name
         let key = name.toLowerCase()
         spec.key = key
-        if (spec.kind == "TOMBSTONE") {
+        if (spec.deleted) {
             delete this.ports[key]
             return null
         }

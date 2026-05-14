@@ -74,7 +74,7 @@ export function updateIntegrationFactory(spec) {
 
 
 export function processPortUpdate(integration, name, f) {
-    if (!(integration.updatePort(name, f) != null)) {
+    if (integration.updatePort(name, f) == null) {
         let entryElement = document.getElementById("port." + f.fqName)
         if (entryElement != null) {
             entryElement.parentElement.removeChild(entryElement)
