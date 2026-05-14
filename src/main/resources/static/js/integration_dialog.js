@@ -1,7 +1,6 @@
 import {FormController} from "./forms/form_builder.js";
 
 import {post, transformSchema} from "./lib/utils.js";
-import {promptDialog} from "./lib/dialogs.js";
 import {Integration} from "./Integration.js";
 import {IntegrationFactory} from "./IntegrationFactory.js";
 

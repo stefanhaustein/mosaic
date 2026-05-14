@@ -26,6 +26,7 @@ open class InputPortNode(
 
     override var valueTag  = 0L
     override var value: Any? = null
+    var newValue: Any? = null
 
     init {
         require(!name.contains(".")) { "Port name '$name' must not contain '.'" }
@@ -57,15 +58,19 @@ open class InputPortNode(
     }
 
     override fun portValueChanged(newValue: Any?, token: ModificationToken) {
-        if (value != newValue) {
-            value = newValue
+        if (this.newValue != newValue) {
+            this.newValue = newValue
             token.addRefresh(this)
             valueTag = token.tag
         }
     }
 
     override fun recalculateValue(tag: Long): Boolean {
-        return valueTag == tag
+        if (value != newValue) {
+            value = newValue
+            return true
+        }
+        return false
     }
 
     override fun toString() = name

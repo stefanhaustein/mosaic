@@ -14,7 +14,6 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import org.kobjects.tomson.toJson
 import org.kobjects.mosaic.model.sheet.CellRangeReference
 import org.kobjects.mosaic.model.Model
 import org.kobjects.tomson.TomsonOutput
@@ -25,6 +24,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 fun main(args: Array<String>) {
+    println("Loading default data")
+    Model.applySynchronized {
+        println("Model should be ready now; starting server...")
+    }
+
     io.ktor.server.cio.EngineMain.main(args)
 }
 
@@ -159,8 +163,12 @@ fun Application.module() {
         }
         get("img/{name...}") {
             val path = call.parameters.getAll("name")!!.joinToString("/")
-            println("Svg requested: $path; available: ${Model.svgs.map}")
-            val svg = Model.svgs.map["img/$path"]
+
+                println("Svg requested: $path")
+                val available = Model.svgs.map
+                println("Available SVGs: $available")
+                val svg = available["img/$path"]
+
             println("Found: $svg")
 
             val parameterMap = call.request.queryParameters.entries().map { Pair(it.key, it.value.first()) }.toMap()

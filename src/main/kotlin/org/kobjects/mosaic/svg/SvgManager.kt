@@ -4,19 +4,18 @@ import java.io.File
 
 class SvgManager(root: File) {
 
-    val map = mutableMapOf<String, ParameterizableSvg>()
-
-    init {
-        loadDirectory(root, "img/")
+    val map = buildMap {
+        loadDirectory(this, root, "img/")
     }
 
-    fun loadDirectory(dir: File, basePath: String) {
+
+    fun loadDirectory(map: MutableMap<String, ParameterizableSvg>,  dir: File, webPath: String) {
         for (file in dir.listFiles() ?: emptyArray()) {
             if (file.isDirectory) {
-                loadDirectory(file, basePath + file.name + "/")
+                loadDirectory(map, file, webPath + file.name + "/")
             } else if (file.name.endsWith(".svg")) {
-                println("Loading file ${file.name}; local base path: $basePath")
-                val path = basePath + file.name
+                println("Loading file ${file.name}; local base path: $webPath")
+                val path = webPath + file.name
                 map[path] = ParameterizableSvg.load(file)
             }
         }

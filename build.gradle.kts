@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
 
-    kotlin("plugin.serialization") version "2.1.0" // Match your Kotlin version
+    kotlin("plugin.serialization") version "2.2.20" // Match your Kotlin version
 }
 
 group = "org.kobjects"
@@ -38,11 +38,11 @@ dependencies {
     implementation("io.github.davidepianca98:kmqtt-common-jvm:1.0.0")
     implementation("io.github.davidepianca98:kmqtt-client-jvm:1.0.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-    implementation("io.ktor:ktor-client-websockets")
-    implementation("io.ktor:ktor-client-cio")
-    implementation("io.ktor:ktor-client-content-negotiation")
-    implementation("io.ktor:ktor-serialization-kotlinx-json")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+    implementation("io.ktor:ktor-client-websockets:3.3.3")
+    implementation("io.ktor:ktor-client-cio:3.3.3")
+    implementation("io.ktor:ktor-client-content-negotiation:3.3.3")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.3")
 
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.html.builder)

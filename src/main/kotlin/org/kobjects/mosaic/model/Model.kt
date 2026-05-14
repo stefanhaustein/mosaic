@@ -32,6 +32,7 @@ import kotlin.contracts.ExperimentalContracts
 object Model : ModelInterface {
 
     val STORAGE_FILE = File("storage/data.tc")
+    val svgs = SvgManager(File("src/main/resources/static/img"))
 
     var modificationTag: Long = 0
 
@@ -48,7 +49,6 @@ object Model : ModelInterface {
     val integrationFactories = IntegrationFactories()
     val integrations = Integrations()
 
-    val svgs = SvgManager(File("src/main/resources/static/img"))
 
     var refreshRequested: Boolean = false
 
@@ -86,6 +86,8 @@ object Model : ModelInterface {
         }
     }
 
+
+
     override fun addUpdateListener(permanent: Boolean, onChangeOnly: Boolean, listener: (modificationTag: Long, anyChanged: Boolean) -> Unit) {
         updateListeners.add(UpdateListenerData(permanent = permanent, onChangeOnly = onChangeOnly, listener = listener))
     }
@@ -108,6 +110,11 @@ object Model : ModelInterface {
             for ((key, map) in toml) {
                 try {
                     val parts = key.split(".")
+
+                    println()
+                    println("Starting loading section [$key]")
+                    println()
+
                     if (parts.size == 1 && parts[0].isEmpty()) {
                         setRunMode(map["runMode"]?.jsonPrimitive?.booleanOrNull ?: false, token)
                     } else if (parts.size == 3 && parts[0] == "sheets" && parts[2] == "cells") {
@@ -131,6 +138,11 @@ object Model : ModelInterface {
                     } else {
                         System.err.println("Unrecognized toml section: $key")
                     }
+
+                    println()
+                    println("Finished loading section [$key]")
+                    println()
+
                 } catch (e: Exception) {
                     System.err.println("Error processing section $key")
                     e.printStackTrace()
@@ -304,7 +316,11 @@ object Model : ModelInterface {
 
             println("Saturated dependencies: ${modificationToken.refreshNodes}")
 
+            var previousSize = modificationToken.refreshNodes.size
             while (modificationToken.refreshNodes.isNotEmpty()) {
+
+                println("Remaining dependencies: ${modificationToken.refreshNodes}")
+
                 for (node in modificationToken.refreshNodes) {
                     var found = true
                     for (dep in node.inputs) {
@@ -322,6 +338,11 @@ object Model : ModelInterface {
                         break
                     }
                 }
+                if (modificationToken.refreshNodes.size == previousSize) {
+                    println("Bailing out b/c no reduction")
+                    break
+                }
+                previousSize = modificationToken.refreshNodes.size
             }
 
             modificationTag = modificationToken.tag

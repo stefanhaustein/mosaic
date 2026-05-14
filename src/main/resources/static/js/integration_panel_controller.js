@@ -2,13 +2,12 @@ import {addOption, insertById} from "./lib/dom.js";
 import {updateSpec} from "./artifacts.js";
 import {ensureCategory, post} from "./lib/utils.js";
 import {currentCell, currentSheet, portValues, setCurrentCellFormula} from "./shared_state.js";
-import {showPortDialog} from "./port_editor.js";
+import {showPortDialog} from "./integration_port_dialog.js";
 import {confirmDialog} from "./lib/dialogs.js";
 import {Integration} from "./Integration.js";
-import {sendIntegration, showIntegrationInstanceConfigurationDialog} from "./integration_editor.js";
+import {sendIntegration, showIntegrationInstanceConfigurationDialog} from "./integration_dialog.js";
 import {IntegrationFactory} from "./IntegrationFactory.js";
 
-let integrationListElement = document.getElementById("integrationList")
 let integrationSpecListElement = document.getElementById("integrationSpecList")
 let sidePanel = document.getElementById("sidePanel")
 let panelSelectElement = document.getElementById("panelSelect")
@@ -100,7 +99,7 @@ export function processPortUpdate(integration, name, f) {
 
         if (!(spec.name || "").endsWith("_out")) {
 
-            // Row 1 Icon: Config
+            // Row 1 Icon: Left
 
             let setFormulaIconDiv = document.createElement("div")
             let setFormulaElement = document.createElement("img")
@@ -126,6 +125,12 @@ export function processPortUpdate(integration, name, f) {
                 entryTitleElement.append(": ", f.kind)
             }
             portElement.append(entryTitleElement)
+
+            if ((spec.params || []).length > 0) {
+                entryTitleElement.onclick = () => {
+                    showPortDialog(spec, f)
+                }
+            }
         }
 
         if (spec.kind == "OUTPUT_PORT") {
@@ -154,18 +159,10 @@ export function processPortUpdate(integration, name, f) {
 
         // Row 2/3: Icon
 
-        let configDiv = document.createElement("div")
-        portElement.append(configDiv)
+        let row3IconDiv = document.createElement("div")
+        portElement.append(row3IconDiv)
 
-        if ((spec.params || []).length > 0) {
-            let entryConfigElement = document.createElement("img")
-            entryConfigElement.src = "/img/settings.svg"
-            entryConfigElement.className = "portConfig"
-            entryConfigElement.onclick = () => {
-                showPortDialog(spec, f)
-            }
-            configDiv.append(entryConfigElement)
-        }
+
 
 
         // Row 2/3: Value
