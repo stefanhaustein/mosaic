@@ -18,7 +18,6 @@
     <div id="topBar">
         <div id="rangeName" style="width:72px;padding:6px 0 0 0; text-align: center; border:1px solid black;"></div>
 
-
         <input id="formulaInput" style="flex-grow: 1" list="functions">
         <datalist id="functions"></datalist>
         <div id="globalErrorDiv"></div>
@@ -27,10 +26,7 @@
             <option>About</option>
             <option value="Function">Functions</option>
             <option>Graphics</option>
-            <option value="InputPorts">Input Ports</option>
             <option value="Integration">Integrations</option>
-            <option value="NamedCells">Named Cells</option>
-            <option value="OutputPorts">Output Ports</option>
             <option value="Validation">User Input</option>
             <option value="Hide">Hide Panel</option>
         </select>
@@ -63,30 +59,7 @@
                     Utilize a spreadsheet interface
                     to control simple IoT projects.
             </div>
-            <div id="InputPortsPanel">
-                <div class="panelContainer">
-                </div>
-                <div id="inputPortList" class="panelItemContainer"> </div>
-                <h2>Available Inputs</h2>
-                <div id="inputPortSpecList" class="panelContainer"></div>
 
-
-            </div>
-            <div id="OutputPortsPanel" >
-                <div  id="outputPortList" class="panelItemContainer"></div>
-                <h2>Available Outputs</h2>
-                <div id="outputPortSpecList" class="panelContainer"></div>
-            </div>
-            <div id="PortEditorPanel">
-                <div id="portEditorContainer" ></div>
-            </div>
-            <div id="NamedCellsPanel">
-                <div id="namedCellListContainer" class="panelItemContainer">
-                </div>
-                <div class="panelContainer">
-                <button id="addNamedCellsButton">Add</button>
-                </div>
-            </div>
             <div id="FunctionPanel" class="panelContainer">
                 <div id="operationEditorContainer" class="panelItemContainer"></div>
                 <h2>All Functions</h2>
