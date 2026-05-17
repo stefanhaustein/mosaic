@@ -24,8 +24,10 @@ interface Node {
     var tag: Long
 
     /**
-     * Re-calculates the value bases on inputs.
-     * Input port values will be refreshed from the port value here.
+     * Re-calculates the value bases on inputs. Returns true if the value has changed.
+     *
+     * This is only relevant for "inner" nodes and will never return true for input ports; input port / external
+     * changes are communicated by other means.
      */
     fun recalculateValue(tag: Long): Boolean
     fun detach()

@@ -3,9 +3,9 @@ package org.kobjects.mosaic.plugins.homeassistant
 import org.kobjects.mosaic.model.integration.InputPortNode
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.integration.InputPortInstance
-import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration.Companion.getValue
+
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
-import org.kobjects.mosaic.plugins.homeassistant.client.HAEntityState
+
 
 class HaEntityInputPortInstance(
     val entity: HAEntity,
@@ -18,11 +18,11 @@ class HaEntityInputPortInstance(
 
     override fun entityStateChanged(
         entity: HAEntity,
-        oldState: HAEntityState,
-        newState: HAEntityState
+        oldState: Any?,
+        newState: Any?
     ) {
         Model.requestSynchronizedWithToken {
-            portHolder.portValueChanged(getValue(entity, newState), it)
+            portHolder.portValueChanged(newState, it)
 
         }
 

@@ -34,7 +34,7 @@ export function processIntegrationUpdate(name, data) {
 
             let editButton = document.createElement("button")
             editButton.style.margin = "10px 0 10px 10px"
-            editButton.append("Edit")
+            editButton.append("Configure")
             editButton.addEventListener("click", () => {
                 console.log("click", integration)
                 showIntegrationInstanceConfigurationDialog(IntegrationFactory.get(integration.kind), integration)

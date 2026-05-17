@@ -39,14 +39,14 @@ class HomeAssistantClient(
     init {
         entities = runBlocking {
             println("*** fetching entity states ******")
-            val entityStates = fetchEntityStates().associateBy { it.id }
+            val entityStates = fetchEntityStates()
             println("*** fetching entities ******")
             val rawEntities = fetchJson("config/entity_registry/list")
             buildMap<String, HAEntity> {
                 for (rawEntity in rawEntities.jsonArray) {
                     val id = rawEntity.jsonObject["entity_id"]?.jsonPrimitive?.contentOrNull
                     if (id != null) {
-                        val state = entityStates[id]
+                        val state = entityStates[id]?.jsonObject
                         if (state != null) {
                             put(id, HAEntity(this@HomeAssistantClient, rawEntity.jsonObject, state))
                         }
@@ -62,7 +62,7 @@ class HomeAssistantClient(
                     for ((id, update) in it.jsonObject.entries) {
                         val entity = entities[id]
                         if (entity != null) {
-                            entity.state = entity.state.update(update.jsonObject)
+                            entity.state = update.jsonObject["+"]?.jsonObject ?: JsonObject(emptyMap())
                         }
                     }
                 }
@@ -143,7 +143,7 @@ class HomeAssistantClient(
 
     suspend fun fetchDevices() = fetchJson("config/device_registry/list").jsonArray.map { HADevice(this, it.jsonObject) }
 
-    suspend fun fetchEntityStates() = fetchJson("get_states").jsonArray.map { HAEntityState(it.jsonObject) }
+    suspend fun fetchEntityStates() = fetchJson("get_states").jsonArray.associateBy { it.jsonObject["entity_id"]!!.jsonPrimitive.content }
 
     suspend fun subscribeEntityStates(callback: (JsonObject) -> Unit) =
         fetchJson("subscribe_entities", keepListening = true) {

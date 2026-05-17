@@ -22,7 +22,7 @@ export function processPortUpdate(integration, name, f) {
         let modifiers = spec["modifiers"] || []
 
         let portElement = document.createElement("div")
-        portElement.id = "port." + f.name
+        portElement.id = "port." + f.fqName
         portElement.className = "port"
         let containerName = "integration." + integration.key + ".ports"
         let containerElement = document.getElementById(containerName)

@@ -1,112 +1,68 @@
-simulationMode = true
+runMode = false
 
-[ports]
+[integration.root]
+kind = "Root"
 
-low_sensor: {"name":"low_sensor", "type":"din", "configuration": {"address":1,"name":"low_sensor"}}
-level_a: {"name":"level_a", "type":"din", "configuration": {"address":"2","name":"level_a"}}
-level_b: {"name":"level_b", "type":"din", "configuration": {"address":3,"name":"level_b"}}
-valve_a: {"name":"valve_a", "type":"dout", "configuration": {"address":"4","name":"valve_a"}, "dependsOn":"[Sheet1!E3:=not level_a and not valve_out]", "dependencies":"[]", "expression":"=Sheet1!E3"}
-valve_b: {"name":"valve_b", "type":"dout", "configuration": {"address":"5","name":"valve_b"}, "dependsOn":"[Sheet1!I3:=level_a and not level_b and not valve_out]", "dependencies":"[]", "expression":"=Sheet1!I3"}
-valve_out: {"name":"valve_out", "type":"dout", "configuration": {"address":"6","name":"valve_out"}, "dependsOn":"[Sheet1!H11:=rs(ton(level_b, 10), not low_sensor)]", "dependencies":"[Sheet1!E3:=not level_a and not valve_out, Sheet1!I3:=level_a and not level_b and not valve_out]", "expression":"=Sheet1!H11"}
-mixer: {"name":"mixer", "type":"dout", "configuration": {"address":"7","name":"mixer"}, "dependsOn":"[Sheet1!G2:=tp(level_b, 10)]", "dependencies":"[]", "expression":"=Sheet1!G2"}
+[integration.root.ports]
+state = {"kind":"NamedCell","configuration":{},"c":"emptying","source":"=Sheet1!G8"}
+level_a = {"kind":"NamedCell","configuration":{},"c":true,"source":"false"}
+level_b = {"kind":"NamedCell","configuration":{},"c":true,"source":"false"}
+level_0 = {"kind":"NamedCell","configuration":{},"c":true,"source":"false"}
 
-[portValues]
-
-low_sensor: false
-level_a: false
-level_b: false
-valve_a: true
-valve_b: false
-valve_out: false
-mixer: false
-
-[simulationValues]
-
-low_sensor: false
-level_a: false
-level_b: false
+[sheets.Sheet1]
 
 
 [sheets.Sheet1.cells]
-
-A1 = {"f": "", "i": ""}
-A2 = {"f": ""}
-B4 = {"f": "Master"}
-B5 = {"f": "true", "v":{"type":"Boolean","values":[{"value":true,"label":"ON"},{"value":false,"label":"OFF"}]}}
-P4 = {"f": ""}
-B7 = {"f": "=tp(B5, 10)"}
-F4 = {"f": "", "i": "img/line/vl.svg"}
-G4 = {"f": "", "i": "img/line/v.svg"}
-H4 = {"f": "", "i": "img/line/vr.svg"}
-F5 = {"f": "", "i": "img/line/vl.svg"}
-F6 = {"f": "", "i": "img/line/v.svg"}
-F7 = {"f": "", "i": "img/line/vl.svg"}
-F8 = {"f": "", "i": "img/line/v.svg"}
-F9 = {"f": "", "i": "img/line/arc.ur.svg"}
-G9 = {"f": "", "i": "img/line/hb.svg"}
-H9 = {"f": "", "i": "img/line/arc.ul.svg"}
-H8 = {"f": "", "i": "img/line/v.svg"}
-H7 = {"f": "", "i": "img/line/v.svg"}
-H6 = {"f": "", "i": "img/line/v.svg"}
-H5 = {"f": "", "i": "img/line/v.svg"}
-H3 = {"f": "", "i": "img/line/arc.dl.svg"}
-F3 = {"f": "", "i": "img/line/arc.dr.svg"}
-G10 = {"f": "", "i": "img/line/vl.svg"}
-G11 = {"f": "", "i": "img/line/tr.svg"}
-E8 = {"f": ""}
-D2 = {"f": ""}
-E9 = {"f": ""}
-E7 = {"f": "=level_a", "i": "img/symbol/sensor.level.r.svg?active="}
-E3 = {"f": "=not level_a and not valve_out", "i": "img/symbol/valve.v.svg?active="}
-I3 = {"f": "=level_a and not level_b and not valve_out", "i": "img/symbol/valve.v.svg?active="}
-E5 = {"f": "=level_b", "i": "img/symbol/sensor.level.r.svg?active="}
-G3 = {"f": "", "i": "img/line/hv.svg"}
-H11 = {"f": "=rs(ton(level_b, 10), not low_sensor)", "i": "img/symbol/valve.h.svg?active="}
-J5 = {"f": ""}
-C14 = {"f": ""}
-D14 = {"f": ""}
-E14 = {"f": ""}
-C15 = {"f": ""}
-D15 = {"f": ""}
-E15 = {"f": ""}
-C16 = {"f": ""}
-D16 = {"f": ""}
-E16 = {"f": ""}
-A5 = {"f": ""}
-C12 = {"f": ""}
-D12 = {"f": ""}
-D7 = {"f": "level a"}
-D5 = {"f": "level b"}
-D9 = {"f": ""}
-E12 = {"f": ""}
-F12 = {"f": ""}
-K6 = {"f": ""}
-K5 = {"f": ""}
-D3 = {"f": ""}
-I2 = {"f": "", "i": "img/arrow/d.svg"}
-E2 = {"f": "", "i": "img/arrow/d.svg"}
-J3 = {"f": "", "i": ""}
-H10 = {"f": "valve_out"}
-L7 = {"f": ""}
-F10 = {"f": "", "i": "img/line/h.svg"}
-E10 = {"f": "=low_sensor", "i": "img/symbol/sensor.level.r.svg?active="}
-D10 = {"f": "level 0"}
-F2 = {"f": ""}
-H2 = {"f": ""}
-G1 = {"f": ""}
-G2 = {"f": "=tp(level_b, 10)", "i": "img/symbol/motor.svg?active="}
-G5 = {"f": "", "i": "img/line/v.svg"}
-G6 = {"f": "", "i": "img/line/v.svg"}
-E4 = {"f": "", "i": "img/line/tr.svg"}
-I4 = {"f": "", "i": "img/line/tl.svg"}
-G7 = {"f": "", "i": "img/line/v.svg"}
-K3 = {"f": ""}
-C3 = {"f": ""}
-G8 = {"f": "", "i": "img/symbol/mixer.u.svg"}
-E1 = {"f": "input a"}
-B12 = {"f": "", "i": ""}
-J6 = {"f": "", "i": ""}
-I11 = {"f": "", "i": "img/arrow/r.svg"}
-I1 = {"f": "input b", "i": ""}
-I8 = {"f": "", "i": ""}
-
+B1 = {"f":"input a"}
+G1 = {"f":"input b"}
+B2 = {"i":"img/arrow/d.svg"}
+D2 = {"f":"=state = \"mixing\"","i":"img/symbol/motor.svg?active="}
+G2 = {"i":"img/arrow/d.svg"}
+B3 = {"f":"=state = \"filling_a\"","i":"img/symbol/valve.v.svg?active="}
+C3 = {"i":"img/line/arc.dr.svg"}
+D3 = {"i":"img/line/hv.svg"}
+E3 = {"i":"img/line/arc.dl.svg"}
+G3 = {"f":"=state = \"filling_b\"","i":"img/symbol/valve.v.svg?active="}
+B4 = {"i":"img/line/tr.svg"}
+C4 = {"i":"img/line/vl.svg"}
+D4 = {"i":"img/line/v.svg"}
+E4 = {"i":"img/line/vr.svg"}
+F4 = {"i":"img/line/h.svg"}
+G4 = {"i":"img/line/tl.svg"}
+B5 = {"f":"=level_b","i":"img/symbol/sensor.level.r.svg?active="}
+C5 = {"i":"img/line/vl.svg"}
+D5 = {"i":"img/line/v.svg"}
+E5 = {"i":"img/line/v.svg"}
+C6 = {"i":"img/line/v.svg"}
+D6 = {"i":"img/line/v.svg"}
+E6 = {"i":"img/line/v.svg"}
+B7 = {"f":"=level_a","i":"img/symbol/sensor.level.r.svg?active="}
+C7 = {"i":"img/line/vl.svg"}
+D7 = {"i":"img/line/v.svg"}
+E7 = {"i":"img/line/v.svg"}
+C8 = {"i":"img/line/v.svg"}
+D8 = {"i":"img/symbol/mixer.u.svg"}
+E8 = {"i":"img/line/v.svg"}
+F8 = {"f":"state"}
+G8 = {"f":"=statemachine(Sheet1!G9:J12)"}
+C9 = {"i":"img/line/arc.ur.svg"}
+D9 = {"i":"img/line/hb.svg"}
+E9 = {"i":"img/line/arc.ul.svg"}
+G9 = {"f":"filling_a"}
+I9 = {"f":"=level_a"}
+J9 = {"f":"filling_b"}
+B10 = {"f":"=level_0","i":"img/symbol/sensor.level.r.svg?active="}
+C10 = {"i":"img/line/h.svg"}
+D10 = {"i":"img/line/vl.svg"}
+G10 = {"f":"filling_b"}
+I10 = {"f":"=level_b"}
+J10 = {"f":"mixing"}
+D11 = {"f":"=state = \"emptying\"","i":"img/symbol/valve.v.svg?active="}
+G11 = {"f":"mixing"}
+I11 = {"f":"3000"}
+J11 = {"f":"emptying"}
+D12 = {"i":"img/line/tr.svg"}
+E12 = {"i":"img/arrow/r.svg"}
+G12 = {"f":"emptying"}
+I12 = {"f":"=not level_0"}
+J12 = {"f":"filling_a"}

@@ -12,7 +12,6 @@ import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
-import org.kobjects.mosaic.plugins.homeassistant.client.HAEntityState
 import org.kobjects.mosaic.plugins.homeassistant.client.HomeAssistantClient
 
 class HomeAssistantIntegration(
@@ -68,7 +67,7 @@ class HomeAssistantIntegration(
                 )
 
                 inputPortHolder.instance = HaEntityInputPortInstance(entity, inputPortHolder)
-                inputPortHolder.value = getValue(entity)
+                inputPortHolder.value = entity.decodeState(entity.state)
 
                 nodes.put(name, inputPortHolder)
 
@@ -118,17 +117,6 @@ class HomeAssistantIntegration(
             else -> false
         }
 
-        fun getValue(entity: HAEntity, state: HAEntityState = entity.state): Any {
-            return when (entity.kind) {
-                HAEntity.Kind.BINARY_SENSOR,
-                HAEntity.Kind.LIGHT -> when (state.state) {
-                    "on" -> true
-                    "off" -> false
-                    else -> IllegalStateException(state.state?.toString() ?: "null")
-                }
-                else -> state.state?.toString() ?: ""
-            }
-        }
 
         fun spec(model: ModelInterface) = IntegrationDescriptor(
             category = "HomeAutomation",

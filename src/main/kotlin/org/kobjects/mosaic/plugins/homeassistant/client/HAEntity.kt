@@ -9,15 +9,18 @@ import kotlinx.serialization.json.jsonPrimitive
 data class HAEntity(
     val client: HomeAssistantClient,
     val json: JsonObject,
-    private var state_: HAEntityState
+    val initialStateJson: JsonObject
 ) {
-    var state: HAEntityState
+    private var state_ = initialStateJson
+
+    var state: JsonObject
         get() = state_
         set(value) {
+            // println("New state: ${Json.encodeToString(value)}")
             val previousState = state_
             state_ = value
             for (listener in stateListeners) {
-                listener.entityStateChanged(this, previousState, state)
+                listener.entityStateChanged(this, decodeState(previousState), decodeState(value))
             }
         }
 
@@ -39,13 +42,30 @@ data class HAEntity(
     val disabledBy = json["disabled_by"]?.jsonPrimitive?.contentOrNull
 
     val friendlyName: String?
-        get() = state.json?.get("attributes")?.jsonObject?.get("friendly_name")?.jsonPrimitive?.contentOrNull
+        get() = initialStateJson?.get("attributes")?.jsonObject?.get("friendly_name")?.jsonPrimitive?.contentOrNull
 
     val description: String
         get() = (friendlyName?:"") + ".debug:\n" + PRETTY_JSON.encodeToString(json) +
-                "\n\nstate:" + PRETTY_JSON.encodeToString(state.json)
+                "\n\ninitialState:" + PRETTY_JSON.encodeToString(initialStateJson) +
+                "\n\nstate:" + PRETTY_JSON.encodeToString(state_)
 
     override fun toString(): String = id + " - " + category + " - " + json
+
+    fun decodeState(json: JsonObject): Any? =
+        when (kind) {
+            Kind.EVENT -> {
+                println("***** " + Json.encodeToString(json) + "*****")
+                (json["a"] ?: json["attributes"])?.jsonObject?.get("event_type")?.jsonPrimitive?.contentOrNull
+            }
+            Kind.BINARY_SENSOR,
+            Kind.LIGHT -> when ((json["s"] ?: json["state"])?.jsonPrimitive?.contentOrNull) {
+                "on" -> true
+                "off" -> false
+                else -> IllegalStateException(Json.encodeToString(json))
+            }
+            else -> kind.name + ": " + Json.encodeToString(json)
+        }
+
 
     fun addListener(listener: StateChangeListener) {
         stateListeners.add(listener)
@@ -56,6 +76,7 @@ data class HAEntity(
     }
 
     enum class Kind {
+        EVENT,
         BUTTON,
         BINARY_SENSOR,
         LIGHT,
@@ -71,6 +92,6 @@ data class HAEntity(
     }
 
     interface StateChangeListener {
-        fun entityStateChanged(entity: HAEntity, oldState: HAEntityState, newState: HAEntityState)
+        fun entityStateChanged(entity: HAEntity, oldState: Any?, newState: Any?)
     }
 }

@@ -71,6 +71,9 @@ interface PortNode: Node {
         }
         builder.put("configuration", jsonConfiguration)
         builder.put("c", serializeValue())
+        if (deleted) {
+            builder.put("deleted", JsonPrimitive(true))
+        }
         if (forClient) {
             serializeDependencies(builder)
         }
