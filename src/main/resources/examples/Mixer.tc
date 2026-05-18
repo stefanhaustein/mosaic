@@ -5,9 +5,9 @@ kind = "Root"
 
 [integration.root.ports]
 state = {"kind":"NamedCell","configuration":{},"c":"emptying","source":"=Sheet1!G8"}
-level_a = {"kind":"NamedCell","configuration":{},"c":true,"source":"false"}
-level_b = {"kind":"NamedCell","configuration":{},"c":true,"source":"false"}
-level_0 = {"kind":"NamedCell","configuration":{},"c":true,"source":"false"}
+level_a = {"kind":"NamedCell","configuration":{},"c":false,"source":"false"}
+level_b = {"kind":"NamedCell","configuration":{},"c":false,"source":"false"}
+level_0 = {"kind":"NamedCell","configuration":{},"c":false,"source":"false"}
 
 [sheets.Sheet1]
 
