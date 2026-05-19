@@ -1,0 +1,72 @@
+runMode = false
+
+[integration.root]
+kind = "Root"
+
+[integration.root.ports]
+
+[integration.hts_221]
+sensor = "HTS221"
+bus = 1
+address = 95
+kind = "I2cSensor"
+
+[integration.hts_221.ports]
+
+[integration.lps_25h]
+sensor = "LPS25H"
+bus = 1
+address = 92
+kind = "I2cSensor"
+
+[integration.lps_25h.ports]
+
+[integration.lsm_9ds1]
+sensor = "LSM9DS1"
+bus = 1
+address = 106
+kind = "I2cSensor"
+
+[integration.lsm_9ds1.ports]
+
+[integration.lsm_9ds1_m]
+sensor = "LSM9DS1-Magnetometer"
+bus = 1
+address = 28
+kind = "I2cSensor"
+
+[integration.lsm_9ds1_m.ports]
+
+[integration.tcs_3400]
+sensor = "TCS3400"
+bus = 1
+address = 57
+kind = "I2cSensor"
+
+[integration.tcs_3400.ports]
+
+[sheets.Sheet1]
+highlighted = []
+
+[sheets.Sheet1.cells]
+A2 = {"f":"HTS 221"}
+C2 = {"f":"=hts_221.humidity"}
+G2 = {"f":"LPS 25H"}
+I2 = {"f":"=lps_25h.pressure"}
+C3 = {"f":"=hts_221.temperature"}
+I3 = {"f":"=lps_25h.temperature"}
+A5 = {"f":"LSM 9DS1"}
+C5 = {"f":"=lsm_9ds1.acceleration_x"}
+F5 = {"f":"=lsm_9ds1.angular_velocity_x"}
+I5 = {"f":"=lsm_9ds1_m.magnetic_field_x"}
+C6 = {"f":"=lsm_9ds1.acceleration_y"}
+F6 = {"f":"=lsm_9ds1.angular_velocity_y"}
+I6 = {"f":"=lsm_9ds1_m.magnetic_field_y"}
+C7 = {"f":"=lsm_9ds1.acceleration_z"}
+F7 = {"f":"=lsm_9ds1.angular_velocity_z"}
+I7 = {"f":"=lsm_9ds1_m.magnetic_field_z"}
+A9 = {"f":"TCS 3400"}
+C9 = {"f":"=tcs_3400.light"}
+C10 = {"f":"=tcs_3400.light_blue"}
+F10 = {"f":"=tcs_3400.light_green"}
+I10 = {"f":"=tcs_3400.light_red"}
