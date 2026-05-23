@@ -10,11 +10,12 @@ class OutputPortNode(
     override val owner: Integration,
     override val name: String,
     override val descriptor: OutputPortDescriptor,
-    rawFormula: String,
+    rawFormula: String = "",
     override val displayName: String? = null,
-    override val category: String? = null
+    override val category: String? = null,
+    var instance: OutputPortInstance? = null // Supplied via configure except for implied ports
 ) : ExpressionNode(owner),  PortNode {
-    var instance: OutputPortInstance? = null
+
     var error: Exception? = null
 
     override var jsonConfiguration = JsonObject(emptyMap())
@@ -57,4 +58,5 @@ class OutputPortNode(
     }
 
     override fun toString() = name
+
 }
