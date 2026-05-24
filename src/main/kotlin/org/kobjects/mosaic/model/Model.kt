@@ -16,6 +16,7 @@ import org.kobjects.mosaic.model.integration.OutputPortNode
 import org.kobjects.mosaic.model.integration.Root
 import org.kobjects.mosaic.model.sheet.Cell
 import org.kobjects.mosaic.model.sheet.Sheet
+import org.kobjects.mosaic.plugins.display.SenseHatDisplayIntegration
 import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
 import org.kobjects.mosaic.plugins.i2csensor.I2cSensorIntegration
 import org.kobjects.mosaic.plugins.pixtend.PiXtendIntegration
@@ -70,6 +71,7 @@ object Model : ModelInterface {
         addIntegration(HomeAssistantIntegration.spec(this))
         addIntegration(Root.spec(this))
         addIntegration(I2cSensorIntegration.descriptor(this))
+        addIntegration(SenseHatDisplayIntegration.descriptor(this))
         // addPlugin(MqttPlugin)
 
         integrations.integrationMap["root"] = Root()
