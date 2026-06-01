@@ -12,7 +12,6 @@ abstract class AbstractDisplayIntegration(
 ) : Integration(integrationName, name){
     var display: GraphicsDisplay? = null
 
-
     override val portDescriptors = listOf(
         OutputPortDescriptor.Companion.createUninstantiable(
             this,
