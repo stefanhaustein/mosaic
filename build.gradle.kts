@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -5,6 +6,13 @@ plugins {
 
     kotlin("plugin.serialization") version "2.2.20" // Match your Kotlin version
 }
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
 
 group = "org.kobjects"
 version = "0.0.1"
@@ -32,7 +40,9 @@ dependencies {
     implementation("org.kobjects.parsek:core:0.10.0")
     implementation("com.pi4j:pi4j-core:4.0.1")
     implementation("com.pi4j:pi4j-plugin-ffm:4.0.1")
-    implementation("com.pi4j:pi4j-drivers:0.0.1-SNAPSHOT")
+//    implementation("com.pi4j:pi4j-plugin-gpiod:3.0.2")
+            //  implementation("com.pi4j:pi4j-plugin-linuxfs:3.0.2")
+    implementation("com.pi4j:pi4j-drivers:1.1.0")
     implementation("io.github.davidepianca98:kmqtt-common-jvm:1.0.0")
     implementation("io.github.davidepianca98:kmqtt-client-jvm:1.0.0")
 

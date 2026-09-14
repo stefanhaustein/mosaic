@@ -2,10 +2,11 @@
      xmlns="http://www.w3.org/2000/svg"
      xmlns:param="http://kobjects.org/svg/param">
     <param:def name="active" type="Boolean" />
-    <circle cx="50" cy="50" r="47"
+    <circle cx="50" cy="50" r="48"
             param:fill="active ? 'yellow' : 'white'"
             fill="white" stroke-width="5"
             stroke="black" />
-    <line x1="17" y1="17" x2="83" y2="83" stroke="black" stroke-width="5" />
-    <line x1="17" y1="83" x2="83" y2="17" stroke="black" stroke-width="5" />
+
+    <polyline points="100,50 0,50" stroke="black" stroke-width="2"/>
+    <text x="50" y="40" text-anchor="middle" style="font-family:sans-serif; font-size:30">L</text>
 </svg>

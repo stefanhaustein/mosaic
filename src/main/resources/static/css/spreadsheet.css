@@ -29,19 +29,29 @@ body #spreadsheetTable tbody tr td.highlight {
     background: none;
 }
 
-
 #spreadsheetTable th,
 #spreadsheetTable td {
-    min-width: 73px;
-    width: 73px;
-    max-width: 73px;
-    min-height: 37px;
-    height: 37px;
-    max-height: 37px;
+    min-width: 60px;
+    width: 60px;
+    max-width: 60px;
+    min-height: 60px;
+    height: 60px;
+    max-height: 60px;
     overflow: hidden;
-    white-space: nowrap;
+ /*   white-space: nowrap; */
 }
 
+#spreadsheetTable #spreadsheetTHead th {
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+}
+
+#spreadsheetTable tr :first-child {
+    width: 72px;
+    min-width: 72px;
+    max-width: 72px;
+}
 
 #spreadsheetTable th {
     font-weight: normal;

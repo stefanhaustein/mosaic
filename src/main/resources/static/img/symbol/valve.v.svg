@@ -1,11 +1,11 @@
-<svg width="200" height="100"
+<svg width="100" height="100"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:param="http://kobjects.org/svg/param">
     <param:activity />
-    <polygon points="70,10 130,10 70,90 130,90"
+    <polygon points="20,10 80,10 20,90 80,90"
             fill="white" stroke-width="5"
             stroke="black" />
-    <polyline points="100,0 100,10" stroke="black" stroke-width="5" />
-    <polyline points="100,100 100,90" stroke="black" stroke-width="5" />
+    <polyline points="50,0 50,10" stroke="black" stroke-width="5" />
+    <polyline points="50,100 50,90" stroke="black" stroke-width="5" />
 
 </svg>
