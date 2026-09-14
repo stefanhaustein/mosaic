@@ -16,32 +16,8 @@
 </head>
 <body style="width:100%; height:100%; border:0; padding:0; margin:0; display: flex;  flex-direction: column;">
     <div id="topBar">
-        <div id="rangeName" style="width:72px;padding:6px 0 0 0; text-align: center; border:1px solid black;"></div>
 
-        <input id="formulaInput" style="flex-grow: 1" list="functions">
-        <datalist id="functions"></datalist>
-        <div id="globalErrorDiv"></div>
 
-        <select id="panelSelect" style="width:144px">
-            <option>About</option>
-            <option value="Function">Functions</option>
-            <option>Graphics</option>
-            <option value="Integration">Integrations</option>
-            <option value="Validation">User Input</option>
-            <option value="Hide">Hide Panel</option>
-        </select>
-
-        <select id="menuSelect" style="width:64px">
-            <option>Menu</option>
-
-            <option>Clear All</option>
-            <option>Cut</option>
-            <option>Copy</option>
-            <option>Paste</option>
-            <option>Load File</option>
-            <option>Load Example</option>
-            <option>Save File</option>
-        </select>
     </div>
     <div style="display:flex; flex-grow: 1; height: 0">
         <div id="spreadsheetViewport" style="flex-grow: 1; height:100%; overflow: scroll" >
@@ -52,12 +28,46 @@
         </div>
         <div id="divider" style='height:100%; flex: 0 0 12px; background-image: url("dotted.jpeg")'></div>
         <div id="sidePanel" style="height: 100%; flex: 0 0 200px; overflow: auto">
+            <div style="height:40px;display:flex">
+            <select id="panelSelect" style="height:40px;flex-grow: 1">
+                <option>About</option>
+                <option value="Details">Cell Details</option>
+                <option value="Function">Functions</option>
+                <option>Graphics</option>
+                <option value="Integration">Integrations</option>
+                <option value="Validation">User Input</option>
+
+            </select>
+
+            <select id="menuSelect" style="height:40px;width:40px">
+                <option>☰</option>
+
+                <option>Clear All</option>
+                <option>Cut</option>
+                <option>Copy</option>
+                <option>Paste</option>
+                <option>Load File</option>
+                <option>Load Example</option>
+                <option>Save File</option>
+            </select>
+            </div>
+
             <div id="AboutPanel" class="panelContainer">
                 <h2>TableCraft</h2>
 
                     <center><img src="TableCraft.png" width="150" /></center>
                     Utilize a spreadsheet interface
                     to control simple IoT projects.
+            </div>
+
+            <div id="DetailsPanel" class="panelContainer">
+                <h2 id="rangeName" ></h2>
+                Value:<br>
+                <input id="formulaInput" list="functions" style="width:100%">
+                <datalist id="functions"></datalist>
+
+
+                <div id="globalErrorDiv" ></div>
             </div>
 
             <div id="FunctionPanel" class="panelContainer">
