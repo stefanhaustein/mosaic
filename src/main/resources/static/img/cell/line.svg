@@ -1,0 +1,89 @@
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+    <symbol id="arc.dl"  viewBox="0 0 100 100">
+    <path d="M 0,50 Q 50,50 50,100" fill="none" stroke-width="5" stroke="black" />
+</symbol>
+
+<symbol id="arc.dr"  viewBox="0 0 100 100">
+<path d="M 100,50 Q 50,50 50,100" fill="none" stroke-width="5" stroke="black" />
+</symbol>
+
+<symbol id="arc.ul"  viewBox="0 0 100 100">
+<path d="M 0,50 Q 50,50 50,0" fill="none" stroke-width="5" stroke="black" />
+</symbol>
+
+<symbol id="arc.ur"  viewBox="0 0 100 100">
+<path d="M 100,50 Q 50,50 50,0" fill="none" stroke-width="5" stroke="black" />
+</symbol>
+
+<symbol id="bl"  viewBox="0 0 100 100">
+<line x1="50" y1="50" x2="50" y2="100" style="stroke: black; stroke-width:5"/>
+<line x1="0" y1="50" x2="50" y2="50" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="br"  viewBox="0 0 100 100">
+<line x1="50" y1="50" x2="50" y2="100" style="stroke: black; stroke-width:5"/>
+<line x1="50" y1="50" x2="100" y2="50" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="diagonal.dl"  viewBox="0 0 100 100">
+<line x1="0" y1="50" x2="50" y2="100" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="diagonal.dr"  viewBox="0 0 100 100">
+<line x1="100" y1="50" x2="50" y2="100" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="diagonal.ul"  viewBox="0 0 100 100">
+<line x1="0" y1="50" x2="50" y2="0" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="diagonal.ur"  viewBox="0 0 100 100">
+<line x1="100" y1="50" x2="50" y2="0" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="h"  viewBox="0 0 100 100"
+    >
+<line x1="0" y1="50" x2="100" y2="50" stroke="black" stroke-width="5" />
+</symbol>
+
+<symbol id="hb"  viewBox="0 0 100 100">
+<line x1="50" y1="50" x2="50" y2="100" style="stroke: black; stroke-width:5"/>
+<line x1="0" y1="50" x2="100" y2="50" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="ht"  viewBox="0 0 100 100">
+<line x1="50" y1="0" x2="50" y2="50" style="stroke: black; stroke-width:5"/>
+<line x1="0" y1="50" x2="100" y2="50" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="hv"  viewBox="0 0 100 100">
+<line x1="50" y1="0" x2="50" y2="100" style="stroke: black; stroke-width:5"/>
+<line x1="0" y1="50" x2="100" y2="50" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="tl"  viewBox="0 0 100 100">
+<line x1="50" y1="0" x2="50" y2="50" style="stroke: black; stroke-width:5"/>
+<line x1="0" y1="50" x2="50" y2="50" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="tr"  viewBox="0 0 100 100">
+<line x1="50" y1="0" x2="50" y2="50" style="stroke: black; stroke-width:5"/>
+<line x1="50" y1="50" x2="100" y2="50" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="v"  viewBox="0 0 100 100">
+<line x1="50" y1="0" x2="50" y2="100" style="stroke: CanvasText; stroke-width:5"/>
+</symbol>
+
+<symbol id="vl"  viewBox="0 0 100 100">
+<line x1="50" y1="0" x2="50" y2="100" style="stroke: black; stroke-width:5"/>
+<line x1="0" y1="50" x2="50" y2="50" style="stroke: black; stroke-width:5"/>
+</symbol>
+
+<symbol id="vr"  viewBox="0 0 100 100">
+<line x1="50" y1="0" x2="50" y2="100" style="stroke: black; stroke-width:5"/>
+<line x1="50" y1="50" x2="100" y2="50" style="stroke: black; stroke-width:5"/>
+</symbol>
+</defs>
+</svg>

@@ -29,12 +29,15 @@ export function renderDependencies(
         element.classList.add(classNames[depth >= classNames.length ? classNames.length - 1 : depth])
     }
 
-    let entity = model.sheets[key.substring(0, cut)].cells[key.substring(cut + 1)]
-    if (entity != null) {
-        let depList = entity[propertyName]
-        if (depList != null) {
-            for (let childKey of depList) {
-                renderDependencies(childKey, propertyName, seen, depth + 1, classNames)
+    let sheet = model.sheets[key.substring(0, cut)]
+    if (sheet != null) {
+        let entity = sheet.cells[key.substring(cut + 1)]
+        if (entity != null) {
+            let depList = entity[propertyName]
+            if (depList != null) {
+                for (let childKey of depList) {
+                    renderDependencies(childKey, propertyName, seen, depth + 1, classNames)
+                }
             }
         }
     }

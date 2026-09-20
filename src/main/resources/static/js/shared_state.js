@@ -69,7 +69,7 @@ function updateErrorMessage() {
     }
 }
 
-function commitCurrentCell() {
+export function commitCurrentCell() {
     committedFormula = currentCell.f
     post("update/" + currentSheet.name + "!" + currentCell.key, currentCell)
 }
@@ -93,11 +93,6 @@ export function setCurrentCellFormula(value, source) {
             cellContentChangeListeners[key](value, source)
         }
     }
-}
-
-export function setCurrentCellImage(value) {
-    currentCell["i"] = value
-    commitCurrentCell()
 }
 
 
@@ -147,7 +142,6 @@ export function showDependencies(targetKey) {
 // Note that this is also called when the current cell is updated by the server (as the server update might
 // swap out the whole object.
 export function selectCell(id, rangeX = 0, rangeY = 0) {
-
     if (isNaN(rangeX)) {
         console.log("rangeX is NaN")
         rangeX = 0
@@ -225,16 +219,11 @@ export function selectCell(id, rangeX = 0, rangeY = 0) {
                 }
             }
         }
-
         showDependencies(targetKey)
-
-        notifySelectionListeners()
     }
-}
-
-function notifySelectionListeners() {
     for (let listener of cellSelectionListeners) {
         listener(currentCell.key)
     }
 }
+
 

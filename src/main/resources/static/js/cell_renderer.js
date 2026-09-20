@@ -4,21 +4,49 @@ import {getColumn, getRow, toCellId} from "./lib/utils.js";
 import {InputController} from "./forms/input_controller.js";
 
 export function renderCell(key) {
-    let targetElement = document.getElementById(key)
-    if (targetElement == null) {
+    let cellElement = document.getElementById(key)
+    if (cellElement == null) {
         console.log("Element for cell key '" + key + "' not found.'")
         return;
     }
 
-    let classes = targetElement.classList
+    let classes = cellElement.classList
     classes.remove("c", "e", "i", "r", "l", "u")
-    targetElement.removeAttribute("title")
+    cellElement.removeAttribute("title")
+    cellElement.textContent = ""
+    cellElement.style = ""
 
     let cellData = currentSheet.cells[key]
     if (cellData == null) {
         cellData = {}
     }
-    let imgSrc = cellData["i"]
+
+    let targetElement = cellElement
+    let styles = cellData["s"]
+    if (Array.isArray(styles)) {
+        let container = document.createElement("div")
+        container.style.display = "grid"
+        cellElement.style.padding = "0"
+        cellElement.append(container)
+        for (let style of styles) {
+            let layer = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+            layer.style.gridArea = "1/1"
+            layer.style.width = "60px";
+            layer.style.height = "60px";
+            layer.style.rotate = (style.rotation || 0) + "deg"
+            if (style.image != null) {
+                let use = document.createElementNS("http://www.w3.org/2000/svg", "use")
+                use.setAttribute("href", "img/cell/" + style.image)
+                layer.append(use)
+            }
+            container.append(layer)
+        }
+        targetElement = document.createElement("div")
+        targetElement.style.gridArea = "1/1"
+        targetElement.style.padding = "0 3px"
+        container.append(targetElement)
+    }
+
     let value = cellData["c"]
     if (value == null) {
         value = ""
@@ -30,24 +58,12 @@ export function renderCell(key) {
         return
     }
 
-
     let validation = cellData["v"]
     if (validation?.type != null && validation?.type != "No User Input") {
         renderInput(targetElement, cellData)
         return
     }
 
-    if (imgSrc) {
-        if (imgSrc.endsWith("=")) {
-            imgSrc += value
-            value = ""
-        }
-        targetElement.style.backgroundImage = "url(" + imgSrc + ")"
-        targetElement.style.backgroundSize = "cover"
-    } else {
-        targetElement.style.backgroundImage = null
-        targetElement.style.backgroundSize = null
-    }
 
     let renderedValue = value
     switch(typeof value) {
@@ -62,7 +78,7 @@ export function renderCell(key) {
             break
 
         case "string":
-            if (value == "" && !imgSrc) {
+            if (value == "") {
                 let col = getColumn(key)
                 let row = getRow(key)
                 let nextKey = toCellId(col + 1, row)

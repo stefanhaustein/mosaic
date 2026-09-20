@@ -5,8 +5,12 @@ import kotlinx.datetime.format.char
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.tomson.ToJson
 import org.kobjects.mosaic.model.ExpressionNode
@@ -27,28 +31,21 @@ class Cell(
     override val owner: Namespace
         get() = sheet
 
-
-    var image: String? = null
-
     var validation: JsonObject? = null
 
     override val inputs = mutableSetOf<Node>()
     override val outputs = mutableSetOf<Node>()
 
+    val styles = mutableListOf<Style>()
 
     fun clear(modificationToken: ModificationToken) {
         setFormula("", modificationToken)
-        setImage("", modificationToken)
         setValidation(null, modificationToken)
-    }
-
-    fun setImage(path: String, modificationToken: ModificationToken) {
-        image = path
-        tag = modificationToken.tag
-        modificationToken.formulaChanged = true
+        styles.clear()
     }
 
     fun setJson(json: JsonObject, modificationToken: ModificationToken) {
+        this.tag = modificationToken.tag
         val formula = json["f"]?.jsonPrimitive?.contentOrNull
         if (formula != null) {
             setFormula(formula, modificationToken)
@@ -56,11 +53,18 @@ class Cell(
         val validation = json["v"]
         setValidation(if (validation is JsonObject) validation else null, modificationToken)
 
+        modificationToken.formulaChanged = true
+
+        styles.clear()
+        // Legacy image support
         val image = json["i"]
         if (image is JsonPrimitive) {
-            setImage(image.jsonPrimitive.content, modificationToken)
-        } else {
-            setImage("", modificationToken)
+            styles.add(Style(image.content, null))
+        }
+        for (jsonStyle in json["s"]?.jsonArray.orEmpty().filter{ it is JsonObject }) {
+            val imageName = jsonStyle.jsonObject["image"]?.jsonPrimitive?.contentOrNull
+            val rotation = jsonStyle.jsonObject["rotation"]?.jsonPrimitive?.intOrNull
+            styles.add(Style(imageName, rotation))
         }
     }
 
@@ -84,8 +88,19 @@ class Cell(
                 if (validation?.isNotEmpty() == true) {
                     put("v", validation)
                 }
-                if (!image.isNullOrBlank()) {
-                    put("i", JsonPrimitive(image))
+                if (styles.isNotEmpty()) {
+                    put("s", buildJsonArray {
+                        styles.forEach {
+                            add(buildJsonObject {
+                                if (it.image != null) {
+                                    put("image", JsonPrimitive(it.image))
+                                }
+                                if (it.rotation != null) {
+                                    put("rotation", JsonPrimitive(it.rotation))
+                                }
+                            })
+                        }
+                    })
                 }
                 if (forClient) {
                     put("c", serializeValue())

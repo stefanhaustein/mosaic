@@ -47,7 +47,7 @@ body #spreadsheetTable tbody tr td.highlight {
     max-height: 40px;
 }
 
-#spreadsheetTable tr :first-child {
+#spreadsheetTable tr:first-child {
     width: 72px;
     min-width: 72px;
     max-width: 72px;

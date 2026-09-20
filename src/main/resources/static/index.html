@@ -26,17 +26,16 @@
             <tbody id="spreadsheetTBody"></tbody>
             </table>
         </div>
+
         <div id="divider" style='height:100%; flex: 0 0 12px; background-image: url("dotted.jpeg")'></div>
+
         <div id="sidePanel" style="height: 100%; flex: 0 0 200px; overflow: auto">
             <div style="height:40px;display:flex">
             <select id="panelSelect" style="height:40px;flex-grow: 1">
                 <option>About</option>
-                <option value="Details">Cell Details</option>
+                <option value="Details" selected="selected">Cell Details</option>
                 <option value="Function">Functions</option>
-                <option>Graphics</option>
                 <option value="Integration">Integrations</option>
-                <option value="Validation">User Input</option>
-
             </select>
 
             <select id="menuSelect" style="height:40px;width:40px">
@@ -65,7 +64,26 @@
                 Value:<br>
                 <input id="formulaInput" list="functions" style="width:100%">
                 <datalist id="functions"></datalist>
-
+                <p>
+                <label>Input:<br>
+                    <select id="inputType" style="width:100%">
+                        <option>No User Input</option>
+                        <option>Bool</option>
+                        <option>String</option>
+                        <option>Int</option>
+                        <option>Real</option>
+                    </select>
+                </label>
+                <div id="ValidationForm" style="margin-top:10px">
+                </div>
+                <div id="ValidationExplanation"></div>
+                <p>
+                <div>Style:</div>
+                <div id="stylesDiv"></div>
+                <div id="addStyleDiv" style="padding-bottom:5px;padding-top:5px">
+                    <img src="img/add_circle.svg" style="float:left;padding-top:2px">
+                    <div style="padding-left:20px">Add Style / Image</div>
+                </div>
 
                 <div id="globalErrorDiv" ></div>
             </div>
@@ -76,82 +94,11 @@
                 <div id="operationListContainer" class="panelItemContainer"></div>
             </div>
 
-            <div id="ValidationPanel" class="panelContainer">
-                <label>Type:&nbsp;
-                <select id="inputType">
-                    <option>No User Input</option>
-                    <option>Bool</option>
-                    <option>String</option>
-                    <option>Int</option>
-                    <option>Real</option>
-                </select>
-                </label>
-                <div id="ValidationForm" style="margin-top:10px">
-                </div>
-                <div id="ValidationExplanation"></div>
-            </div>
-
             <div id="IntegrationPanel">
                 <div id="integrationList" class="panelContainer"></div>
                 <h2>Available Integrations</h2>
                 <div id="integrationSpecList" class="panelContainer"></div>
             </div>
-
-            <div id="GraphicsPanel" class="panelContainer">
-                <button >Clear Cell Graphics</button>
-                <details class="symbols" open="open">
-                    <summary>Lines</summary>
-                    <img src="img/line/hb.svg" />
-                    <img src="img/line/h.svg" />
-
-                    <img src="img/line/br.svg" />
-                    <img src="img/line/bl.svg" />
-
-                    <img src="img/line/vr.svg" />
-                    <img src="img/line/vl.svg" />
-
-                    <img src="img/line/v.svg" />
-                    <img src="img/line/v.svg" />
-
-                    <img src="img/line/tr.svg" />
-                    <img src="img/line/tl.svg" />
-
-                    <img src="img/line/ht.svg" />
-                    <img src="img/line/hv.svg" />
-
-                    <img src="img/line/arc.dr.svg" />
-                    <img src="img/line/arc.dl.svg" />
-                    <img src="img/line/arc.ur.svg" />
-                    <img src="img/line/arc.ul.svg" />
-
-                    <img src="img/line/diagonal.dr.svg" />
-                    <img src="img/line/diagonal.dl.svg" />
-                    <img src="img/line/diagonal.ur.svg" />
-                    <img src="img/line/diagonal.ul.svg" />
-                </details>
-
-                <details class="symbols">
-                    <summary>Arrows</summary>
-                    <img src="img/arrow/l.svg" />
-                    <img src="img/arrow/r.svg" />
-                    <img src="img/arrow/u.svg" />
-                    <img src="img/arrow/d.svg" />
-
-                </details>
-
-                <details class="symbols">
-                <summary>Symbols</summary>
-                    <img src="img/symbol/lamp.svg?active=" />
-                    <img src="img/symbol/motor.svg?active=" />
-                    <img src="img/symbol/valve.v.svg?active=" />
-                    <img src="img/symbol/valve.h.svg?active=" />
-                    <img src="img/symbol/sensor.level.svg?active=" />
-                    <img src="img/symbol/mixer.u.svg" />
-                    <img src="img/symbol/mixer.d.svg" />
-
-                </details>
-            </div>
-            <div id="HidePanel" style="width:0"></div>
         </div>
     </div>
     <dialog id="dialog">
@@ -238,18 +185,81 @@
         </div>
     </dialog>
 
+    <dialog id="imageDialog">
+        <h2>Select Image</h2>
+        <div id="imageDialogContent" style="width: 400px; height:300px; overflow-y: auto">
+        <details class="symbols" open="open">
+            <summary>Lines</summary>
+            <svg><use href="img/cell/line.svg#hb" /></svg>
+            <svg><use href="img/cell/line.svg#h" /></svg>
+
+            <svg><use href="img/cell/line.svg#br" /></svg>
+            <svg><use href="img/cell/line.svg#bl" /></svg>
+
+            <svg><use href="img/cell/line.svg#vr" /></svg>
+            <svg><use href="img/cell/line.svg#vl" /></svg>
+
+            <svg><use href="img/cell/line.svg#v" /></svg>
+            <svg><use href="img/cell/line.svg#v" /></svg>
+
+            <svg><use href="img/cell/line.svg#tr" /></svg>
+            <svg><use href="img/cell/line.svg#tl" /></svg>
+
+            <svg><use href="img/cell/line.svg#ht" /></svg>
+            <svg><use href="img/cell/line.svg#hv" /></svg>
+
+            <svg><use href="img/cell/line.svg#arc.dr" /></svg>
+            <svg><use href="img/cell/line.svg#arc.dl" /></svg>
+            <svg><use href="img/cell/line.svg#arc.ur" /></svg>
+            <svg><use href="img/cell/line.svg#arc.ul" /></svg>
+
+            <svg><use href="img/cell/line.svg#diagonal.dr" /></svg>
+            <svg><use href="img/cell/line.svg#diagonal.dl" /></svg>
+            <svg><use href="img/cell/line.svg#diagonal.ur" /></svg>
+            <svg><use href="img/cell/line.svg#diagonal.ul" /></svg>
+        </details>
+
+        <details class="symbols">
+            <summary>Arrows</summary>
+            <svg><use href="img/cell/arrow.svg#l" /></svg>
+            <svg><use href="img/cell/arrow.svg#r" /></svg>
+            <svg><use href="img/cell/arrow.svg#u" /></svg>
+            <svg><use href="img/cell/arrow.svg#d" /></svg>
+
+        </details>
+
+        <details class="symbols">
+            <summary>Symbols</summary>
+            <svg><use href="img/cell/symbol#lamp" /></svg>
+            <svg><use href="img/cell/symbol#motor" /></svg>
+            <svg><use href="img/cell/symbol#valve.v" /></svg>
+            <svg><use href="img/cell/symbol#valve.h" /></svg>
+            <svg><use href="img/cell/symbol#sensor.level.svg" /></svg>
+                <svg><use href="img/cell/symbol#mixer.u" /></svg>
+                <svg><use href="img/cell/symbol#mixer.d" /></svg>
+
+        </details>
+        </div>
+        <div class="dialogButtons">
+            <button id="imageDialogOkButton">Select</button>
+            <button id="imageDialogClearButton">Clear</button>
+            <button id="imageDialogCancelButton">Cancel</button>
+        </div>
+    </dialog>
+
+    <script type="module" src="js/sidepanel_menu_controller.js"></script>
     <script type="module" src="js/setup.js"></script>
     <script type="module" src="js/shared_state.js"></script>
     <script type="module" src="js/shared_state_setup.js"></script>
     <script type="module" src="js/table_controller.js"></script>
     <script type="module" src="js/operation_panel_controller.js"></script>
     <script type="module" src="js/operation_editor.js"></script>
-    <script type="module" src="js/graphics_panel_controller.js"></script>
     <script type="module" src="js/integration_dialog.js"></script>
     <script type="module" src="js/integration_controller.js"></script>
     <script type="module" src="js/menu_controller.js"></script>
     <script type="module" src="js/sheet_menu_controller.js"></script>
     <script type="module" src="js/user_input_controller.js"></script>
+    <script type="module" src="js/details_controller.js"></script>
     <script type="module" src="js/sync.js"></script>
 </body>
 </html>

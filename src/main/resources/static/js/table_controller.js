@@ -5,6 +5,9 @@ import {
     selectionRangeY,
     selectionRangeX,
 } from "./shared_state.js"
+import {
+    selectPanel
+} from "./sidepanel_menu_controller.js";
 
 import {getColumn, getRow, toCellId} from "./lib/utils.js";
 
@@ -27,6 +30,7 @@ spreadsheetTBodyElement.addEventListener(
 spreadsheetTBodyElement.addEventListener(
     "dblclick", (event) => {
         selectCell(event.target.id|| event.target.parentNode.id)
+        selectPanel("Details")
         formulaInputElement.focus()
     })
 
