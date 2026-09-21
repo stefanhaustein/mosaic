@@ -9,43 +9,81 @@ export function renderCell(key) {
         console.log("Element for cell key '" + key + "' not found.'")
         return;
     }
-
-    let classes = cellElement.classList
-    classes.remove("c", "e", "i", "r", "l", "u")
-    cellElement.removeAttribute("title")
     cellElement.textContent = ""
-    cellElement.style = ""
+
+    // The container is always necessary to work around TD elements INTENTIONALLY IGNORING HEIGHT RESTRICTIONS...
+    let container = document.createElement("div")
+    cellElement.append(container)
 
     let cellData = currentSheet.cells[key]
     if (cellData == null) {
         cellData = {}
     }
 
-    let targetElement = cellElement
-    let styles = cellData["s"]
+    let styles = cellData.s
+    let formula = cellData.f || ""
+
+    // Check if we need inner divs and fill everything but the content
     if (Array.isArray(styles)) {
-        let container = document.createElement("div")
         container.style.display = "grid"
-        cellElement.style.padding = "0"
-        cellElement.append(container)
-        for (let style of styles) {
-            let layer = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-            layer.style.gridArea = "1/1"
-            layer.style.width = "60px";
-            layer.style.height = "60px";
-            layer.style.rotate = (style.rotation || 0) + "deg"
-            if (style.image != null) {
-                let use = document.createElementNS("http://www.w3.org/2000/svg", "use")
-                use.setAttribute("href", "img/cell/" + style.image)
-                layer.append(use)
+        container.style.alignItems = "stretch"
+        if (Array.isArray(styles)) {
+            for (let style of styles) {
+                let layer = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+                layer.style.gridArea = "1/1"
+                layer.style.width = "100%"
+                layer.style.height = "100%"
+                layer.style.rotate = (style.rotation || 0) + "deg"
+                if (style.image != null) {
+                    let use = document.createElementNS("http://www.w3.org/2000/svg", "use")
+                    use.setAttribute("href", "img/cell/" + style.image)
+                    layer.append(use)
+                }
+                container.append(layer)
             }
-            container.append(layer)
         }
-        targetElement = document.createElement("div")
-        targetElement.style.gridArea = "1/1"
-        targetElement.style.padding = "0 3px"
-        container.append(targetElement)
+        let innerContainer = document.createElement("div")
+        innerContainer.style.gridArea = "1/1"
+        innerContainer.style.width = "100%"
+        innerContainer.style.height = "100%"
+
+        container.append(innerContainer)
+        container = innerContainer
+        container.style.zIndex = "2"
     }
+
+    if (formula.startsWith("=")) {
+        container.style.display = "flex"
+        container.style.flexDirection = "column"
+        container.style.justifyContent = "center"
+        container.style.alignItems = "stretch"
+
+        let formulaElement = document.createElement("div")
+        formulaElement.style.color = "#aaa"
+        formulaElement.style.fontSize = "12px"
+        formulaElement.textContent = formula.substring(1)
+        formulaElement.style.paddingLeft = "3px"
+        formulaElement.style.flex = "0 1"
+        container.append(formulaElement)
+
+        let innerContainer = document.createElement("div")
+        innerContainer.style.flex = "1"
+        container.append(innerContainer)
+        container = innerContainer
+    }
+
+    container.style.display = "flex"
+    container.style.flexDirection = "column"
+    container.style.justifyContent = "center"
+    container.style.alignItems = "center"
+
+    let targetElement = document.createElement("div")
+    targetElement.style.textOverflow = "ellipsis"
+    targetElement.style.minHeight = "0"
+
+    container.append(targetElement)
+
+    let classes = targetElement.classList
 
     let value = cellData["c"]
     if (value == null) {
@@ -78,26 +116,7 @@ export function renderCell(key) {
             break
 
         case "string":
-            if (value == "") {
-                let col = getColumn(key)
-                let row = getRow(key)
-                let nextKey = toCellId(col + 1, row)
-                let nextCell = currentSheet.cells[nextKey]
-                if (nextCell?.f != null && nextCell.f.startsWith("=")) {
-                    renderedValue = nextCell.f.substring(1).trim()
-                    classes.add("i")
-                    // This is necessary because table cells don't respect (max-)height properly.
-                    if (renderedValue.length > 8) {
-                        targetElement.textContent = ""
-                        let div = document.createElement("div")
-                        targetElement.appendChild(div)
-                        div.textContent = renderedValue
-                        return
-                    }
-                    break
-                }
-            }
-            classes.add("l")
+            classes.add("c")
             break
 
         default:

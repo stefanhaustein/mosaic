@@ -5,7 +5,13 @@
 #spreadsheetTable {
     border-collapse: separate;
     border-spacing: 0;
-// table-layout: fixed;
+    table-layout: fixed;
+}
+
+/** This is necessary unfortunately */
+#spreadsheetTable * {
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -19,7 +25,6 @@ body table#spreadsheetTable tbody tr td.changed {
     }
 }
 
-
 body #spreadsheetTable tbody tr td.highlight {
     background-color: #ddd;
 }
@@ -30,7 +35,7 @@ body #spreadsheetTable tbody tr td.highlight {
 }
 
 #spreadsheetTable th,
-#spreadsheetTable td {
+#spreadsheetTable td>div {
     min-width: 60px;
     width: 60px;
     max-width: 60px;
@@ -47,19 +52,20 @@ body #spreadsheetTable tbody tr td.highlight {
     max-height: 40px;
 }
 
-#spreadsheetTable tr:first-child {
+#spreadsheetTable tr th:first-child {
     width: 72px;
     min-width: 72px;
     max-width: 72px;
 }
 
 #spreadsheetTable th {
+    padding: 0;
     font-weight: normal;
     border-right: 1px solid #888;
     border-bottom: 1px solid #888;
     background-color: #fff;
     position: sticky;
-    z-index: 2;
+    z-index: 10;
     user-select: none;
 }
 
@@ -87,32 +93,34 @@ body #spreadsheetTable tbody tr td.highlight {
     outline: 2px solid #88f;
 }
 
-#spreadsheetTable td.c,   /* center */
-#spreadsheetTable td.e,   /* error */
-#spreadsheetTable td.i,   /* implied label */
-#spreadsheetTable td.l,   /* left */
-#spreadsheetTable td.r,   /* right */
-#spreadsheetTable td.u {  /* User Input */
+
+#spreadsheetTable xxx td.c,   /* center */
+#spreadsheetTable xxx td.e,   /* error */
+#spreadsheetTable xxx td.i,   /* implied label */
+#spreadsheetTable xxx td.l,   /* left */
+#spreadsheetTable xxx td.r,   /* right */
+#spreadsheetTable xxx td.u {  /* User Input */
     position: relative;
     background: white;
 }
 
-#spreadsheetTable td.l {
-    overflow: visible;
-    padding: 0 3px;
-    white-space: nowrap;
+#spreadsheetTable td.l,
+#spreadsheetTable td .l {
+    text-align: left;
+    padding-left: 3px;
 }
 
-#spreadsheetTable td.c {
+#spreadsheetTable td.c,
+#spreadsheetTable td .c {
     text-align: center;
 }
 
-#spreadsheetTable td.e {
+#spreadsheetTable td .e {
     color: red;
     text-align: center;
 }
 
-#spreadsheetTable td.i {
+#spreadsheetTable td .i {
     text-align: right;
     padding-top: 0;
     padding-bottom: 0;
@@ -120,7 +128,7 @@ body #spreadsheetTable tbody tr td.highlight {
 }
 
 
-#spreadsheetTable tr td.i div {
+#spreadsheetTable tr td .i div {
     font-size: 14px;
     white-space: normal;
     overflow: hidden;
@@ -130,12 +138,13 @@ body #spreadsheetTable tbody tr td.highlight {
 }
 
 
-#spreadsheetTable td.r {
-    padding: 0 3px;
+#spreadsheetTable td.r,
+#spreadsheetTable td .r {
     text-align: right;
+    padding-right: 3px;
 }
 
 
-#spreadsheetTable td.u {
+#spreadsheetTable td .u {
     padding: 0;
 }

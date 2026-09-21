@@ -63,7 +63,7 @@ function update() {
 
                 let select = document.createElement("select")
                 select.innerHTML = "<option value='0'>0°</option><option value='90'>90°</option><option value='180'>180°</option><option value='270'>270°</option>"
-                select.value = style.rotation
+                select.value = style.rotation || 0
                 select.style.width = "60px";
                 select.style.height = "60px";
                 select.style.display = "inline-block"
