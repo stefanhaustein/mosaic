@@ -14,6 +14,10 @@ document.getElementById("addStyleDiv").addEventListener("click", () => {
     commitCurrentCell()
 })
 
+function element(name) {
+    return document.createElement(name)
+}
+
 function update() {
     stylesDiv.textContent = ""
 
@@ -41,6 +45,13 @@ function update() {
             let contentDiv = document.createElement("div")
             contentDiv.style.paddingLeft="20px"
             styleDiv.append(contentDiv)
+
+            contentDiv.append("Condition:", element("br"), element("input"), element("p"))
+
+            let colorPicker = document.createElement("argb-picker")
+            let backgroundPicker = document.createElement("argb-picker")
+
+            contentDiv.append(element("p"), "Color:", element("br"), colorPicker, element("p"), "Background:", element("br"), backgroundPicker, element("p"))
 
             if (style.image) {
                 let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
@@ -72,13 +83,16 @@ function update() {
                     style.rotation = parseInt(select.value)
                     commitCurrentCell()
                 })
-                contentDiv.append(svg, " ", select)
+                contentDiv.append(svg, " ", select, document.createElement("br"))
+
             } else {
-                contentDiv.append("[Set Image]")
-                contentDiv.addEventListener("click", async event => {
+                let imageButton = element("button")
+                imageButton.textContent = "Add Image"
+                imageButton.addEventListener("click", async event => {
                     style.image = await selectImage(style.image)
                     commitCurrentCell()
                 })
+                contentDiv.append(imageButton)
             }
 
             stylesDiv.append(styleDiv)
