@@ -1,5 +1,6 @@
 import {addCellSelectionListener, currentCell, commitCurrentCell} from "./shared_state.js";
 import {selectImage} from "./image_dialog.js";
+import {element} from "./lib/dom.js";
 
 addCellSelectionListener(() => update())
 
@@ -14,10 +15,6 @@ document.getElementById("addStyleDiv").addEventListener("click", () => {
     commitCurrentCell()
 })
 
-function element(name) {
-    return document.createElement(name)
-}
-
 function update() {
     stylesDiv.textContent = ""
 
@@ -28,32 +25,32 @@ function update() {
     if (Array.isArray(styles)) {
         for (let i = 0; i < styles.length; i++) {
             let style = styles[i]
-            let styleDiv = document.createElement("div")
+            let styleDiv = element("div")
             styleDiv.style.paddingTop="5px"
             styleDiv.style.paddingBottom="5px"
 
-            let removeImg = document.createElement("img")
-            removeImg.src = "img/cancel.svg"
-            removeImg.style.float = "left"
-            removeImg.style.paddingTop="2px"
+            let removeImg = element("img", {src: "img/cancel.svg", style: {float: "left", paddingTop: "2px"}})
             removeImg.addEventListener("click", () => {
                 styles.splice(i, 1)
                 commitCurrentCell()
             })
             styleDiv.append(removeImg)
 
-            let contentDiv = document.createElement("div")
+            let contentDiv =  element("div", {style: {paddingLeft: "20px"}})
             contentDiv.style.paddingLeft="20px"
             styleDiv.append(contentDiv)
 
-            contentDiv.append("Condition:", element("br"), element("input"), element("p"))
+            contentDiv.append(element("input", {placeholder: "Condition"}))
 
             let colorPicker = document.createElement("argb-picker")
             let backgroundPicker = document.createElement("argb-picker")
+            let colorTable = element("div", {style: {display: "grid", gridTemplateColumns: "max-content auto", padding: "8px 0", gap: "4px"}},
+                "Color:\u00a0", colorPicker, "BG:", backgroundPicker)
 
-            contentDiv.append(element("p"), "Color:", element("br"), colorPicker, element("p"), "Background:", element("br"), backgroundPicker, element("p"))
+            colorTable.append("Image:")
 
             if (style.image) {
+                let imageDiv = element("div")
                 let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
                 svg.style.background = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAE0lEQVR4nGNoaGj4//8/AxADWQA+5Aj7yVba5wAAAABJRU5ErkJggg==')"
                 svg.style.imageRendering = "pixelated"
@@ -83,17 +80,18 @@ function update() {
                     style.rotation = parseInt(select.value)
                     commitCurrentCell()
                 })
-                contentDiv.append(svg, " ", select, document.createElement("br"))
-
+                imageDiv.append(svg, " ", select, document.createElement("br"))
+                colorTable.append(imageDiv)
             } else {
                 let imageButton = element("button")
-                imageButton.textContent = "Add Image"
+                imageButton.textContent = "Add"
                 imageButton.addEventListener("click", async event => {
                     style.image = await selectImage(style.image)
                     commitCurrentCell()
                 })
-                contentDiv.append(imageButton)
+                colorTable.append(element("div", imageButton))
             }
+            contentDiv.append(colorTable)
 
             stylesDiv.append(styleDiv)
         }

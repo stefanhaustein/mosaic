@@ -59,12 +59,16 @@ class Cell(
         // Legacy image support
         val image = json["i"]
         if (image is JsonPrimitive) {
-            styles.add(Style(image.content, null))
+            styles.add(Style(image = image.content))
         }
         for (jsonStyle in json["s"]?.jsonArray.orEmpty().filter{ it is JsonObject }) {
-            val imageName = jsonStyle.jsonObject["image"]?.jsonPrimitive?.contentOrNull
-            val rotation = jsonStyle.jsonObject["rotation"]?.jsonPrimitive?.intOrNull
-            styles.add(Style(imageName, rotation))
+                styles.add(Style(
+                    condition = jsonStyle.jsonObject["conditon"]?.jsonPrimitive?.contentOrNull,
+                    image = jsonStyle.jsonObject["image"]?.jsonPrimitive?.contentOrNull,
+                    rotation = jsonStyle.jsonObject["rotation"]?.jsonPrimitive?.intOrNull,
+                    color = jsonStyle.jsonObject["color"]?.jsonPrimitive?.contentOrNull,
+                    background = jsonStyle.jsonObject["background"]?.jsonPrimitive?.contentOrNull,
+            ))
         }
     }
 
@@ -92,11 +96,20 @@ class Cell(
                     put("s", buildJsonArray {
                         styles.forEach {
                             add(buildJsonObject {
+                                if (it.condition != null) {
+                                    put("condition", JsonPrimitive(it.condition))
+                                }
                                 if (it.image != null) {
                                     put("image", JsonPrimitive(it.image))
                                 }
                                 if (it.rotation != null) {
                                     put("rotation", JsonPrimitive(it.rotation))
+                                }
+                                if (it.color != null) {
+                                    put("color", JsonPrimitive(it.color))
+                                }
+                                if (it.background != null) {
+                                    put("background", JsonPrimitive(it.background))
                                 }
                             })
                         }

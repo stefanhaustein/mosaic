@@ -29,6 +29,27 @@ export function blink(element) {
 
 }
 
+export function element(name, ...content) {
+    let e = document.createElement(name)
+    for (let c of content) {
+        if (c instanceof Object && !(c instanceof String) && !(c instanceof Node)) {
+            for (let key in c) {
+                let value = c[key]
+                if (key == "style" && !(value instanceof String)) {
+                    for (let p in value) {
+                        e.style[p] = value[p]
+                    }
+                } else {
+                    e.setAttribute(key, value)
+                }
+            }
+        } else {
+            e.append(c)
+        }
+    }
+    return e
+}
+
 export function insertById(parent, element) {
     let id = element.id
     let existing = document.getElementById(id)
