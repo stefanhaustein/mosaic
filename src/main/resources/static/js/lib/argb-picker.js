@@ -13,15 +13,15 @@ class ArgbPicker extends HTMLElement {
         this._colorInput = document.createElement('input');
         this._colorInput.type = 'color';
         this._colorInput.value = '#000000';
-        this._colorInput.style.width = "40px"
+        this._colorInput.style.width = "45px"
 
         // Native slider input for Alpha (0 - 255)
         this._alphaSelect = document.createElement('select');
-        this._alphaSelect.style.width = "80px"
+        this._alphaSelect.style.width = "55px"
         for (let i = 0; i <= 100; i += 10) {
             let option = document.createElement("option")
-            option.setAttribute("value", option * 255 / 100);
-            option.innerText = i == 0 ? "Opaque" : i == 100 ? "Transparent" : (i + "%")
+            option.setAttribute("value", "" + i);
+            option.innerText = (i + "%")
             this._alphaSelect.append(option)
         }
 
@@ -50,7 +50,7 @@ class ArgbPicker extends HTMLElement {
 
     // Getter: returns strictly #AARRGGBB format
     get value() {
-        const alphaDec = parseInt(this._alphaSelect.value, 10);
+        const alphaDec = Math.round(parseInt(this._alphaSelect.value) * 255 / 100);
         const alphaHex = alphaDec.toString(16).padStart(2, '0').toUpperCase();
         const rgbHex = this._colorInput.value.substring(1).toUpperCase();
         return `#${alphaHex}${rgbHex}`;
@@ -67,7 +67,7 @@ class ArgbPicker extends HTMLElement {
         const alphaHex = normalized.substring(1, 3);
         const rgbHex = normalized.substring(3, 9);
 
-        this._alphaSelect.value = 10 * (parseInt(alphaHex, 16) * 10 / 255);
+        this._alphaSelect.value = Math.round(parseInt(alphaHex, 16) * 10 / 255) * 10;
         this._colorInput.value = `#${rgbHex}`;
     }
 }

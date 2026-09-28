@@ -43,7 +43,21 @@ function update() {
             contentDiv.append(element("input", {placeholder: "Condition"}))
 
             let colorPicker = document.createElement("argb-picker")
+            colorPicker.value = style.color || "#00000000"
+            console.log("color set to ", colorPicker.value, " from ", style.color)
+            colorPicker.addEventListener("change",() => {
+                style.color = colorPicker.value
+                console.log("new color:", style.color)
+                commitCurrentCell()
+            })
+
             let backgroundPicker = document.createElement("argb-picker")
+            backgroundPicker.value = style.background || "#ffffffff"
+            backgroundPicker.addEventListener("change",() => {
+                style.background = backgroundPicker.value
+                commitCurrentCell()
+            })
+
             let colorTable = element("div", {style: {display: "grid", gridTemplateColumns: "max-content auto", padding: "8px 0", gap: "4px"}},
                 "Color:\u00a0", colorPicker, "BG:", backgroundPicker)
 
