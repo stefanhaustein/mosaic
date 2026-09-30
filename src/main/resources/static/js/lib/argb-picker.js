@@ -13,11 +13,11 @@ class ArgbPicker extends HTMLElement {
         this._colorInput = document.createElement('input');
         this._colorInput.type = 'color';
         this._colorInput.value = '#000000';
-        this._colorInput.style.width = "45px"
+        this._colorInput.style.width = "24px"
 
         // Native slider input for Alpha (0 - 255)
         this._alphaSelect = document.createElement('select');
-        this._alphaSelect.style.width = "55px"
+        this._alphaSelect.style.width = "56px"
         for (let i = 0; i <= 100; i += 10) {
             let option = document.createElement("option")
             option.setAttribute("value", "" + i);

@@ -58,13 +58,11 @@ function update() {
                 commitCurrentCell()
             })
 
-            let colorTable = element("div", {style: {display: "grid", gridTemplateColumns: "max-content auto", padding: "8px 0", gap: "4px"}},
-                "Color:\u00a0", colorPicker, "BG:", backgroundPicker)
 
-            colorTable.append("Image:")
 
             if (style.image) {
-                let imageDiv = element("div")
+                let gridDiv = element("div", {style: {display: "grid", gridTemplateColumns: "max-content max-content auto", padding: "8px 0", gap: "4px"}})
+                let imageDiv = element("div", {style: {gridRow: "1 / span 2", gridColumn: "2"}})
                 let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
                 svg.style.background = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAE0lEQVR4nGNoaGj4//8/AxADWQA+5Aj7yVba5wAAAABJRU5ErkJggg==')"
                 svg.style.imageRendering = "pixelated"
@@ -94,18 +92,24 @@ function update() {
                     style.rotation = parseInt(select.value)
                     commitCurrentCell()
                 })
-                imageDiv.append(svg, " ", select, document.createElement("br"))
-                colorTable.append(imageDiv)
+                imageDiv.append(svg)
+
+                gridDiv.append(element("button", "↻"), imageDiv, colorPicker, element("button", "↺"),  backgroundPicker)
+                contentDiv.append(gridDiv)
             } else {
-                let imageButton = element("button")
-                imageButton.textContent = "Add"
+
+                let gridDiv = element("div", {style: {display: "grid", gridTemplateColumns: "max-content max-content", padding: "8px 0", gap: "4px"}})
+                gridDiv.append("Color:", colorPicker,  "BG:", backgroundPicker)
+                contentDiv.append(gridDiv)
+
+                let imageButton = element("button", "Image")
                 imageButton.addEventListener("click", async event => {
                     style.image = await selectImage(style.image)
                     commitCurrentCell()
                 })
-                colorTable.append(element("div", imageButton))
+                contentDiv.append(imageButton)
+
             }
-            contentDiv.append(colorTable)
 
             stylesDiv.append(styleDiv)
         }
