@@ -6,6 +6,15 @@ addCellSelectionListener(() => update())
 
 let stylesDiv = document.getElementById("stylesDiv")
 
+document.getElementById("addImageDiv").addEventListener("click", () => {
+    let e = {image: "x"}
+    if (currentCell.s == null) {
+        currentCell.s = [e]
+    } else {
+        currentCell.s.push(e)
+    }
+    commitCurrentCell()
+})
 document.getElementById("addStyleDiv").addEventListener("click", () => {
     if (currentCell.s == null) {
         currentCell.s = [{}]
@@ -14,6 +23,8 @@ document.getElementById("addStyleDiv").addEventListener("click", () => {
     }
     commitCurrentCell()
 })
+
+
 
 function update() {
     stylesDiv.textContent = ""
@@ -59,7 +70,6 @@ function update() {
             })
 
 
-
             if (style.image) {
                 let gridDiv = element("div", {style: {display: "grid", gridTemplateColumns: "max-content max-content auto", padding: "8px 0", gap: "4px"}})
                 let imageDiv = element("div", {style: {gridRow: "1 / span 2", gridColumn: "2"}})
@@ -80,7 +90,7 @@ function update() {
                 })
                 svg.style.display = "inline-block"
                 svg.style.verticalAlign = "middle"
-
+                /*
                 let select = document.createElement("select")
                 select.innerHTML = "<option value='0'>0°</option><option value='90'>90°</option><option value='180'>180°</option><option value='270'>270°</option>"
                 select.value = style.rotation || 0
@@ -91,10 +101,21 @@ function update() {
                 select.addEventListener("change", () =>{
                     style.rotation = parseInt(select.value)
                     commitCurrentCell()
-                })
+                })*/
                 imageDiv.append(svg)
 
-                gridDiv.append(element("button", "↻"), imageDiv, colorPicker, element("button", "↺"),  backgroundPicker)
+                let clockwiseButton = element("button", "↻")
+                clockwiseButton.addEventListener("click", () => {
+                    style.rotation = ((style.rotation || 0) / 90 + 1) % 4 * 90
+                    commitCurrentCell()
+                })
+                let antiButton = element("button", "↺")
+                antiButton.addEventListener("click", () => {
+                    style.rotation = ((style.rotation || 0) / 90 + 3) % 4 * 90
+                    commitCurrentCell()
+                })
+
+                gridDiv.append(clockwiseButton, imageDiv, colorPicker, antiButton,  backgroundPicker)
                 contentDiv.append(gridDiv)
             } else {
 
@@ -107,8 +128,6 @@ function update() {
                     style.image = await selectImage(style.image)
                     commitCurrentCell()
                 })
-                contentDiv.append(imageButton)
-
             }
 
             stylesDiv.append(styleDiv)
