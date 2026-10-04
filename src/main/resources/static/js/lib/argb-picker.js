@@ -53,7 +53,7 @@ class ArgbPicker extends HTMLElement {
         const alphaDec = Math.round(parseInt(this._alphaSelect.value) * 255 / 100);
         const alphaHex = alphaDec.toString(16).padStart(2, '0').toUpperCase();
         const rgbHex = this._colorInput.value.substring(1).toUpperCase();
-        return `#${alphaHex}${rgbHex}`;
+        return `#${rgbHex}${alphaHex}`;
     }
 
     // Setter: accepts strictly #AARRGGBB string
@@ -64,8 +64,8 @@ class ArgbPicker extends HTMLElement {
         // Validate #AARRGGBB format
         if (!/^#[0-9A-FA-F]{8}$/.test(normalized)) return;
 
-        const alphaHex = normalized.substring(1, 3);
-        const rgbHex = normalized.substring(3, 9);
+        const alphaHex = normalized.substring(7, 9);
+        const rgbHex = normalized.substring(1, 7);
 
         this._alphaSelect.value = Math.round(parseInt(alphaHex, 16) * 10 / 255) * 10;
         this._colorInput.value = `#${rgbHex}`;

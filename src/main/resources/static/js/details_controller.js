@@ -74,10 +74,9 @@ function update() {
                 let gridDiv = element("div", {style: {display: "grid", gridTemplateColumns: "max-content max-content auto", padding: "8px 0", gap: "4px"}})
                 let imageDiv = element("div", {style: {gridRow: "1 / span 2", gridColumn: "2"}})
                 let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-                svg.style.background = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAE0lEQVR4nGNoaGj4//8/AxADWQA+5Aj7yVba5wAAAABJRU5ErkJggg==')"
-                svg.style.imageRendering = "pixelated"
-                svg.style.backgroundSize = "50% 50%"
+
                 // svg.style.display = "block"
+                svg.style.backgroundColor = backgroundPicker.value
                 svg.style.width = "60px";
                 svg.style.height = "60px";
                 svg.style.rotate = (style.rotation || 0) + "deg"
@@ -102,6 +101,10 @@ function update() {
                     style.rotation = parseInt(select.value)
                     commitCurrentCell()
                 })*/
+                imageDiv.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAE0lEQVR4nGNoaGj4//8/AxADWQA+5Aj7yVba5wAAAABJRU5ErkJggg==')"
+                imageDiv.style.backgroundSize = "50% 50%"
+                imageDiv.style.imageRendering = "pixelated"
+
                 imageDiv.append(svg)
 
                 let clockwiseButton = element("button", "↻")
