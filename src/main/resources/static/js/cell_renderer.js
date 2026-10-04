@@ -90,7 +90,7 @@ export function renderCell(key) {
         value = ""
     }
 
-    if (typeof value == "object" && value?.type == "err") {
+    if (value?.type == "err") {
         targetElement.textContent = "#REF"
         targetElement.classList.add("e")
         return
@@ -103,8 +103,8 @@ export function renderCell(key) {
     }
 
 
-    let renderedValue = value
-    switch(typeof value) {
+    let renderedValue = value.value
+    switch(typeof renderedValue) {
         case "bigint":
         case "number":
             classes.add("r")
@@ -127,7 +127,7 @@ export function renderCell(key) {
                     break
                 default:
                     classes.add("l")
-                    renderedValue = JSON.stringify(value)
+                    //renderedValue = JSON.stringify(value)
             }
     }
 
@@ -143,7 +143,7 @@ function renderInput(targetElement, cellData) {
     inputElement.style.width = "100%"
     inputElement.style.height = "100%"
     targetElement.appendChild(inputElement)
-    inputController.setValue(cellData["c"])
+    inputController.setValue(cellData.c.value)
     inputElement.addEventListener("change", () => {
         setCurrentCellFormula(inputElement.value, "renderer")
     })

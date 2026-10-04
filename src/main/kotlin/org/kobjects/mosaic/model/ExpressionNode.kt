@@ -9,8 +9,6 @@ import org.kobjects.mosaic.model.parser.TcFormulaParser
 abstract class ExpressionNode(
     override val owner: Namespace
 ) : Node {
-
-
     var rawFormula = ""
 
     var expression: Expression = Literal(Unit)
@@ -34,43 +32,11 @@ abstract class ExpressionNode(
         inputs.clear()
     }
 
-    fun setFormula(value: String, modificationToken: ModificationToken) {
-        if (value != rawFormula) {
-            rawFormula = value
-            reparse()
-            tag = modificationToken.tag
-            modificationToken.formulaChanged = true
-            modificationToken.addRefresh(this)
-        }
-    }
 
-
-    fun reparse() {
+    open fun reparse() {
         clearDependsOn()
         expression.detachAll()
-        expression = if (rawFormula.startsWith("=")) {
-            try {
-                val context = ParsingContext(this)
-                val parsed = TcFormulaParser.parseExpression(rawFormula.substring(1), context)
-                parsed.attachAll()
-                parsed
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Literal(e)
-            }
-        } else {
-            when (rawFormula.lowercase()) {
-                "true" -> Literal(true)
-                "false" -> Literal(false)
-                else -> {
-                    try {
-                        Literal(Values.parseNumber(rawFormula))
-                    } catch (e: Exception) {
-                        Literal(rawFormula)
-                    }
-                }
-            }
-        }
+        expression = TcFormulaParser.parseNodeExpression(rawFormula, ParsingContext(this))
     }
 
     open fun notifyValueChanged(newValue: Any?) {}

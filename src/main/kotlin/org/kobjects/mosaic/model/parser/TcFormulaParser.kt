@@ -4,6 +4,7 @@ import org.kobjects.parsek.expression.Operator
 import org.kobjects.parsek.expression.PrattParser
 import org.kobjects.mosaic.model.sheet.CellRangeReference
 import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.Values
 import org.kobjects.mosaic.model.sheet.Sheet
 import org.kobjects.mosaic.model.expression.*
 
@@ -145,4 +146,28 @@ object TcFormulaParser : PrattParser<TcScanner, ParsingContext, Expression>(
         require(scanner.eof)
         return result
     }
+
+    fun parseNodeExpression(rawFormula: String, context: ParsingContext): Expression =
+        if (rawFormula.startsWith("=")) {
+            try {
+                val parsed = TcFormulaParser.parseExpression(rawFormula.substring(1), context)
+                parsed.attachAll()
+                parsed
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Literal(e)
+            }
+        } else {
+            when (rawFormula.lowercase()) {
+                "true" -> Literal(true)
+                "false" -> Literal(false)
+                else -> {
+                    try {
+                        Literal(Values.parseNumber(rawFormula))
+                    } catch (e: Exception) {
+                        Literal(rawFormula)
+                    }
+                }
+            }
+        }
 }

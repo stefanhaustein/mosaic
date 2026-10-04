@@ -27,6 +27,18 @@ class OutputPortNode(
         this.rawFormula = rawFormula
     }
 
+
+    fun setFormula(value: String, modificationToken: ModificationToken) {
+        if (value != rawFormula) {
+            rawFormula = value
+            reparse()
+            tag = modificationToken.tag
+            modificationToken.formulaChanged = true
+            modificationToken.addRefresh(this)
+        }
+    }
+
+
     override fun configureInternal(config: Map<String, Any?>, token: ModificationToken) {
         instance = descriptor.createFn(config)
     }

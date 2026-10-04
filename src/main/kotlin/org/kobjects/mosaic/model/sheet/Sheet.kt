@@ -20,11 +20,6 @@ class Sheet(
     val cells = mutableMapOf<String, Cell>()
     var deleted = false
 
-    fun set(cellId: String, value: String, modificationToken: ModificationToken) {
-        val cell = getOrCreateCell(cellId)
-        cell.setFormula(value, modificationToken)
-    }
-
     fun delete(token: ModificationToken) {
         deleted = true
         tag = token.tag
@@ -77,7 +72,7 @@ class Sheet(
 
     fun clear(modificationToken: ModificationToken) {
         for (cell in cells.values) {
-            cell.setFormula("", modificationToken)
+            cell.clear(modificationToken)
         }
     }
 

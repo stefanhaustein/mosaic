@@ -35,24 +35,26 @@ interface Node {
     fun qualifiedId(): String
 
 
-    fun serializeValue(): JsonElement {
-        val value = this.value
-        return when (value) {
+    fun serializeValue() = buildJsonObject {
+        val value = this@Node.value
+        when (value) {
             null,
-            is Unit -> JsonNull
-            is Exception -> buildJsonObject {
+            is Unit -> {
+                put("value", JsonNull)
+            }
+            is Exception -> {
                 put("type", JsonPrimitive("err"))
                 put ("msg", JsonPrimitive(value::class.simpleName.toString() + value.message))
             }
-            is Instant -> buildJsonObject {
+            is Instant -> {
                 val localDateTime = value.toLocalDateTime(TimeZone.currentSystemDefault())
                 put("type", JsonPrimitive("instant"))
                 put("rendered", JsonPrimitive(localDateTime.time.format(TIME_FORMAT_SECONDS)))
             }
-            is Number -> JsonPrimitive(value)
-            is String -> JsonPrimitive(value)
-            is Boolean -> JsonPrimitive(value)
-            else -> buildJsonObject {
+            is Number -> put("value", JsonPrimitive(value))
+            is String -> put("value", JsonPrimitive(value))
+            is Boolean -> put("value", JsonPrimitive(value))
+            else -> {
                 put("type", JsonPrimitive("err"))
                 put ("msg", JsonPrimitive("Unrecognized value type: '${value.javaClass}' for $value"))
             }
