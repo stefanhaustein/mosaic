@@ -51,7 +51,13 @@ function update() {
             contentDiv.style.paddingLeft="20px"
             styleDiv.append(contentDiv)
 
-            contentDiv.append(element("input", {placeholder: "Condition"}))
+            let conditionInput = element("input",
+                {placeholder: "Condition", value: style.condition || ""})
+            conditionInput.addEventListener("change", () => {
+                style.condition = conditionInput.value
+                commitCurrentCell()
+            })
+            contentDiv.append(conditionInput)
 
             let colorPicker = document.createElement("argb-picker")
             colorPicker.value = style.color || "#00000000"

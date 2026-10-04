@@ -63,7 +63,7 @@ class Cell(
         }
         for (jsonStyle in json["s"]?.jsonArray.orEmpty().filter{ it is JsonObject }) {
                 styles.add(Style(
-                    condition = jsonStyle.jsonObject["conditon"]?.jsonPrimitive?.contentOrNull,
+                    condition = jsonStyle.jsonObject["condition"]?.jsonPrimitive?.contentOrNull,
                     image = jsonStyle.jsonObject["image"]?.jsonPrimitive?.contentOrNull,
                     rotation = jsonStyle.jsonObject["rotation"]?.jsonPrimitive?.intOrNull,
                     color = jsonStyle.jsonObject["color"]?.jsonPrimitive?.contentOrNull,
