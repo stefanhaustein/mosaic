@@ -36,27 +36,31 @@ interface Node {
 
 
     fun serializeValue() = buildJsonObject {
+        serializeValue(this)
+    }
+
+    fun serializeValue(builder: JsonObjectBuilder) {
         val value = this@Node.value
         when (value) {
             null,
             is Unit -> {
-                put("value", JsonNull)
+                builder.put("value", JsonNull)
             }
             is Exception -> {
-                put("type", JsonPrimitive("err"))
-                put ("msg", JsonPrimitive(value::class.simpleName.toString() + value.message))
+                builder.put("type", JsonPrimitive("err"))
+                builder.put ("msg", JsonPrimitive(value::class.simpleName.toString() + value.message))
             }
             is Instant -> {
                 val localDateTime = value.toLocalDateTime(TimeZone.currentSystemDefault())
-                put("type", JsonPrimitive("instant"))
-                put("rendered", JsonPrimitive(localDateTime.time.format(TIME_FORMAT_SECONDS)))
+                builder.put("type", JsonPrimitive("instant"))
+                builder.put("rendered", JsonPrimitive(localDateTime.time.format(TIME_FORMAT_SECONDS)))
             }
-            is Number -> put("value", JsonPrimitive(value))
-            is String -> put("value", JsonPrimitive(value))
-            is Boolean -> put("value", JsonPrimitive(value))
+            is Number -> builder.put("value", JsonPrimitive(value))
+            is String -> builder.put("value", JsonPrimitive(value))
+            is Boolean -> builder.put("value", JsonPrimitive(value))
             else -> {
-                put("type", JsonPrimitive("err"))
-                put ("msg", JsonPrimitive("Unrecognized value type: '${value.javaClass}' for $value"))
+                builder.put("type", JsonPrimitive("err"))
+                builder.put ("msg", JsonPrimitive("Unrecognized value type: '${value.javaClass}' for $value"))
             }
         }
     }

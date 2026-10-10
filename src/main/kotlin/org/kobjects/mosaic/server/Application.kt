@@ -37,13 +37,13 @@ fun Application.module() {
         post("/clear/{range}") {
             val rawRange = call.parameters["range"]!!
             val range = CellRangeReference.parse(rawRange)
-            Model.applySynchronizedWithToken {
+            Model.applyStructuralChange {
                 range.clear(it)
             }
             call.respond(HttpStatusCode.OK)
         }
         post("/clearAll") {
-            Model.applySynchronizedWithToken {
+            Model.applyStructuralChange {
                 Model.clearAll(it)
             }
             call.respond(HttpStatusCode.OK)
@@ -52,7 +52,7 @@ fun Application.module() {
             val cell = call.parameters["cell"]!!
             val text = call.receiveText()
             val json = Json.parseToJsonElement(text).jsonObject
-            Model.applySynchronizedWithToken { token ->
+            Model.applyStructuralChange { token ->
                 Model.getOrCreate(cell).setJson(json, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -61,7 +61,7 @@ fun Application.module() {
             val jsonText = call.receiveText()
             println("Received JSON: $jsonText")
             val value = Json.parseToJsonElement(jsonText)
-            Model.applySynchronizedWithToken { token ->
+            Model.applyStructuralChange { token ->
                 Model.setRunMode(value.jsonPrimitive.boolean, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -74,7 +74,7 @@ fun Application.module() {
 
             println("/paste/$targetRange: $tomsonText")
 
-            Model.applySynchronizedWithToken { token ->
+            Model.applyStructuralChange { token ->
                 targetRange.sheet.paste(token, targetRange, tomson)
             }
             call.respond(HttpStatusCode.OK)
@@ -86,7 +86,7 @@ fun Application.module() {
             println("/ports/$integrationName/$portName: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
             val integration = Model.integrations[integrationName] ?: throw IllegalArgumentException("Integration '$integrationName' not found")
-            Model.applySynchronizedWithToken { token ->
+            Model.applyStructuralChange { token ->
                 integration.definePort(portName, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -96,7 +96,7 @@ fun Application.module() {
             val jsonText = call.receiveText()
             println("/integrations/$name: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
-            Model.applySynchronizedWithToken { token ->
+            Model.applyStructuralChange { token ->
                 Model.integrations.configureIntegration(name, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -106,7 +106,7 @@ fun Application.module() {
             println("Received JSON: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
             val name = jsonSpec["name"] as String?
-            Model.applySynchronizedWithToken { token ->
+            Model.applyStructuralChange { token ->
                 Model.updateSheet(name, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -114,7 +114,7 @@ fun Application.module() {
         post("/upload") {
             val fileItem = call.receiveMultipart().readPart() as PartData.FileItem
             val data = fileItem.provider().toByteArray().toString(Charsets.UTF_8)
-            Model.applySynchronizedWithToken {
+            Model.applyStructuralChange {
                 Model.clearAll(it)
                 Model.loadData(data, it)
             }
@@ -124,7 +124,7 @@ fun Application.module() {
             val name = call.receiveText()
             val exampleFile = File("src/main/resources/examples", name + ".tc")
             val data = exampleFile.readText()
-            Model.applySynchronizedWithToken {
+            Model.applyStructuralChange {
                 Model.clearAll(it)
                 Model.loadData(data, it)
             }

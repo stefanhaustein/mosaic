@@ -5,7 +5,7 @@ import org.kobjects.mosaic.model.expression.Literal
 import org.kobjects.mosaic.model.parser.ParsingContext
 import org.kobjects.mosaic.model.parser.TcFormulaParser
 
-class Style(
+class Image(
     val cell: Cell,
     val rawCondition: String? = null,
     val image: String? = null,

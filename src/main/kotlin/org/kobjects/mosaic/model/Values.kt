@@ -3,6 +3,8 @@ package org.kobjects.mosaic.model
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
 import org.kobjects.mosaic.model.expression.Expression.Companion.ZERO_TIME
 import kotlin.time.DurationUnit
 
@@ -36,5 +38,14 @@ object Values {
         else -> throw IllegalArgumentException("Not convertible to boolean: ${value::class.qualifiedName}: '$value'")
     }
 
+    fun toJson(value: Any?) = when (value) {
+        null, Unit -> JsonNull
+        is Double -> JsonPrimitive(value)
+        is Number -> JsonPrimitive(value.toDouble())
+        is Instant -> JsonPrimitive(value.toString())
+        is String -> JsonPrimitive(value)
+        is Boolean -> JsonPrimitive(value)
+        else -> throw IllegalArgumentException("Not convertible to json: ${value::class.qualifiedName}: '$value'")
+    }
 
 }

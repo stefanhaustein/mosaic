@@ -100,7 +100,7 @@ export function processPortUpdate(integration, name, f) {
         let entryValueElement = document.createElement("span")
         entryValueElement.id = "port." + f.fqName + ".value"
         entryValueElement.className = "portValue"
-        entryValueElement.textContent = f.c
+        entryValueElement.textContent = JSON.stringify(f.c.value)
         portElement.appendChild(entryValueElement)
 
 

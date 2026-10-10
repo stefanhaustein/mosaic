@@ -17,12 +17,17 @@ import org.kobjects.mosaic.model.ExpressionNode
 import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
+import org.kobjects.mosaic.model.Values
+import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.parser.ParsingContext
 
 class Cell(
     val sheet: Sheet,
     val id: String
 ) : ExpressionNode(sheet), Iterable<Cell>, ToJson {
+
+    var imageConditionValues: List<Any?> = emptyList()
+    var styleConditionValues: List<Any?> = emptyList()
 
     val column: Int
         get() = getColumn(id)
@@ -37,12 +42,12 @@ class Cell(
     override val inputs = mutableSetOf<Node>()
     override val outputs = mutableSetOf<Node>()
 
-    val styles = mutableListOf<Style>()
+    val images = mutableListOf<Image>()
 
     fun clear(modificationToken: ModificationToken) {
         setJson(JsonObject(emptyMap()), modificationToken)
         setValidation(null, modificationToken)
-        styles.clear()
+        images.clear()
     }
 
     fun setJson(json: JsonObject, modificationToken: ModificationToken) {
@@ -53,14 +58,10 @@ class Cell(
         setValidation(if (validation is JsonObject) validation else null, modificationToken)
 
 
-        styles.clear()
-        // Legacy image support
-        val image = json["i"]
-        if (image is JsonPrimitive) {
-            styles.add(Style(this, image = image.content))
-        }
-        for (jsonStyle in json["s"]?.jsonArray.orEmpty().filter{ it is JsonObject }) {
-                styles.add(Style(this,
+        images.clear()
+
+        for (jsonStyle in (json["i"] ?: json["s"])?.jsonArray.orEmpty().filter{ it is JsonObject }) {
+                images.add(Image(this,
                     rawCondition = jsonStyle.jsonObject["condition"]?.jsonPrimitive?.contentOrNull,
                     image = jsonStyle.jsonObject["image"]?.jsonPrimitive?.contentOrNull,
                     rotation = jsonStyle.jsonObject["rotation"]?.jsonPrimitive?.intOrNull,
@@ -78,7 +79,7 @@ class Cell(
     override fun reparse() {
         super.reparse()
         val parsingContext = ParsingContext(this)
-        for (style in styles) {
+        for (style in images) {
             style.reparse(parsingContext)
         }
     }
@@ -103,9 +104,9 @@ class Cell(
                 if (validation?.isNotEmpty() == true) {
                     put("v", validation)
                 }
-                if (styles.isNotEmpty()) {
-                    put("s", buildJsonArray {
-                        styles.forEach {
+                if (images.isNotEmpty()) {
+                    put("i", buildJsonArray {
+                        images.forEach {
                             add(buildJsonObject {
                                 if (it.rawCondition != null) {
                                     put("condition", JsonPrimitive(it.rawCondition))
@@ -140,6 +141,17 @@ class Cell(
         }
     }
 
+    override fun serializeValue(builder: JsonObjectBuilder) {
+        super.serializeValue(builder)
+        if (imageConditionValues.isNotEmpty()) {
+            builder.put("images", buildJsonArray {
+                for (value in imageConditionValues) {
+                    add(Values.toJson(value))
+                }
+            })
+        }
+    }
+
     override fun toJson() = buildJsonObject {
         serialize(this, -1, false)
     }
@@ -149,6 +161,23 @@ class Cell(
     override fun iterator(): Iterator<Cell> = setOf(this).iterator()
 
     override fun toString() = qualifiedId() + ":" + rawFormula// rawFormula
+
+    override fun recalculateValue(tag: Long): Boolean {
+        var result = super.recalculateValue(tag)
+
+        val newImageConditionValues = buildList {
+            for (image in images) {
+                add(image.parsedCondition.eval(EvaluationContext(tag)))
+            }
+        }
+
+        if (imageConditionValues != newImageConditionValues) {
+            imageConditionValues = newImageConditionValues
+            result = true
+        }
+
+        return result
+    }
 
     companion object {
         val TIME_FORMAT_MINUTES = LocalTime.Format {

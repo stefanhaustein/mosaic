@@ -6,7 +6,9 @@ interface ModelInterface {
 
 
     /** The callback is run after the effects of the action are calculated / materialized */
-    fun applySynchronizedWithToken(callback: ((modificationTag: Long, anyChanged: Boolean) -> Unit)? = null, action: (ModificationToken) -> Unit)
+    fun applyStructuralChange(
+        //callback: ((modificationTag: Long, anyChanged: Boolean) -> Unit)? = null,
+        action: (ModificationToken) -> Unit)
 
     fun addUpdateListener(permanent: Boolean, onChangeOnly: Boolean, listener: (modificationTag: Long, anyChanged: Boolean) -> Unit)
 

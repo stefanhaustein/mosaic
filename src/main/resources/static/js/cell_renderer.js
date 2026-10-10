@@ -20,7 +20,7 @@ export function renderCell(key) {
         cellData = {}
     }
 
-    let styles = cellData.s
+    let styles = cellData.i
     let formula = cellData.f || ""
 
     // Check if we need inner divs and fill everything but the content
@@ -34,6 +34,7 @@ export function renderCell(key) {
                 layer.style.width = "100%"
                 layer.style.height = "100%"
                 layer.style.rotate = (style.rotation || 0) + "deg"
+                layer.style.backgroundColor = style.background
                 if (style.image != null) {
                     let use = document.createElementNS("http://www.w3.org/2000/svg", "use")
                     use.setAttribute("href", "img/cell/" + style.image)
@@ -112,7 +113,7 @@ export function renderCell(key) {
 
         case "boolean":
             classes.add("c")
-            renderedValue = value ? "True" : "False"
+            renderedValue = renderedValue ? "True" : "False"
             break
 
         case "string":
@@ -127,7 +128,9 @@ export function renderCell(key) {
                     break
                 default:
                     classes.add("l")
-                    //renderedValue = JSON.stringify(value)
+                    if (value) {
+                        renderedValue = JSON.stringify(value)
+                    }
             }
     }
 

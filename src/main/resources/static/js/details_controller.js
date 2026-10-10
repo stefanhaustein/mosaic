@@ -8,18 +8,18 @@ let stylesDiv = document.getElementById("stylesDiv")
 
 document.getElementById("addImageDiv").addEventListener("click", () => {
     let e = {image: "x"}
-    if (currentCell.s == null) {
-        currentCell.s = [e]
+    if (currentCell.i == null) {
+        currentCell.i = [e]
     } else {
-        currentCell.s.push(e)
+        currentCell.i.push(e)
     }
     commitCurrentCell()
 })
 document.getElementById("addStyleDiv").addEventListener("click", () => {
-    if (currentCell.s == null) {
-        currentCell.s = [{}]
+    if (currentCell.i == null) {
+        currentCell.i = [{}]
     } else {
-        currentCell.s.push({})
+        currentCell.i.push({})
     }
     commitCurrentCell()
 })
@@ -29,54 +29,54 @@ document.getElementById("addStyleDiv").addEventListener("click", () => {
 function update() {
     stylesDiv.textContent = ""
 
-    let styles = currentCell.s
+    let images = currentCell.i
 
     stylesDiv.textContent = ""
 
-    if (Array.isArray(styles)) {
-        for (let i = 0; i < styles.length; i++) {
-            let style = styles[i]
-            let styleDiv = element("div")
-            styleDiv.style.paddingTop="5px"
-            styleDiv.style.paddingBottom="5px"
+    if (Array.isArray(images)) {
+        for (let i = 0; i < images.length; i++) {
+            let image = images[i]
+            let containerDiv = element("div")
+            containerDiv.style.paddingTop="5px"
+            containerDiv.style.paddingBottom="5px"
 
             let removeImg = element("img", {src: "img/cancel.svg", style: {float: "left", paddingTop: "2px"}})
             removeImg.addEventListener("click", () => {
-                styles.splice(i, 1)
+                images.splice(i, 1)
                 commitCurrentCell()
             })
-            styleDiv.append(removeImg)
+            containerDiv.append(removeImg)
 
             let contentDiv =  element("div", {style: {paddingLeft: "20px"}})
             contentDiv.style.paddingLeft="20px"
-            styleDiv.append(contentDiv)
+            containerDiv.append(contentDiv)
 
             let conditionInput = element("input",
-                {placeholder: "Condition", value: style.condition || ""})
+                {placeholder: "Condition", value: image.condition || ""})
             conditionInput.addEventListener("change", () => {
-                style.condition = conditionInput.value
+                image.condition = conditionInput.value
                 commitCurrentCell()
             })
             contentDiv.append(conditionInput)
 
             let colorPicker = document.createElement("argb-picker")
-            colorPicker.value = style.color || "#00000000"
-            console.log("color set to ", colorPicker.value, " from ", style.color)
+            colorPicker.value = image.color || "#00000000"
+            console.log("color set to ", colorPicker.value, " from ", image.color)
             colorPicker.addEventListener("change",() => {
-                style.color = colorPicker.value
-                console.log("new color:", style.color)
+                image.color = colorPicker.value
+                console.log("new color:", image.color)
                 commitCurrentCell()
             })
 
             let backgroundPicker = document.createElement("argb-picker")
-            backgroundPicker.value = style.background || "#ffffffff"
+            backgroundPicker.value = image.background || "#ffffffff"
             backgroundPicker.addEventListener("change",() => {
-                style.background = backgroundPicker.value
+                image.background = backgroundPicker.value
                 commitCurrentCell()
             })
 
 
-            if (style.image) {
+            if (image.image) {
                 let gridDiv = element("div", {style: {display: "grid", gridTemplateColumns: "max-content max-content auto", padding: "8px 0", gap: "4px"}})
                 let imageDiv = element("div", {style: {gridRow: "1 / span 2", gridColumn: "2"}})
                 let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
@@ -85,12 +85,12 @@ function update() {
                 svg.style.backgroundColor = backgroundPicker.value
                 svg.style.width = "60px";
                 svg.style.height = "60px";
-                svg.style.rotate = (style.rotation || 0) + "deg"
+                svg.style.rotate = (image.rotation || 0) + "deg"
                 let use = document.createElementNS("http://www.w3.org/2000/svg", "use")
-                use.setAttribute("href", "img/cell/" + style.image)
+                use.setAttribute("href", "img/cell/" + image.image)
                 svg.append(use)
                 svg.addEventListener("click", async event => {
-                    style.image = await selectImage(style.image)
+                    image.image = await selectImage(image.image)
                     commitCurrentCell()
                 })
                 svg.style.display = "inline-block"
@@ -115,12 +115,12 @@ function update() {
 
                 let clockwiseButton = element("button", "↻")
                 clockwiseButton.addEventListener("click", () => {
-                    style.rotation = ((style.rotation || 0) / 90 + 1) % 4 * 90
+                    image.rotation = ((image.rotation || 0) / 90 + 1) % 4 * 90
                     commitCurrentCell()
                 })
                 let antiButton = element("button", "↺")
                 antiButton.addEventListener("click", () => {
-                    style.rotation = ((style.rotation || 0) / 90 + 3) % 4 * 90
+                    image.rotation = ((image.rotation || 0) / 90 + 3) % 4 * 90
                     commitCurrentCell()
                 })
 
@@ -134,12 +134,12 @@ function update() {
 
                 let imageButton = element("button", "Image")
                 imageButton.addEventListener("click", async event => {
-                    style.image = await selectImage(style.image)
+                    image.image = await selectImage(image.image)
                     commitCurrentCell()
                 })
             }
 
-            stylesDiv.append(styleDiv)
+            stylesDiv.append(containerDiv)
         }
     }
 

@@ -76,7 +76,7 @@ object Model : ModelInterface {
 
         integrations.integrationMap["root"] = Root()
 
-        applySynchronizedWithToken { runtimeContext ->
+        applyStructuralChange { runtimeContext ->
             runtimeContext.loading = true
             var fileData = ""
             try {
@@ -228,18 +228,20 @@ object Model : ModelInterface {
         }
     }
 
+    override fun applyStructuralChange(
+        action: (ModificationToken) -> Unit
+    ) = applySynchronizedWithTokenImpl(ModificationToken(true),null, action)
+
     @OptIn(ExperimentalContracts::class)
-    override fun applySynchronizedWithToken(
+    fun applySynchronizedWithTokenImpl(
+        modificationToken: ModificationToken,
         callback: ((modificationTag: Long, anyChanged: Boolean) -> Unit)?,
         action: (ModificationToken) -> Unit
     ) {
         applySynchronized {
-            val modificationToken = ModificationToken()
-
             if (callback != null) {
                 updateListeners.add(UpdateListenerData(false, false, callback))
             }
-
             val pendingUpdatesLocal = pendingUpdates
             pendingUpdates = mutableListOf()
             for (update in pendingUpdatesLocal) {
@@ -400,7 +402,7 @@ object Model : ModelInterface {
         applySynchronized {
             if (!refreshRequested) {
                 refreshRequested = true
-                applySynchronizedWithToken {
+                applyStructuralChange {
                     refreshRequested = false
                 }
             }

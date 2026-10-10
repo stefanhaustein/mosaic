@@ -4,13 +4,12 @@ package org.kobjects.mosaic.model
  * The token is used to collect changes. After the collection, where the result can't be influenced any longer,
  * only the tag should be used.
  */
-class ModificationToken() {
+class ModificationToken(var symbolsChanged: Boolean = false) {
 
     val tag: Long = System.nanoTime()
 
     var loading = false
-    var formulaChanged = false
-    var symbolsChanged = false
+    var formulaChanged = symbolsChanged
 
     val refreshRoots = mutableSetOf<Node>()
     val refreshNodes = mutableSetOf<Node>()

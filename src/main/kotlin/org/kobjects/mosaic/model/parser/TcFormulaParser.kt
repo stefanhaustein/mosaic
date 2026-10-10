@@ -158,7 +158,7 @@ object TcFormulaParser : PrattParser<TcScanner, ParsingContext, Expression>(
                 Literal(e)
             }
         } else {
-            when (rawFormula.lowercase()) {
+            when (rawFormula.lowercase().trim()) {
                 "true" -> Literal(true)
                 "false" -> Literal(false)
                 else -> {

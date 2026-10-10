@@ -39,7 +39,8 @@ import org.kobjects.mosaic.model.integration.IntegrationDescriptor
             return
         }
         driver.syncState()
-        model.applySynchronizedWithToken(
+        Model.applySynchronizedWithTokenImpl(
+            ModificationToken(false),
             callback = { tag, anyChange ->
                 model.runAsync {
                     syncState(driver, invocationId)
