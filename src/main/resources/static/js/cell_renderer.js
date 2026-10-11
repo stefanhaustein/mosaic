@@ -20,24 +20,28 @@ export function renderCell(key) {
         cellData = {}
     }
 
-    let styles = cellData.i
+    let images = cellData.i
     let formula = cellData.f || ""
 
     // Check if we need inner divs and fill everything but the content
-    if (Array.isArray(styles)) {
+    if (Array.isArray(images)) {
         container.style.display = "grid"
         container.style.alignItems = "stretch"
-        if (Array.isArray(styles)) {
-            for (let style of styles) {
+        if (Array.isArray(images)) {
+            for (let i = 0; i < images.length; i++) {
+                if (!cellData.c.images[i]) {
+                    continue
+                }
+                let image = images[i]
                 let layer = document.createElementNS("http://www.w3.org/2000/svg", "svg")
                 layer.style.gridArea = "1/1"
                 layer.style.width = "100%"
                 layer.style.height = "100%"
-                layer.style.rotate = (style.rotation || 0) + "deg"
-                layer.style.backgroundColor = style.background
-                if (style.image != null) {
+                layer.style.rotate = (image.rotation || 0) + "deg"
+                layer.style.backgroundColor = image.background
+                if (image.image != null) {
                     let use = document.createElementNS("http://www.w3.org/2000/svg", "use")
-                    use.setAttribute("href", "img/cell/" + style.image)
+                    use.setAttribute("href", "img/cell/" + image.image)
                     layer.append(use)
                 }
                 container.append(layer)

@@ -7,6 +7,7 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
+import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.function.Functions
 import org.kobjects.mosaic.model.integration.InputPortListener
 import org.kobjects.mosaic.model.integration.IntegrationFactories
@@ -289,12 +290,13 @@ object Model : ModelInterface {
 
             println("Root nodes needing refresh: ${modificationToken.refreshRoots}; other: ${modificationToken.refreshNodes}")
 
+            val evaluationContext = EvaluationContext(modificationTag)
             while (modificationToken.refreshRoots.isNotEmpty()) {
                 val current = modificationToken.refreshRoots.first()
                 modificationToken.refreshRoots.remove(current)
                 // println("Updating: $current")
                 try { // Ports may fail if simulation mode is turned off and there is no "real" value
-                    if (current.recalculateValue(modificationToken.tag)) {
+                    if (current.recalculateValue(evaluationContext)) {
                         anyChanged = true
                         // println("adding new dependencies: ${current.dependencies}")
                         for (dep in current.outputs) {
@@ -336,7 +338,7 @@ object Model : ModelInterface {
                     if (found) {
                         println("Updating node: $node")
                         modificationToken.refreshNodes.remove(node)
-                        if (node.recalculateValue(modificationToken.tag)) {
+                        if (node.recalculateValue(evaluationContext)) {
                             anyChanged = true
                         }
                         break
@@ -402,7 +404,7 @@ object Model : ModelInterface {
         applySynchronized {
             if (!refreshRequested) {
                 refreshRequested = true
-                applyStructuralChange {
+                applySynchronizedWithTokenImpl(ModificationToken(), null) {
                     refreshRequested = false
                 }
             }

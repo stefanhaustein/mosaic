@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.sheet.Cell.Companion.TIME_FORMAT_SECONDS
 
 
@@ -29,11 +30,11 @@ interface Node {
      * This is only relevant for "inner" nodes and will never return true for input ports; input port / external
      * changes are communicated by other means.
      */
-    fun recalculateValue(tag: Long): Boolean
+    fun recalculateValue(context: EvaluationContext): Boolean
+
     fun detach()
 
     fun qualifiedId(): String
-
 
     fun serializeValue() = buildJsonObject {
         serializeValue(this)
@@ -64,9 +65,6 @@ interface Node {
             }
         }
     }
-
-
-
 
     fun serializeDependencies(builder: JsonObjectBuilder) {
         if (inputs.isNotEmpty()) {

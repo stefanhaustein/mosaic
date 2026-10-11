@@ -42,10 +42,10 @@ abstract class ExpressionNode(
     open fun notifyValueChanged(newValue: Any?) {}
 
 
-    override fun recalculateValue(tag: Long): Boolean {
+    override fun recalculateValue(context: EvaluationContext): Boolean {
         var newValue: Any?
         try {
-            newValue = expression.eval(EvaluationContext(tag))
+            newValue = expression.eval(context)
         } catch (e: Exception) {
             e.printStackTrace()
             newValue = e

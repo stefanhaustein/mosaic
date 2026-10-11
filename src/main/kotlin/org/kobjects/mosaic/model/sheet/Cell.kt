@@ -162,8 +162,8 @@ class Cell(
 
     override fun toString() = qualifiedId() + ":" + rawFormula// rawFormula
 
-    override fun recalculateValue(tag: Long): Boolean {
-        var result = super.recalculateValue(tag)
+    override fun recalculateValue(context: EvaluationContext): Boolean {
+        var result = super.recalculateValue(context)
 
         val newImageConditionValues = buildList {
             for (image in images) {

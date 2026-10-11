@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonObject
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Node
+import org.kobjects.mosaic.model.expression.EvaluationContext
 
 open class InputPortNode(
     override val owner: Integration,
@@ -65,7 +66,7 @@ open class InputPortNode(
         }
     }
 
-    override fun recalculateValue(tag: Long): Boolean {
+    override fun recalculateValue(cotext: EvaluationContext): Boolean {
         if (value != newValue) {
             value = newValue
             return true
