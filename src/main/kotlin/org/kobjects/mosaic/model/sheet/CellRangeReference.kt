@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model.sheet
 
-import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.ModelImpl
 import org.kobjects.mosaic.model.ModificationToken
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -85,7 +85,7 @@ data class CellRangeReference(
                 sheet = impliedSheet
             } else {
                 val sheetName = name.substring(0, cut0)
-                sheet = Model.sheets[sheetName] ?: throw IllegalArgumentException(
+                sheet = ModelImpl.sheets[sheetName] ?: throw IllegalArgumentException(
                     "Sheet '$sheetName' not found."
                 )
             }

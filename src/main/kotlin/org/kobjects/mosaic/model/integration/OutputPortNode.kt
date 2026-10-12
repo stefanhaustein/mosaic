@@ -16,6 +16,7 @@ class OutputPortNode(
     var instance: OutputPortInstance? = null // Supplied via configure except for implied ports
 ) : ExpressionNode(owner),  PortNode {
 
+    override var topologicalOrder: Int = -1
     var error: Exception? = null
 
     override var jsonConfiguration = JsonObject(emptyMap())

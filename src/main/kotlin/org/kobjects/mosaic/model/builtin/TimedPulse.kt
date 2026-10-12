@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model.builtin
 
-import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.ModelImpl
 import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.model.function.StatefulFunctionInstance
@@ -34,7 +34,7 @@ class TimedPulse(
                     task = object : TimerTask() {
                         override fun run() {
                             outputState = false
-                            Model.notifyValueChanged(host)
+                            ModelImpl.notifyValueChanged(host)
                         }
                     }
                     timer.schedule(task, (delay * 1000.0).toLong())

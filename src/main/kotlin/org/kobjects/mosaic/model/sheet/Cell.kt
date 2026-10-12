@@ -26,6 +26,7 @@ class Cell(
     val id: String
 ) : ExpressionNode(sheet), Iterable<Cell>, ToJson {
 
+    override var topologicalOrder: Int = -1
     var imageConditionValues: List<Any?> = emptyList()
     var styleConditionValues: List<Any?> = emptyList()
 

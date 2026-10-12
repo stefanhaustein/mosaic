@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model.integration
 
-import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 
 class Root : Integration(
@@ -30,7 +30,7 @@ class Root : Integration(
     }
 
     companion object {
-        fun spec(model: ModelInterface) = IntegrationDescriptor(
+        fun spec(model: Model) = IntegrationDescriptor(
             "", "Root", "", emptyList()) {
             _ -> throw UnsupportedOperationException()
 

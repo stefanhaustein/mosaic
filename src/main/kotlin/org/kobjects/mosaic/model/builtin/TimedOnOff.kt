@@ -1,6 +1,6 @@
 package org.kobjects.mosaic.model.builtin
 
-import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.ModelImpl
 import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.model.function.StatefulFunctionInstance
@@ -33,7 +33,7 @@ class TimedOnOff(
             task = object : TimerTask() {
                 override fun run() {
                     outputState = delayedState
-                    Model.notifyValueChanged(host)
+                    ModelImpl.notifyValueChanged(host)
                     task = null
                 }
             }

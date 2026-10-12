@@ -23,6 +23,7 @@ interface Node {
     val inputs: MutableSet<Node>
     val owner: Namespace
     var tag: Long
+    var topologicalOrder: Int
 
     /**
      * Re-calculates the value bases on inputs. Returns true if the value has changed.
