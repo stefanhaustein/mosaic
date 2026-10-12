@@ -21,7 +21,7 @@ class HaEntityInputPortInstance(
         oldState: Any?,
         newState: Any?
     ) {
-        Model.requestSynchronizedWithToken {
+        Model.instance.requestSynchronizedWithToken {
             portHolder.portValueChanged(newState, it)
 
         }

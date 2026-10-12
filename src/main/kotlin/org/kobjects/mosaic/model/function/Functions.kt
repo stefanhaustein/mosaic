@@ -2,6 +2,7 @@ package org.kobjects.mosaic.model.function
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import org.kobjects.mosaic.model.Model
 import org.kobjects.tomson.TomsonOutput
 
 class Functions : Iterable<FunctionSpec> {

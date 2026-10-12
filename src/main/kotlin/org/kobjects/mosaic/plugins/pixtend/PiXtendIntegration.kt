@@ -4,7 +4,6 @@ import com.pi4j.drivers.plc.pixtend.PiXtendDriver
 import org.kobjects.mosaic.model.AbstractDescriptor
 
 import org.kobjects.mosaic.model.Model
-import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
@@ -12,8 +11,8 @@ import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 
  class PiXtendIntegration(
-    val model: ModelInterface,
-): Integration("pixt", "pixt") {
+     model: Model,
+): Integration(model, "pixt", "pixt") {
     var driver: PiXtendDriver? = null
     var error: Exception? = null
     val inputPorts = mutableSetOf<PiXtendInputPortInstance>()
@@ -24,7 +23,7 @@ import org.kobjects.mosaic.model.integration.IntegrationDescriptor
     private fun attach() {
 
             try {
-                driver = PiXtendDriver(Model.pi4J, this@PiXtendIntegration.pixtendModel)
+                driver = PiXtendDriver(model.pi4J, this@PiXtendIntegration.pixtendModel)
                 error = null
                 model.runAsync { syncState(driver!!, ++invocationId) }
             } catch (e: Exception) {
@@ -39,7 +38,7 @@ import org.kobjects.mosaic.model.integration.IntegrationDescriptor
             return
         }
         driver.syncState()
-        Model.applySynchronizedWithTokenImpl(
+        model.applySynchronizedWithTokenImpl(
             ModificationToken(false),
             callback = { tag, anyChange ->
                 model.runAsync {
@@ -57,7 +56,7 @@ import org.kobjects.mosaic.model.integration.IntegrationDescriptor
     companion object {
         val piXtendModel = Type.ENUM(PiXtendDriver.Model.entries)
 
-        fun spec(model: ModelInterface) = IntegrationDescriptor(
+        fun spec(model: Model) = IntegrationDescriptor(
             category = "PLC",
             name = "pixt",
             description = "PiXtend PLC Integration",

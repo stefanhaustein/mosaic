@@ -8,21 +8,22 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.AbstractPortDescriptor
-import org.kobjects.mosaic.model.ModelImpl
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
 import org.kobjects.tomson.TomsonOutput
 
 
 abstract class Integration(
+    model: Model,
     // The name of the factory
     kind: String,
     // The name of this instance
     name: String,
-) : Namespace(name) {
+) : Namespace(model, name) {
     // Values
 
-    val factory = ModelImpl.integrationFactories[kind]!!
+    val factory = model.integrationFactories[kind]!!
 
     // Variables
 

@@ -25,7 +25,7 @@ import kotlin.coroutines.suspendCoroutine
 
 fun main(args: Array<String>) {
     println("Loading default data")
-    Model.applySynchronized {
+    Model.instance.applySynchronized {
         println("Model should be ready now; starting server...")
     }
 
@@ -33,18 +33,19 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
+    val model = Model.instance
     routing {
         post("/clear/{range}") {
             val rawRange = call.parameters["range"]!!
-            val range = CellRangeReference.parse(rawRange)
-            Model.applyStructuralChange {
+            val range = CellRangeReference.parse(model,rawRange)
+            model.applyStructuralChange {
                 range.clear(it)
             }
             call.respond(HttpStatusCode.OK)
         }
         post("/clearAll") {
-            Model.applyStructuralChange {
-                Model.clearAll(it)
+            model.applyStructuralChange {
+                model.clearAll(it)
             }
             call.respond(HttpStatusCode.OK)
         }
@@ -52,8 +53,8 @@ fun Application.module() {
             val cell = call.parameters["cell"]!!
             val text = call.receiveText()
             val json = Json.parseToJsonElement(text).jsonObject
-            Model.applyStructuralChange { token ->
-                Model.getOrCreate(cell).setJson(json, token)
+            model.applyStructuralChange { token ->
+                model.getOrCreate(cell).setJson(json, token)
             }
             call.respond(HttpStatusCode.OK)
         }
@@ -61,20 +62,20 @@ fun Application.module() {
             val jsonText = call.receiveText()
             println("Received JSON: $jsonText")
             val value = Json.parseToJsonElement(jsonText)
-            Model.applyStructuralChange { token ->
-                Model.setRunMode(value.jsonPrimitive.boolean, token)
+            model.applyStructuralChange { token ->
+                model.setRunMode(value.jsonPrimitive.boolean, token)
             }
             call.respond(HttpStatusCode.OK)
         }
         post("/paste/{target}") {
             val rawTargetRange = call.parameters["target"]!!
-            val targetRange = CellRangeReference.parse(rawTargetRange)
+            val targetRange = CellRangeReference.parse(model, rawTargetRange)
             val tomsonText = call.receiveText()
             val tomson = TomsonParser.parse(tomsonText)
 
             println("/paste/$targetRange: $tomsonText")
 
-            Model.applyStructuralChange { token ->
+            model.applyStructuralChange { token ->
                 targetRange.sheet.paste(token, targetRange, tomson)
             }
             call.respond(HttpStatusCode.OK)
@@ -85,8 +86,8 @@ fun Application.module() {
             val jsonText = call.receiveText()
             println("/ports/$integrationName/$portName: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
-            val integration = Model.integrations[integrationName] ?: throw IllegalArgumentException("Integration '$integrationName' not found")
-            Model.applyStructuralChange { token ->
+            val integration = model.integrations[integrationName] ?: throw IllegalArgumentException("Integration '$integrationName' not found")
+            model.applyStructuralChange { token ->
                 integration.definePort(portName, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -96,8 +97,8 @@ fun Application.module() {
             val jsonText = call.receiveText()
             println("/integrations/$name: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
-            Model.applyStructuralChange { token ->
-                Model.integrations.configureIntegration(name, jsonSpec, token)
+            model.applyStructuralChange { token ->
+                model.integrations.configureIntegration(name, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
         }
@@ -106,17 +107,17 @@ fun Application.module() {
             println("Received JSON: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
             val name = jsonSpec["name"] as String?
-            Model.applyStructuralChange { token ->
-                Model.updateSheet(name, jsonSpec, token)
+            model.applyStructuralChange { token ->
+                model.updateSheet(name, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
         }
         post("/upload") {
             val fileItem = call.receiveMultipart().readPart() as PartData.FileItem
             val data = fileItem.provider().toByteArray().toString(Charsets.UTF_8)
-            Model.applyStructuralChange {
-                Model.clearAll(it)
-                Model.loadData(data, it)
+            model.applyStructuralChange {
+                model.clearAll(it)
+                model.loadData(data, it)
             }
             call.respond(HttpStatusCode.OK)
         }
@@ -124,9 +125,9 @@ fun Application.module() {
             val name = call.receiveText()
             val exampleFile = File("src/main/resources/examples", name + ".tc")
             val data = exampleFile.readText()
-            Model.applyStructuralChange {
-                Model.clearAll(it)
-                Model.loadData(data, it)
+            model.applyStructuralChange {
+                model.clearAll(it)
+                model.loadData(data, it)
             }
         }
 
@@ -135,22 +136,22 @@ fun Application.module() {
             val forClient = rawTag != null
             val tag = rawTag ?: -1
 
-            if (tag >= Model.modificationTag) {
+            if (tag >= model.modificationTag) {
                 suspendCoroutine<Unit> { continuation ->
-                    Model.applySynchronized {
-                        Model.addUpdateListener(permanent = false, onChangeOnly = true) { tag, anyChange ->
+                    model.applySynchronized {
+                        model.addUpdateListener(permanent = false, onChangeOnly = true) { tag, anyChange ->
                             continuation.resume(Unit)
                         }
                     }
                 }
             }
-            val result = Model.applySynchronized {
+            val result = model.applySynchronized {
                 val writer = StringWriter()
                 val tomson = TomsonOutput(writer)
                 if (forClient) {
-                    tomson.appendValue("tag", JsonPrimitive(Model.modificationTag))
+                    tomson.appendValue("tag", JsonPrimitive(model.modificationTag))
                 }
-                Model.serialize(tomson, forClient, tag)
+                model.serialize(tomson, forClient, tag)
                 writer.close()
                 writer.toString()
             }
@@ -165,7 +166,7 @@ fun Application.module() {
             val path = call.parameters.getAll("name")!!.joinToString("/")
 
                 println("Svg requested: $path")
-                val available = Model.svgs.map
+                val available = model.svgs.map
                 println("Available SVGs: $available")
                 val svg = available["img/$path"]
 

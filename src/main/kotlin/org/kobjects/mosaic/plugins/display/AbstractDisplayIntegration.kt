@@ -2,14 +2,15 @@ package org.kobjects.mosaic.plugins.display
 
 import com.pi4j.drivers.display.graphics.Graphics
 import com.pi4j.drivers.display.graphics.GraphicsDisplay
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 import org.kobjects.mosaic.model.integration.OutputPortNode
 
 
 abstract class AbstractDisplayIntegration(
-    integrationName: String, name: String
-) : Integration(integrationName, name){
+    model: Model, integrationName: String, name: String
+) : Integration(model,integrationName, name){
     var display: GraphicsDisplay? = null
 
     override val portDescriptors = listOf(

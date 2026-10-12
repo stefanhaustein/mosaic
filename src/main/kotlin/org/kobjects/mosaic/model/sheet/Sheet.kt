@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
 import org.kobjects.tomson.TomsonOutput
@@ -12,9 +13,10 @@ import org.kobjects.tomson.toJson
 import kotlin.collections.iterator
 
 class Sheet(
+    model: Model,
     name: String,
     var tag: Long = 0L
-) : Namespace(name) {
+) : Namespace(model, name) {
     val highlighted = mutableSetOf<CellRangeReference>()
     var highlightTag: Long = 0L
     val cells = mutableMapOf<String, Cell>()
@@ -78,7 +80,7 @@ class Sheet(
 
     fun paste(token: ModificationToken, targetSelectionRange: CellRangeReference, tomson: Map<String, JsonObject>) {
         val rawSourceRange = tomson[""]!!["range"]!!.jsonPrimitive.content
-        val sourceRange = CellRangeReference.parse(rawSourceRange)
+        val sourceRange = CellRangeReference.parse(model, rawSourceRange)
 
         val targetRange = CellRangeReference(
             targetSelectionRange.sheet,

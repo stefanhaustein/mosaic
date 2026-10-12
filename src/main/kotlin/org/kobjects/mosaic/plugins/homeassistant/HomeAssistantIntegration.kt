@@ -6,7 +6,7 @@ import org.kobjects.mosaic.model.integration.OutputPortNode
 import org.kobjects.mosaic.model.integration.InputPortDescriptor
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationDescriptor
-import org.kobjects.mosaic.model.ModelInterface
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.integration.OutputPortDescriptor
 import org.kobjects.mosaic.model.ParameterSpec
@@ -15,10 +15,10 @@ import org.kobjects.mosaic.plugins.homeassistant.client.HAEntity
 import org.kobjects.mosaic.plugins.homeassistant.client.HomeAssistantClient
 
 class HomeAssistantIntegration(
-    val model: ModelInterface,
+    model: Model,
     name: String,
 
-) : Integration("HomeAssistant", name) {
+    ) : Integration(model, "HomeAssistant", name) {
     var client: HomeAssistantClient? = null
     var host = ""
     var port = -1
@@ -118,7 +118,7 @@ class HomeAssistantIntegration(
         }
 
 
-        fun spec(model: ModelInterface) = IntegrationDescriptor(
+        fun spec(model: Model) = IntegrationDescriptor(
             category = "HomeAutomation",
             name = "HomeAssistant",
             "HomeAssistant integration",

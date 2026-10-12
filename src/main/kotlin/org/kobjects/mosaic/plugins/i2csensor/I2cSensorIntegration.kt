@@ -6,7 +6,6 @@ import com.pi4j.drivers.sensor.SensorDetector
 import com.pi4j.io.i2c.I2C
 import kotlinx.serialization.json.JsonObject
 import org.kobjects.mosaic.model.Model
-import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
@@ -16,9 +15,9 @@ import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 
 class I2cSensorIntegration(
-    val model: ModelInterface,
+    model: Model,
     name: String,
-) : Integration(INTEGRATION_NAME, name) {
+) : Integration(model, INTEGRATION_NAME, name) {
 
     var i2c: I2C? = null
     var sensor: Sensor? = null
@@ -46,7 +45,7 @@ class I2cSensorIntegration(
         val address = configuration["address"] as Int
 
         val sensorDescriptor = SensorDetector.DESCRIPTORS.first { it.sensorName == sensorName }
-        i2c = Model.pi4J?.create(I2C.newConfigBuilder(Model.pi4J).bus(bus).device(address))
+        i2c = model.pi4J?.create(I2C.newConfigBuilder(model.pi4J).bus(bus).device(address))
         sensor = sensorDescriptor.detect(i2c)
 
         for (value in sensor?.descriptor?.values ?: emptyList()) {
@@ -59,13 +58,13 @@ class I2cSensorIntegration(
             inputPortNode.configure(JsonObject(emptyMap()), token)
         }
         val localRun = ++run
-        Model.scheduleAsync(5000) {
+        Model.instance.scheduleAsync(5000) {
             if (localRun != run) {
                 false
             } else {
                 val measurements = DoubleArray(sensorDescriptor.values.size)
                 sensor?.readMeasurement(measurements)
-                Model.requestSynchronizedWithToken { token ->
+                model.requestSynchronizedWithToken { token ->
                     for (value in sensorDescriptor.values) {
                         (nodes[value.kind.name.lowercase()] as? InputPortNode)?.portValueChanged(measurements[value.index], token)
                     }
@@ -80,7 +79,7 @@ class I2cSensorIntegration(
 
         val sensorType: Type = Type.Options(SensorDetector.DESCRIPTORS.map{ it.sensorName } )
 
-        fun descriptor(model: ModelInterface) = IntegrationDescriptor(
+        fun descriptor(model: Model) = IntegrationDescriptor(
             category = "Sensor",
             name = INTEGRATION_NAME,
             description = "I2c-Based Sensors",

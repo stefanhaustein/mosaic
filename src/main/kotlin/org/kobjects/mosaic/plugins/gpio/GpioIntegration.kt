@@ -4,15 +4,14 @@ import com.pi4j.context.Context
 import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.AbstractPortDescriptor
 import org.kobjects.mosaic.model.Model
-import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.integration.Integration
 import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 
 class GpioIntegration(
-    val model: ModelInterface,
-) : Integration("GPIO", "gpio") {
-    val pi4j: Context? = Model.pi4J
+    model: Model,
+) : Integration(model, "GPIO", "gpio") {
+    val pi4j: Context? = model.pi4J
 
     override val portDescriptors = listOf<AbstractPortDescriptor>(
         DigitalInputPort.descriptor(this),
@@ -28,7 +27,7 @@ class GpioIntegration(
     }
 
     companion object {
-        fun spec(model: ModelInterface) = IntegrationDescriptor(
+        fun spec(model: Model) = IntegrationDescriptor(
             "",
             "GPIO",
             "GPIO integration",

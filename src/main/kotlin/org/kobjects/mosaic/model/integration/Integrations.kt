@@ -3,12 +3,11 @@ package org.kobjects.mosaic.model.integration
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonPrimitive
-import org.kobjects.mosaic.model.ModelImpl
-import org.kobjects.mosaic.model.ModelImpl.integrations
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.tomson.TomsonOutput
 
-class Integrations : Iterable<Integration> {
+class Integrations(val model: Model) : Iterable<Integration> {
 
     val integrationMap = mutableMapOf<String, Integration>()
 
@@ -16,7 +15,7 @@ class Integrations : Iterable<Integration> {
 
     fun configureIntegration(name: String, jsonSpec: JsonObject, token: ModificationToken) {
         val kind = jsonSpec["kind"]?.jsonPrimitive?.content ?: throw IllegalArgumentException("'kind' missing in $jsonSpec")
-        val specification = ModelImpl.integrationFactories[kind] ?: throw IllegalArgumentException("$kind is not a integration factory in $jsonSpec")
+        val specification = model.integrationFactories[kind] ?: throw IllegalArgumentException("$kind is not a integration factory in $jsonSpec")
 
         var integration = integrationMap[name]
 
@@ -34,7 +33,7 @@ class Integrations : Iterable<Integration> {
 
 
     fun serialize(tomson: TomsonOutput, forClient: Boolean, tag: Long) {
-        for (integration in integrations) {
+        for (integration in model.integrations) {
                 integration.serialize(tomson, forClient, tag)
 
         }

@@ -2,7 +2,7 @@ package org.kobjects.mosaic.model.builtin
 
 import org.kobjects.mosaic.model.sheet.Cell
 import org.kobjects.mosaic.model.sheet.CellRangeReference
-import org.kobjects.mosaic.model.ModelImpl
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.expression.CellRangeExpression
 import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.ValueChangeListener
@@ -73,7 +73,7 @@ class StateMachine(
                     // Trigger a re-calculation as there might be a followup state transition
                     timer.schedule(object : TimerTask() {
                         override fun run() {
-                            ModelImpl.notifyValueChanged(host)
+                            Model.instance.notifyValueChanged(host)
                         }
                     }, 1)
                     break
@@ -105,7 +105,7 @@ class StateMachine(
         val targetRow: Int,
     ) : TimerTask() {
         override fun run() {
-            ModelImpl.requestSynchronizedWithToken {
+            Model.instance.requestSynchronizedWithToken {
                 timedTransition = null
                 setCurrentState(it.tag, targetState)
                 currentRow = targetRow

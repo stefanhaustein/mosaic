@@ -3,7 +3,8 @@ package org.kobjects.mosaic.model.integration
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 
-class Root : Integration(
+class Root(model: Model) : Integration(
+    model,
     "Root",
     "root",
 ) {

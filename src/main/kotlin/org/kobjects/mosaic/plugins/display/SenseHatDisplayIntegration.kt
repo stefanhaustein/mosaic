@@ -2,18 +2,17 @@ package org.kobjects.mosaic.plugins.display
 
 import com.pi4j.drivers.hat.raspberry.SenseHat
 import org.kobjects.mosaic.model.Model
-import org.kobjects.mosaic.model.ModelInterface
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 
 class SenseHatDisplayIntegration(
-    private val model: ModelInterface,
+    model: Model,
     name: String
-) : AbstractDisplayIntegration(INTEGRATION_NAME, name) {
+) : AbstractDisplayIntegration(model, INTEGRATION_NAME, name) {
     var senseHat: SenseHat? = null
 
     override fun configureInternal(configuration: Map<String, Any?>, token: ModificationToken) {
-        val hat = SenseHat(Model.pi4J)
+        val hat = SenseHat(Model.instance.pi4J)
         senseHat = hat
         configureDisplay(hat.display)
     }
@@ -26,7 +25,7 @@ class SenseHatDisplayIntegration(
     companion object {
         const val INTEGRATION_NAME = "SenseHatDisplay"
 
-        fun descriptor(model: ModelInterface) = IntegrationDescriptor(
+        fun descriptor(model: Model) = IntegrationDescriptor(
             category = "IoT",
             name = INTEGRATION_NAME,
             description = "Sense Hat 8x8 RGB Matrix",

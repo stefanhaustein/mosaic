@@ -1,7 +1,7 @@
 package org.kobjects.mosaic.model.builtin
 
 import kotlinx.datetime.Clock
-import org.kobjects.mosaic.model.ModelImpl
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.model.function.StatefulFunctionInstance
@@ -26,7 +26,7 @@ class NowFunction(
         if (period > 0) {
             task = object : TimerTask() {
                 override fun run() {
-                    ModelImpl.notifyValueChanged(host)
+                    Model.instance.notifyValueChanged(host)
                 }
             }
             timer.schedule(task, period, period)

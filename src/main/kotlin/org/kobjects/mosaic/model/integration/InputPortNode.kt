@@ -2,7 +2,7 @@ package org.kobjects.mosaic.model.integration
 
 
 import kotlinx.serialization.json.JsonObject
-import org.kobjects.mosaic.model.ModelImpl
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.expression.EvaluationContext
@@ -55,7 +55,7 @@ open class InputPortNode(
     // Implements the corresponding value change listener methods.
 
     override fun portValueChanged(newValue: Any?) {
-        ModelImpl.requestSynchronizedWithToken {
+        Model.instance.requestSynchronizedWithToken {
             portValueChanged(newValue, it)
         }
     }

@@ -3,7 +3,7 @@ package org.kobjects.mosaic.model.parser
 import org.kobjects.parsek.expression.Operator
 import org.kobjects.parsek.expression.PrattParser
 import org.kobjects.mosaic.model.sheet.CellRangeReference
-import org.kobjects.mosaic.model.ModelImpl
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.Values
 import org.kobjects.mosaic.model.sheet.Sheet
 import org.kobjects.mosaic.model.expression.*
@@ -48,7 +48,7 @@ object TcFormulaParser : PrattParser<TcScanner, ParsingContext, Expression>(
 
             TcTokenType.CELL_IDENTIFIER -> {
                 val name = scanner.consume().text
-                val cellRange = CellRangeReference.parse(name, context.cell.owner as? Sheet)
+                val cellRange = CellRangeReference.parse(context.model, name, context.cell.owner as? Sheet)
 
                 if (name.contains(":")) {
                     CellRangeExpression(context.cell, cellRange)
@@ -77,18 +77,18 @@ object TcFormulaParser : PrattParser<TcScanner, ParsingContext, Expression>(
 
                     else -> {
                         val lowercase = name.lowercase()
-                        val integration = ModelImpl.integrations.integrationMap[lowercase]
+                        val integration = context.model.integrations.integrationMap[lowercase]
                         if (integration != null) {
                             scanner.consume(".")
                             val name = scanner.consume(TcTokenType.IDENTIFIER).text.lowercase()
                             val port = integration.nodes[name] ?: throw IllegalArgumentException("'$name' not found in integration '$lowercase'")
                             PortExpression(context.cell, port)
                         } else {
-                            val functionSpec = ModelImpl.functions[lowercase]
+                            val functionSpec = context.model.functions[lowercase]
                             if (functionSpec != null) {
                                 PluginOperationCall.create(context.cell, functionSpec, parameterList)
                             } else {
-                                val integration = ModelImpl.integrations["root"] ?: throw IllegalStateException("root not found")
+                                val integration = context.model.integrations["root"] ?: throw IllegalStateException("root not found")
                                 val port = integration.nodes[name] ?: throw IllegalArgumentException("'$name' not found in root")
                                 PortExpression(context.cell, port)
                             }
