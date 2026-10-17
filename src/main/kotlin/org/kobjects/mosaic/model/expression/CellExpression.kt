@@ -15,7 +15,7 @@ class CellExpression(
 
     override fun eval(context: EvaluationContext): Any? {
         try {
-            return target.value
+            return context.model.values[target]?.value
         } catch (e: Exception) {
             e.printStackTrace()
             return e

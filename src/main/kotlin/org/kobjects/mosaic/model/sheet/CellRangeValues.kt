@@ -5,7 +5,8 @@ import org.kobjects.mosaic.model.RangeValues
 class CellRangeValues(val cellRange: CellRangeReference): RangeValues {
 
     val values = Array<Any?>(cellRange.width * cellRange.height) {
-        cellRange[it % cellRange.width, it / cellRange.width].value }
+        cellRange.sheet.model.values[cellRange[it % cellRange.width, it / cellRange.width]]?.value
+    }
 
     override fun toString() = "[$values]"
 

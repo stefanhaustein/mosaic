@@ -67,8 +67,7 @@ class HomeAssistantIntegration(
                 )
 
                 inputPortHolder.instance = HaEntityInputPortInstance(entity, inputPortHolder)
-                inputPortHolder.value = entity.decodeState(entity.state)
-
+                inputPortHolder.portValueChanged(entity.decodeState(entity.state))
                 nodes.put(name, inputPortHolder)
 
                 if (supportsOutput(entity.kind)) {

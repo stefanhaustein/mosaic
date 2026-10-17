@@ -9,9 +9,5 @@ interface InputPortListener {
      */
     fun portValueChanged(newValue: Any?)
 
-    /**
-     * Notifies the node that the value has changed in the skope of the given token. Used where a plugin performs
-     * a synchronized batch change of ports.
-     */
-    fun portValueChanged(newValue: Any?, token: ModificationToken)
+
 }

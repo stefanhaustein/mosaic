@@ -21,11 +21,7 @@ class HaEntityInputPortInstance(
         oldState: Any?,
         newState: Any?
     ) {
-        Model.instance.requestSynchronizedWithToken {
-            portHolder.portValueChanged(newState, it)
-
-        }
-
+        portHolder.portValueChanged(newState)
     }
 
     override fun detach() {

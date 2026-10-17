@@ -64,10 +64,8 @@ class I2cSensorIntegration(
             } else {
                 val measurements = DoubleArray(sensorDescriptor.values.size)
                 sensor?.readMeasurement(measurements)
-                model.requestSynchronizedWithToken { token ->
-                    for (value in sensorDescriptor.values) {
-                        (nodes[value.kind.name.lowercase()] as? InputPortNode)?.portValueChanged(measurements[value.index], token)
-                    }
+                for (value in sensorDescriptor.values) {
+                    (nodes[value.kind.name.lowercase()] as? InputPortNode)?.portValueChanged(measurements[value.index])
                 }
                 true
             }

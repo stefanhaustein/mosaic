@@ -55,7 +55,7 @@ interface PortNode: Node {
 
     fun needsSaving() = !descriptor.modifiers.contains(AbstractDescriptor.Modifier.UNINSTANTIABLE)
 
-    override fun qualifiedId() = if (owner == null) name else owner?.name + "." + name
+    override fun qualifiedId() = owner.name + "." + name
 
     fun serialize(builder: JsonObjectBuilder, forClient: Boolean) {
         builder.put("kind", JsonPrimitive(descriptor.name))
@@ -70,11 +70,15 @@ interface PortNode: Node {
             builder.put("displayName", JsonPrimitive(displayName))
         }
         builder.put("configuration", jsonConfiguration)
-        builder.put("c", serializeValue())
+
         if (deleted) {
             builder.put("deleted", JsonPrimitive(true))
         }
         if (forClient) {
+            val value = owner.model.values[this]
+            if (value != null) {
+                builder.put("c", value.serialize())
+            }
             serializeDependencies(builder)
         }
     }

@@ -1,11 +1,12 @@
 package org.kobjects.mosaic.model.builtin
 
+import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.function.FunctionSpec
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.Type
 
 object BuiltinFunctions {
-    val operationSpecs = listOf<FunctionSpec>(
+    fun operationSpecs(model: Model) = listOf<FunctionSpec>(
         FunctionSpec(
             null,
             "Time",
@@ -117,7 +118,7 @@ object BuiltinFunctions {
                 |Rows consist of the current state, the transition condition and the new state""".trimMargin(),
             listOf(ParameterSpec("transitions", Type.RANGE, null, setOf(ParameterSpec.Modifier.REFERENCE))),
             createFn = {
-                StateMachine.create(it)
+                StateMachine.create(model, it)
             },
         ),
     )

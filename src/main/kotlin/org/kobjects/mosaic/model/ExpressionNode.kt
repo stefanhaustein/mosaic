@@ -12,9 +12,6 @@ abstract class ExpressionNode(
     var rawFormula = ""
 
     var expression: Expression = Literal(Unit)
-    override var value: Any? = null
-
-    override var valueTag = 0L
     override var tag = 0L
 
     override val outputs = mutableSetOf<Node>()
@@ -41,20 +38,5 @@ abstract class ExpressionNode(
 
     open fun notifyValueChanged(newValue: Any?) {}
 
-
-    override fun recalculateValue(context: EvaluationContext): Boolean {
-        var newValue: Any?
-        try {
-            newValue = expression.eval(context)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            newValue = e
-        }
-        return if (newValue == value) false else {
-            value = newValue
-            valueTag = tag
-            notifyValueChanged(newValue)
-            true
-        }
-    }
+    override fun calculateValue(context: EvaluationContext) = NodeValue(context.tag,expression.eval(context))
 }

@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonObject
 import org.kobjects.mosaic.model.Model
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Node
+import org.kobjects.mosaic.model.NodeValue
 import org.kobjects.mosaic.model.expression.EvaluationContext
 
 open class InputPortNode(
@@ -27,9 +28,6 @@ open class InputPortNode(
 
     var instance: InputPortInstance? = null
 
-    override var valueTag  = 0L
-    override var value: Any? = null
-    var newValue: Any? = null
 
     init {
         require(!name.contains(".")) { "Port name '$name' must not contain '.'" }
@@ -55,26 +53,14 @@ open class InputPortNode(
     // Implements the corresponding value change listener methods.
 
     override fun portValueChanged(newValue: Any?) {
-        Model.instance.requestSynchronizedWithToken {
-            portValueChanged(newValue, it)
-        }
+        owner.model.setInputPortValue(this, newValue)
     }
 
-    override fun portValueChanged(newValue: Any?, token: ModificationToken) {
-        if (this.newValue != newValue) {
-            this.newValue = newValue
-            token.addRefresh(ModificationToken.ModificationKind.VALUES, this)
-            valueTag = token.tag
-        }
-    }
 
-    override fun recalculateValue(cotext: EvaluationContext): Boolean {
-        if (value != newValue) {
-            value = newValue
-            return true
-        }
-        return false
-    }
+    override fun calculateValue(context: EvaluationContext) =
+        if (context.newInputPortValues.containsKey(this))
+            NodeValue(context.tag, context.newInputPortValues[this]) else null
+
 
     override fun toString() = name
 }

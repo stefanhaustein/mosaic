@@ -14,7 +14,7 @@ abstract class PiXtendInputPortInstance(
     fun syncState(token: ModificationToken) {
         val newValue = value
         if (newValue != lastValue) {
-            listener.portValueChanged(newValue, token)
+            listener.portValueChanged(newValue)
             lastValue = newValue
         }
     }

@@ -4,7 +4,7 @@ import org.kobjects.mosaic.model.*
 import org.kobjects.mosaic.model.integration.PortNode
 
 class PortExpression(
-    owner: Node,
+    val owner: Node,
     val port: PortNode
 
 ) : Expression() {
@@ -16,7 +16,7 @@ class PortExpression(
 
     override fun eval(context: EvaluationContext): Any? {
         try {
-            return port.value
+            return owner.owner.model.values[port]?.value
         } catch (e: Exception) {
             e.printStackTrace()
             return e

@@ -10,6 +10,7 @@ import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 import java.util.*
 
 class StateMachine(
+    val model: Model,
     val cellRange: CellRangeReference
 ) : StatefulFunctionInstance {
     private var currentState = ""
@@ -32,8 +33,9 @@ class StateMachine(
     }
 
     fun getValue(col: Int, row: Int): Any? {
-        return cellRange.sheet.getOrCreateCell(Cell.id(
-            (if (col < 0) cellRange.toColumn + 1 else cellRange.fromColumn) + col, cellRange.fromRow + row)).value
+        val cell = cellRange.sheet.getOrCreateCell(Cell.id(
+            (if (col < 0) cellRange.toColumn + 1 else cellRange.fromColumn) + col, cellRange.fromRow + row))
+        return model.values[cell]?.value
     }
 
 
@@ -117,7 +119,7 @@ class StateMachine(
 
 
     companion object {
-        fun create(configuration: Map<String, Any?>) = StateMachine(
+        fun create(model: Model, configuration: Map<String, Any?>) = StateMachine(model,
             (configuration["transitions"] as CellRangeExpression).target)
     }
 

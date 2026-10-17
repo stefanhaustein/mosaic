@@ -126,7 +126,7 @@ abstract class Integration(
     fun portsToJson(forClient: Boolean, tag: Long): JsonObject = buildJsonObject {
         for (port in nodes.values) {
             if (forClient || port.needsSaving()) {
-                if (!forClient || port.tag > tag || port.valueTag > tag) {
+                if (!forClient || port.tag > tag || (model.values[port]?.tag?.compareTo(tag) ?: -1) >= 0) {
                     put(port.name, port.toJson(forClient))
                 }
             }

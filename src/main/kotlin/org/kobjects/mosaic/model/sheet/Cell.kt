@@ -17,6 +17,7 @@ import org.kobjects.mosaic.model.ExpressionNode
 import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
+import org.kobjects.mosaic.model.NodeValue
 import org.kobjects.mosaic.model.Values
 import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.parser.ParsingContext
@@ -95,6 +96,7 @@ class Cell(
 
     fun serialize(builder: JsonObjectBuilder, tag: Long, forClient: Boolean) {
         val id = id
+        val value = owner.model.values[this]
         if (this@Cell.tag > tag) {
             val properties = buildJsonObject {
                 if (!rawFormula.isNullOrEmpty()) {
@@ -127,8 +129,8 @@ class Cell(
                         }
                     })
                 }
-                if (forClient) {
-                    put("c", serializeValue())
+                if (forClient && value != null) {
+                    put("c", value.serialize())
                     serializeDependencies(this)
                 }
             }
@@ -136,21 +138,12 @@ class Cell(
                 builder.put(id, properties)
             }
 
-        } else if (valueTag > tag) {
-            builder.put("$id.c", serializeValue())
+        } else if (value != null && value.tag > tag) {
+            builder.put("$id.c", value.serialize())
         }
     }
 
-    override fun serializeValue(builder: JsonObjectBuilder) {
-        super.serializeValue(builder)
-        if (imageConditionValues.isNotEmpty()) {
-            builder.put("images", buildJsonArray {
-                for (value in imageConditionValues) {
-                    add(Values.toJson(value))
-                }
-            })
-        }
-    }
+
 
     override fun toJson() = buildJsonObject {
         serialize(this, -1, false)
@@ -162,21 +155,15 @@ class Cell(
 
     override fun toString() = qualifiedId() + ":" + rawFormula// rawFormula
 
-    override fun recalculateValue(context: EvaluationContext): Boolean {
-        var result = super.recalculateValue(context)
-
-        val newImageConditionValues = buildList {
+    override fun calculateValue(context: EvaluationContext): NodeValue {
+        val value = expression.eval(context)
+        val imageConditionValues = buildList {
             for (image in images) {
-                add(image.parsedCondition.eval(EvaluationContext(tag)))
+                add(image.parsedCondition.eval(context))
             }
         }
 
-        if (imageConditionValues != newImageConditionValues) {
-            imageConditionValues = newImageConditionValues
-            result = true
-        }
-
-        return result
+        return NodeValue(context.tag, value, imageConditionValues)
     }
 
     companion object {

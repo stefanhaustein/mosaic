@@ -34,41 +34,44 @@ import kotlin.contracts.ExperimentalContracts
 
 class Model {
 
-    val STORAGE_FILE = File("storage/data.tc")
+    // Structural stuff
+
     val svgs = SvgManager(File("src/main/resources/static/img"))
-
-    var modificationTag: Long = 0
-
-    private var pendingUpdates = mutableListOf<(ModificationToken)->Unit>()
-
-    var runMode_: Boolean = false
-    var settingsTag: Long = 0
-
-    val sheets = mutableMapOf<String, Sheet>("Sheet1" to Sheet(this, "Sheet1"))
-
-    val updateListeners = mutableSetOf<UpdateListenerData>()
-
+    val sheets = mutableMapOf("Sheet1" to Sheet(this, "Sheet1"))
     val functions = Functions()
     val integrationFactories = IntegrationFactories()
     val integrations = Integrations(this)
-
-    private var upcomingValues: MutableMap<Node, Any?> = mutableMapOf()
-
-    var refreshRequested: Boolean = false
 
     val pi4J: Context? = run {
         try {
             Pi4J.newAutoContext()
         } catch (e: Throwable) {
             e.printStackTrace()
-           null
+            null
         }
     }
 
+    // Miscellaneous
+
     private val lock = ReentrantLock()
+    val updateListeners = mutableSetOf<UpdateListenerData>()
+
+    // State variables
+
+    var modificationTag: Long = 0
+    var refreshRequested: Boolean = false
+    var runMode_: Boolean = false
+    var settingsTag: Long = 0
+
+    // State collections
+
+    private var pendingUpdates = mutableListOf<(ModificationToken)->Unit>()
+    private var upcomingValues: MutableMap<Node, Any?> = mutableMapOf()
+    val values: MutableMap<Node, NodeValue> = mutableMapOf()
+
 
     init {
-        BuiltinFunctions.operationSpecs.forEach { functions.add(it) }
+        BuiltinFunctions.operationSpecs(this).forEach { functions.add(it) }
         addIntegration(GpioIntegration.spec(this))
         addIntegration(PiXtendIntegration.spec(this))
         addIntegration(HomeAssistantIntegration.spec(this))
@@ -294,6 +297,7 @@ class Model {
         action: (ModificationToken) -> Unit
     ) {
         applySynchronized {
+            modificationTag  = modificationToken.tag
             if (callback != null) {
                 updateListeners.add(UpdateListenerData(false, false, callback))
             }
@@ -334,25 +338,28 @@ class Model {
             }
 
             val remainingNodes = TreeSet(modificationToken.refreshNodes)
-            val evaluationContext = EvaluationContext(modificationTag)
+            val evaluationContext = EvaluationContext(this, modificationTag, upcomingValues)
+            upcomingValues = mutableMapOf()
+
             var anyChanged = false
 
             while (remainingNodes.isNotEmpty()) {
-                val current = remainingNodes.removeFirst()
+                val node = remainingNodes.removeFirst()
                 // println("Updating: $current")
-                try { // Ports may fail if simulation mode is turned off and there is no "real" value
-                    if (current.recalculateValue(evaluationContext)) {
-                        anyChanged = true
-                        // println("adding new dependencies: ${current.dependencies}")
-                        for (dep in current.outputs) {
-                           remainingNodes.add(dep)
-                        }
-                    }
+                val newValue: NodeValue? = try { // Ports may fail if simulation mode is turned off and there is no "real" value
+                    node.calculateValue(evaluationContext)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    NodeValue(modificationTag, e)
+                }
+                if (newValue != null) {
+                    val oldValue = values[node]
+                    if (!newValue.contentEquals(oldValue)) {
+                        values[node] = newValue
+                        anyChanged = true
+                    }
                 }
             }
-            modificationTag = modificationToken.tag
+
             val removalSet = mutableSetOf<Any>()
             for(listener in updateListeners) {
                 if (anyChanged || !listener.onChangeOnly) {
@@ -421,13 +428,9 @@ class Model {
         }
     }
 
-    fun setPortValue(port: InputPortListener, value: Any?) {
-        requestSynchronizedWithToken {
-            port.portValueChanged(value, it)
-        }
-    }
-
     companion object {
         val instance: Model by lazy { Model() }
+
+        val STORAGE_FILE = File("storage/data.tc")
     }
 }
