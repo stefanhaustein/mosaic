@@ -9,7 +9,6 @@ import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.builtin.BuiltinFunctions
 import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.function.Functions
-import org.kobjects.mosaic.model.integration.InputPortListener
 import org.kobjects.mosaic.model.integration.IntegrationFactories
 import org.kobjects.mosaic.model.integration.IntegrationDescriptor
 import org.kobjects.mosaic.model.integration.Integrations
@@ -85,7 +84,7 @@ class Model {
 
         integrations.integrationMap["root"] = Root(this)
 
-        applyStructuralChange { modificationToken ->
+        applyModification { modificationToken ->
  //           modificationToken.loading = true
             var fileData = ""
             try {
@@ -260,7 +259,7 @@ class Model {
             if (name != previousName) {
                 val newSheet = Sheet(this, name, token.tag)
                 sheets[name] = newSheet
-                token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
+                token.addRefresh(ModificationKind.STRUCTURE)
                 if (!previousName.isNullOrBlank()) {
                     val oldSheet = sheets[previousName]
                     if (oldSheet != null) {
@@ -280,7 +279,7 @@ class Model {
 
 
     fun clearAll(modificationToken: ModificationToken) {
-        modificationToken.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
+        modificationToken.addRefresh(ModificationKind.STRUCTURE)
 
         // TODO: Delete integrations!!
 
@@ -289,17 +288,20 @@ class Model {
         }
     }
 
-    fun applyStructuralChange(
+    /*
+    fun applyModification(
         action: (ModificationToken) -> Unit
-    ) = applySynchronizedWithTokenImpl(ModificationToken(ModificationToken.ModificationKind.STRUCTURE),null, action)
+    ) = this@Model.applyModification(ModificationKind.STRUCTURE, action = action)
+     */
 
     @OptIn(ExperimentalContracts::class)
-    fun applySynchronizedWithTokenImpl(
-        modificationToken: ModificationToken,
-        callback: ((modificationTag: Long, anyChanged: Boolean) -> Unit)?,
+    fun applyModification(
+        modificationKind: ModificationKind = ModificationKind.UNMODIFIED,
+        callback: ((modificationTag: Long, anyChanged: Boolean) -> Unit)? = null,
         action: (ModificationToken) -> Unit
     ) {
         applySynchronized {
+            val modificationToken = ModificationToken(modificationKind)
             _modificationTag  = modificationToken.tag
             if (callback != null) {
                 updateListeners.add(UpdateListenerData(false, false, callback))
@@ -316,7 +318,7 @@ class Model {
 
             action(modificationToken)
 
-            if (modificationToken.modificatioKind == ModificationToken.ModificationKind.STRUCTURE) {
+            if (modificationToken.modificatioKind == ModificationKind.STRUCTURE) {
                 for (integration in integrations.integrationMap.values) {
                     for (port in integration.nodes.values.filterIsInstance<OutputPortNode>()) {
                         port.reparse()
@@ -329,13 +331,13 @@ class Model {
                 }
             }
 
-            if (modificationToken.modificatioKind >= ModificationToken.ModificationKind.FORMULAS) {
+            if (modificationToken.modificatioKind >= ModificationKind.FORMULAS) {
                 // Other changes are not relevant for saving.
                 applyTopologicalOrdering()
                 save()
-                if (modificationToken.modificatioKind == ModificationToken.ModificationKind.STRUCTURE) {
+                if (modificationToken.modificatioKind == ModificationKind.STRUCTURE) {
                     for (node in allNodes()) {
-                        modificationToken.addRefresh(ModificationToken.ModificationKind.STRUCTURE, node)
+                        modificationToken.addRefresh(ModificationKind.STRUCTURE, node)
                     }
                 }
             }
@@ -376,7 +378,7 @@ class Model {
         }
     }
 
-    fun requestSynchronizedWithToken(action: (ModificationToken) -> Unit) {
+    fun enqueueModification(action: (ModificationToken) -> Unit) {
         applySynchronized {
             pendingUpdates.add(action)
             requestRefresh()
@@ -415,7 +417,7 @@ class Model {
         applySynchronized {
             if (!refreshRequested) {
                 refreshRequested = true
-                applySynchronizedWithTokenImpl(ModificationToken(), null) {
+                this@Model.applyModification() {
                     refreshRequested = false
                 }
             }
@@ -425,7 +427,7 @@ class Model {
     /** A nullable listener simplifies call sites where the listener is a var and might be null */
     fun notifyValueChanged(listener: ValueChangeListener?) {
         if (listener != null) {
-            requestSynchronizedWithToken {
+            enqueueModification {
                 listener.notifyValueChanged(it)
             }
         }

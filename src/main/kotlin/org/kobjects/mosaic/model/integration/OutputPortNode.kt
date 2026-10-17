@@ -4,6 +4,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
 import org.kobjects.mosaic.model.ExpressionNode
+import org.kobjects.mosaic.model.ModificationKind
 import org.kobjects.mosaic.model.ModificationToken
 
 class OutputPortNode(
@@ -34,7 +35,7 @@ class OutputPortNode(
             rawFormula = value
             reparse()
             tag = modificationToken.tag
-            modificationToken.addRefresh(ModificationToken.ModificationKind.FORMULAS, this)
+            modificationToken.addRefresh(ModificationKind.FORMULAS, this)
         }
     }
 

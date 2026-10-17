@@ -38,13 +38,13 @@ fun Application.module() {
         post("/clear/{range}") {
             val rawRange = call.parameters["range"]!!
             val range = CellRangeReference.parse(model,rawRange)
-            model.applyStructuralChange {
+            model.applyModification {
                 range.clear(it)
             }
             call.respond(HttpStatusCode.OK)
         }
         post("/clearAll") {
-            model.applyStructuralChange {
+            model.applyModification {
                 model.clearAll(it)
             }
             call.respond(HttpStatusCode.OK)
@@ -53,7 +53,7 @@ fun Application.module() {
             val cell = call.parameters["cell"]!!
             val text = call.receiveText()
             val json = Json.parseToJsonElement(text).jsonObject
-            model.applyStructuralChange { token ->
+            model.applyModification { token ->
                 model.getOrCreateNode(cell).setJson(json, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -62,7 +62,7 @@ fun Application.module() {
             val jsonText = call.receiveText()
             println("Received JSON: $jsonText")
             val value = Json.parseToJsonElement(jsonText)
-            model.applyStructuralChange { token ->
+            model.applyModification { token ->
                 model.setRunMode(value.jsonPrimitive.boolean, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -75,7 +75,7 @@ fun Application.module() {
 
             println("/paste/$targetRange: $tomsonText")
 
-            model.applyStructuralChange { token ->
+            model.applyModification { token ->
                 targetRange.sheet.paste(token, targetRange, tomson)
             }
             call.respond(HttpStatusCode.OK)
@@ -87,7 +87,7 @@ fun Application.module() {
             println("/ports/$integrationName/$portName: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
             val integration = model.integrations[integrationName] ?: throw IllegalArgumentException("Integration '$integrationName' not found")
-            model.applyStructuralChange { token ->
+            model.applyModification { token ->
                 integration.definePort(portName, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -97,7 +97,7 @@ fun Application.module() {
             val jsonText = call.receiveText()
             println("/integrations/$name: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
-            model.applyStructuralChange { token ->
+            model.applyModification { token ->
                 model.integrations.configureIntegration(name, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -107,7 +107,7 @@ fun Application.module() {
             println("Received JSON: $jsonText")
             val jsonSpec = Json.parseToJsonElement(jsonText).jsonObject
             val name = jsonSpec["name"] as String?
-            model.applyStructuralChange { token ->
+            model.applyModification { token ->
                 model.updateSheet(name, jsonSpec, token)
             }
             call.respond(HttpStatusCode.OK)
@@ -115,7 +115,7 @@ fun Application.module() {
         post("/upload") {
             val fileItem = call.receiveMultipart().readPart() as PartData.FileItem
             val data = fileItem.provider().toByteArray().toString(Charsets.UTF_8)
-            model.applyStructuralChange {
+            model.applyModification {
                 model.clearAll(it)
                 model.loadData(data, it)
             }
@@ -125,7 +125,7 @@ fun Application.module() {
             val name = call.receiveText()
             val exampleFile = File("src/main/resources/examples", name + ".tc")
             val data = exampleFile.readText()
-            model.applyStructuralChange {
+            model.applyModification {
                 model.clearAll(it)
                 model.loadData(data, it)
             }

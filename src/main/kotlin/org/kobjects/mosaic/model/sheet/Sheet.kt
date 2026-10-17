@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.ModificationKind
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
 import org.kobjects.tomson.TomsonOutput
@@ -26,7 +27,7 @@ class Sheet(
         deleted = true
         tag = token.tag
         cells.clear()
-        token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
+        token.addRefresh(ModificationKind.STRUCTURE)
     }
 
     fun setHighlight(tag: Long, cellRangeReference: CellRangeReference, value: Boolean) {

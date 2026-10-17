@@ -107,7 +107,7 @@ class StateMachine(
         val targetRow: Int,
     ) : TimerTask() {
         override fun run() {
-            Model.instance.requestSynchronizedWithToken {
+            Model.instance.enqueueModification {
                 timedTransition = null
                 setCurrentState(it.tag, targetState)
                 currentRow = targetRow

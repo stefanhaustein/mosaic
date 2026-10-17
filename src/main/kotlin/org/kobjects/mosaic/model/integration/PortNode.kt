@@ -9,6 +9,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.AbstractPortDescriptor
+import org.kobjects.mosaic.model.ModificationKind
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Node
 
@@ -40,7 +41,7 @@ interface PortNode: Node {
         }
         deleted = json["deleted"]?.jsonPrimitive?.booleanOrNull ?: false
         if (deleted) {
-            token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
+            token.addRefresh(ModificationKind.STRUCTURE)
         } else if (!unmodifiable) {
             try {
                 val config = descriptor.convertConfiguration(jsonConfiguration)

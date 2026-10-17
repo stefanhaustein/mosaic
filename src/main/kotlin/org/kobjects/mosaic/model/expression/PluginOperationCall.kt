@@ -1,5 +1,6 @@
 package org.kobjects.mosaic.model.expression
 
+import org.kobjects.mosaic.model.ModificationKind
 import org.kobjects.mosaic.model.function.FunctionInstance
 import org.kobjects.mosaic.model.function.FunctionSpec
 import org.kobjects.mosaic.model.Node
@@ -35,7 +36,7 @@ class PluginOperationCall(
     }
 
     override fun notifyValueChanged(token: ModificationToken) {
-        token.addRefresh(ModificationToken.ModificationKind.VALUES, owner)
+        token.addRefresh(ModificationKind.VALUES, owner)
     }
 
     override fun eval(context: EvaluationContext): Any? {

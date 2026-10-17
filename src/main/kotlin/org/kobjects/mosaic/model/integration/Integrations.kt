@@ -4,6 +4,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.ModificationKind
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.tomson.TomsonOutput
 
@@ -26,7 +27,7 @@ class Integrations(val model: Model) : Iterable<Integration> {
             }
             integration = specification.createFn(name)
             integrationMap[name] = integration
-            token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
+            token.addRefresh(ModificationKind.STRUCTURE)
         }
         integration.configure(jsonSpec, token)
     }

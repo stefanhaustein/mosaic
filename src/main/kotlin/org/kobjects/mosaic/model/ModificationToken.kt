@@ -21,11 +21,4 @@ class ModificationToken(private var _modificationKind: ModificationKind = Modifi
     }
 
 
-    enum class ModificationKind {
-        UNMODIFIED,
-        VALUES,
-        FORMULAS,
-        STRUCTURE
-    }
-
 }

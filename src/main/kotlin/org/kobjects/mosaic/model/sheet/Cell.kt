@@ -14,11 +14,11 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.tomson.ToJson
 import org.kobjects.mosaic.model.ExpressionNode
+import org.kobjects.mosaic.model.ModificationKind
 import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
 import org.kobjects.mosaic.model.NodeValue
-import org.kobjects.mosaic.model.Values
 import org.kobjects.mosaic.model.expression.EvaluationContext
 import org.kobjects.mosaic.model.parser.ParsingContext
 
@@ -74,7 +74,7 @@ class Cell(
 
         reparse()
 
-        modificationToken.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
+        modificationToken.addRefresh(ModificationKind.STRUCTURE)
     }
 
     override fun reparse() {
@@ -89,7 +89,7 @@ class Cell(
     private fun setValidation(validation: JsonObject?, modificationToken: ModificationToken) {
         if (validation != this.validation) {
             this.validation = validation
-            modificationToken.addRefresh(ModificationToken.ModificationKind.FORMULAS, this)
+            modificationToken.addRefresh(ModificationKind.FORMULAS, this)
             tag = modificationToken.tag
         }
     }

@@ -9,6 +9,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import org.kobjects.mosaic.model.AbstractDescriptor
 import org.kobjects.mosaic.model.AbstractPortDescriptor
 import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.ModificationKind
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Namespace
 import org.kobjects.tomson.TomsonOutput
@@ -49,7 +50,7 @@ abstract class Integration(
         tag = token.tag
         if (deleted) {
             detach(token)
-            token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
+            token.addRefresh(ModificationKind.STRUCTURE)
         } else {
             try {
                 val config = factory.convertConfiguration(json)
