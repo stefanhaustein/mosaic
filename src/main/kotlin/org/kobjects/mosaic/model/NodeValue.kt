@@ -17,8 +17,6 @@ class NodeValue(
     val value: Any?,
     val imageConditionValues: List<Any?> = emptyList()
 ) {
-
-
     fun contentEquals(other: NodeValue?): Boolean {
         return other != null && value == other.value && imageConditionValues == other.imageConditionValues
     }

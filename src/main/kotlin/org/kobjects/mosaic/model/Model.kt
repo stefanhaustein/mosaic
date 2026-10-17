@@ -54,20 +54,23 @@ class Model {
     // Miscellaneous
 
     private val lock = ReentrantLock()
-    val updateListeners = mutableSetOf<UpdateListenerData>()
+    private val updateListeners = mutableSetOf<UpdateListenerData>()
 
     // State variables
 
-    var modificationTag: Long = 0
-    var refreshRequested: Boolean = false
-    var runMode_: Boolean = false
-    var settingsTag: Long = 0
+    private var _modificationTag: Long = 0
+    val modificationTag: Long get() = _modificationTag
+
+    private var refreshRequested: Boolean = false
+    private var runMode_: Boolean = false
+    private var settingsTag: Long = 0
 
     // State collections
 
     private var pendingUpdates = mutableListOf<(ModificationToken)->Unit>()
     private var upcomingValues: MutableMap<Node, Any?> = mutableMapOf()
-    val values: MutableMap<Node, NodeValue> = mutableMapOf()
+    private val _values: MutableMap<Node, NodeValue> = mutableMapOf()
+    val values: Map<Node, NodeValue> get() = _values
 
 
     init {
@@ -297,7 +300,7 @@ class Model {
         action: (ModificationToken) -> Unit
     ) {
         applySynchronized {
-            modificationTag  = modificationToken.tag
+            _modificationTag  = modificationToken.tag
             if (callback != null) {
                 updateListeners.add(UpdateListenerData(false, false, callback))
             }
@@ -354,7 +357,7 @@ class Model {
                 if (newValue != null) {
                     val oldValue = values[node]
                     if (!newValue.contentEquals(oldValue)) {
-                        values[node] = newValue
+                        _values[node] = newValue
                         anyChanged = true
                     }
                 }

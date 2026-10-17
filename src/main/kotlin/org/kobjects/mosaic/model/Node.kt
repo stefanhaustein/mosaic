@@ -15,9 +15,9 @@ import org.kobjects.mosaic.model.sheet.Cell.Companion.TIME_FORMAT_SECONDS
 
 // Can't be an abstract class because PortHolder needs to be a sub-interface
 interface Node : Comparable<Node> {
+    val owner: Namespace
     val outputs: MutableSet<Node>
     val inputs: MutableSet<Node>
-    val owner: Namespace
     var tag: Long
     var topologicalOrder: Int
 
@@ -34,7 +34,6 @@ interface Node : Comparable<Node> {
     fun detach()
 
     fun qualifiedId(): String
-
 
     fun serializeDependencies(builder: JsonObjectBuilder) {
         if (inputs.isNotEmpty()) {
