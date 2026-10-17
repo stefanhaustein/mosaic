@@ -26,7 +26,7 @@ class Sheet(
         deleted = true
         tag = token.tag
         cells.clear()
-        token.symbolsChanged = true
+        token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
     }
 
     fun setHighlight(tag: Long, cellRangeReference: CellRangeReference, value: Boolean) {

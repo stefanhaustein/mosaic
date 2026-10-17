@@ -49,7 +49,7 @@ abstract class Integration(
         tag = token.tag
         if (deleted) {
             detach(token)
-            token.symbolsChanged = true
+            token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
         } else {
             try {
                 val config = factory.convertConfiguration(json)

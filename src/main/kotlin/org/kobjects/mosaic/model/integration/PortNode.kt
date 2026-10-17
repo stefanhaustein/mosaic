@@ -40,7 +40,7 @@ interface PortNode: Node {
         }
         deleted = json["deleted"]?.jsonPrimitive?.booleanOrNull ?: false
         if (deleted) {
-            token.symbolsChanged = true
+            token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
         } else if (!unmodifiable) {
             try {
                 val config = descriptor.convertConfiguration(jsonConfiguration)

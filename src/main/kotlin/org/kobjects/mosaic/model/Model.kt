@@ -27,6 +27,7 @@ import org.kobjects.tomson.TomsonOutput
 import java.io.File
 import java.io.FileWriter
 import org.kobjects.tomson.TomsonParser
+import java.util.TreeSet
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.contracts.ExperimentalContracts
@@ -78,19 +79,67 @@ class Model {
 
         integrations.integrationMap["root"] = Root(this)
 
-        applyStructuralChange { runtimeContext ->
-            runtimeContext.loading = true
+        applyStructuralChange { modificationToken ->
+ //           modificationToken.loading = true
             var fileData = ""
             try {
                 fileData = STORAGE_FILE.readText()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            loadData(fileData, runtimeContext)
+            loadData(fileData, modificationToken)
         }
     }
 
+    private fun allNodes(): List<Node> = buildList {
+        for (integration in integrations.integrationMap.values) {
+            addAll(integration.nodes.values)
+        }
+        for (sheet in sheets.values) {
+            addAll(sheet.cells.values)
+        }
+    }
 
+    private fun applyTopologicalOrdering() {
+        val allNodes = allNodes()
+        val inDegree = mutableMapOf<Node, Int>()
+        val queue = ArrayDeque<Node>()
+
+        // 1. Initialize in-degrees and populate the queue in a single pass
+        for (node in allNodes) {
+            val degree = node.inputs.size
+            inDegree[node] = degree
+            if (degree == 0) {
+                queue.add(node)
+            }
+        }
+
+        // 2. Process nodes and assign topological orders
+        var currentOrder = 0
+        val processedCount = mutableListOf<Node>()
+
+        while (queue.isNotEmpty()) {
+            val node = queue.removeFirst()
+            node.topologicalOrder = currentOrder++
+            processedCount.add(node)
+
+            for (output in node.outputs) {
+                val newDegree = (inDegree[output] ?: 1) - 1
+                inDegree[output] = newDegree
+                if (newDegree == 0) {
+                    queue.add(output)
+                }
+            }
+        }
+
+        // 4. Cycle detection check
+        if (processedCount.size != allNodes.size) {
+            val problematicNodes = allNodes.toSet() - processedCount.toSet()
+            throw IllegalStateException(
+                "Cycle detected! The following ${problematicNodes.size} node(s) could not be resolved: $problematicNodes"
+            )
+        }
+    }
 
     fun addUpdateListener(permanent: Boolean, onChangeOnly: Boolean, listener: (modificationTag: Long, anyChanged: Boolean) -> Unit) {
         updateListeners.add(UpdateListenerData(permanent = permanent, onChangeOnly = onChangeOnly, listener = listener))
@@ -164,7 +213,7 @@ class Model {
     }
 
 
-    fun getOrCreate(name: String): Cell {
+    fun getOrCreateNode(name: String): Cell {
         val cut = name.indexOf("!")
         val sheet = sheets[name.substring(0, cut)]!!
         return sheet.getOrCreateCell(name.substring(cut + 1))
@@ -205,7 +254,7 @@ class Model {
             if (name != previousName) {
                 val newSheet = Sheet(this, name, token.tag)
                 sheets[name] = newSheet
-                token.symbolsChanged = true
+                token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
                 if (!previousName.isNullOrBlank()) {
                     val oldSheet = sheets[previousName]
                     if (oldSheet != null) {
@@ -225,8 +274,7 @@ class Model {
 
 
     fun clearAll(modificationToken: ModificationToken) {
-        modificationToken.symbolsChanged = true
-        modificationToken.formulaChanged = true
+        modificationToken.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
 
         // TODO: Delete integrations!!
 
@@ -237,7 +285,7 @@ class Model {
 
     fun applyStructuralChange(
         action: (ModificationToken) -> Unit
-    ) = applySynchronizedWithTokenImpl(ModificationToken(true),null, action)
+    ) = applySynchronizedWithTokenImpl(ModificationToken(ModificationToken.ModificationKind.STRUCTURE),null, action)
 
     @OptIn(ExperimentalContracts::class)
     fun applySynchronizedWithTokenImpl(
@@ -261,7 +309,7 @@ class Model {
 
             action(modificationToken)
 
-            if (modificationToken.symbolsChanged) {
+            if (modificationToken.modificatioKind == ModificationToken.ModificationKind.STRUCTURE) {
                 for (integration in integrations.integrationMap.values) {
                     for (port in integration.nodes.values.filterIsInstance<OutputPortNode>()) {
                         port.reparse()
@@ -274,89 +322,36 @@ class Model {
                 }
             }
 
-            var anyChanged = modificationToken.symbolsChanged || modificationToken.formulaChanged || settingsTag >= modificationToken.tag
-            if (anyChanged) {
+            if (modificationToken.modificatioKind >= ModificationToken.ModificationKind.FORMULAS) {
                 // Other changes are not relevant for saving.
+                applyTopologicalOrdering()
                 save()
-            }
-
-            if (modificationToken.symbolsChanged) {
-                // Mark everything "dirty"
-                for (sheet in sheets.values) {
-                    for (cell in sheet.cells.values) {
-                        modificationToken.addRefresh(cell)
-                    }
-                }
-                for (integration in integrations.integrationMap.values) {
-                    for (port in integration.nodes.values.filterIsInstance<OutputPortNode>()) {
-                        modificationToken.addRefresh(port)
+                if (modificationToken.modificatioKind == ModificationToken.ModificationKind.STRUCTURE) {
+                    for (node in allNodes()) {
+                        modificationToken.addRefresh(ModificationToken.ModificationKind.STRUCTURE, node)
                     }
                 }
             }
 
-            println("Root nodes needing refresh: ${modificationToken.refreshRoots}; other: ${modificationToken.refreshNodes}")
-
+            val remainingNodes = TreeSet(modificationToken.refreshNodes)
             val evaluationContext = EvaluationContext(modificationTag)
-            while (modificationToken.refreshRoots.isNotEmpty()) {
-                val current = modificationToken.refreshRoots.first()
-                modificationToken.refreshRoots.remove(current)
+            var anyChanged = false
+
+            while (remainingNodes.isNotEmpty()) {
+                val current = remainingNodes.removeFirst()
                 // println("Updating: $current")
                 try { // Ports may fail if simulation mode is turned off and there is no "real" value
                     if (current.recalculateValue(evaluationContext)) {
                         anyChanged = true
                         // println("adding new dependencies: ${current.dependencies}")
                         for (dep in current.outputs) {
-                            if (dep.inputs.size == 1) {
-                                modificationToken.refreshNodes.remove(dep)
-                                modificationToken.refreshRoots.add(dep)
-                            } else {
-                                modificationToken.refreshNodes.add(dep)
-                            }
+                           remainingNodes.add(dep)
                         }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
-
-            // modificationToken.refreshNodes.addAll(modificationToken.refreshRoots)
-            // modificationToken.refreshRoots.clear()
-
-            for (dep in modificationToken.refreshNodes.toList()) {
-                modificationToken.addAllDependencies(dep)
-            }
-
-            println("Saturated dependencies: ${modificationToken.refreshNodes}")
-
-            var previousSize = modificationToken.refreshNodes.size
-            while (modificationToken.refreshNodes.isNotEmpty()) {
-
-                println("Remaining dependencies: ${modificationToken.refreshNodes}")
-
-                for (node in modificationToken.refreshNodes) {
-                    var found = true
-                    for (dep in node.inputs) {
-                        if (modificationToken.refreshNodes.contains(dep)) {
-                            found = false
-                            break
-                        }
-                    }
-                    if (found) {
-                        println("Updating node: $node")
-                        modificationToken.refreshNodes.remove(node)
-                        if (node.recalculateValue(evaluationContext)) {
-                            anyChanged = true
-                        }
-                        break
-                    }
-                }
-                if (modificationToken.refreshNodes.size == previousSize) {
-                    println("Bailing out b/c no reduction")
-                    break
-                }
-                previousSize = modificationToken.refreshNodes.size
-            }
-
             modificationTag = modificationToken.tag
             val removalSet = mutableSetOf<Any>()
             for(listener in updateListeners) {

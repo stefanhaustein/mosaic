@@ -15,7 +15,7 @@ import org.kobjects.mosaic.model.sheet.Cell.Companion.TIME_FORMAT_SECONDS
 
 
 // Can't be an abstract class because PortHolder needs to be a sub-interface
-interface Node {
+interface Node : Comparable<Node> {
     val value: Any?
     /** Used to track when the value was changed last. */
     var valueTag: Long
@@ -24,6 +24,8 @@ interface Node {
     val owner: Namespace
     var tag: Long
     var topologicalOrder: Int
+
+    override fun compareTo(other: Node): Int = topologicalOrder.compareTo(other.topologicalOrder)
 
     /**
      * Re-calculates the value bases on inputs. Returns true if the value has changed.

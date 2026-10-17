@@ -54,7 +54,7 @@ fun Application.module() {
             val text = call.receiveText()
             val json = Json.parseToJsonElement(text).jsonObject
             model.applyStructuralChange { token ->
-                model.getOrCreate(cell).setJson(json, token)
+                model.getOrCreateNode(cell).setJson(json, token)
             }
             call.respond(HttpStatusCode.OK)
         }

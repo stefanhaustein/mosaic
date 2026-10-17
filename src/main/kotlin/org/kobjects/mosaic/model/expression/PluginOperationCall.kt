@@ -35,7 +35,7 @@ class PluginOperationCall(
     }
 
     override fun notifyValueChanged(token: ModificationToken) {
-        token.addRefresh(owner)
+        token.addRefresh(ModificationToken.ModificationKind.VALUES, owner)
     }
 
     override fun eval(context: EvaluationContext): Any? {

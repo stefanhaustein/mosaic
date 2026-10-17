@@ -34,8 +34,7 @@ class OutputPortNode(
             rawFormula = value
             reparse()
             tag = modificationToken.tag
-            modificationToken.formulaChanged = true
-            modificationToken.addRefresh(this)
+            modificationToken.addRefresh(ModificationToken.ModificationKind.FORMULAS, this)
         }
     }
 

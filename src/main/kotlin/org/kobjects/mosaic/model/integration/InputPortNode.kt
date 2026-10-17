@@ -63,7 +63,7 @@ open class InputPortNode(
     override fun portValueChanged(newValue: Any?, token: ModificationToken) {
         if (this.newValue != newValue) {
             this.newValue = newValue
-            token.addRefresh(this)
+            token.addRefresh(ModificationToken.ModificationKind.VALUES, this)
             valueTag = token.tag
         }
     }

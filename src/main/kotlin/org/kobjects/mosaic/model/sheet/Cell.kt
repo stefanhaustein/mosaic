@@ -73,8 +73,7 @@ class Cell(
 
         reparse()
 
-        modificationToken.formulaChanged = true
-        modificationToken.addRefresh(this)
+        modificationToken.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
     }
 
     override fun reparse() {
@@ -89,7 +88,7 @@ class Cell(
     private fun setValidation(validation: JsonObject?, modificationToken: ModificationToken) {
         if (validation != this.validation) {
             this.validation = validation
-            modificationToken.formulaChanged = true
+            modificationToken.addRefresh(ModificationToken.ModificationKind.FORMULAS, this)
             tag = modificationToken.tag
         }
     }

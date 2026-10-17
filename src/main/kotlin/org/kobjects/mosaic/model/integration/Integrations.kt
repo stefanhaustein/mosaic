@@ -26,7 +26,7 @@ class Integrations(val model: Model) : Iterable<Integration> {
             }
             integration = specification.createFn(name)
             integrationMap[name] = integration
-            token.symbolsChanged = true
+            token.addRefresh(ModificationToken.ModificationKind.STRUCTURE)
         }
         integration.configure(jsonSpec, token)
     }
