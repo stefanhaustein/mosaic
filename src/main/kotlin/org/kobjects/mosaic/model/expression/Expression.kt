@@ -15,22 +15,7 @@ abstract class Expression {
 
     fun evalBoolean(context: EvaluationContext): Boolean = Values.toBoolean(eval(context))
 
-    open fun attach() = Unit
-
     open fun detach() = Unit
-
-    fun attachAll() {
-        for (child in children) {
-            child.attachAll()
-        }
-        try {
-            attach()
-        } catch(e: Exception ) {
-            System.err.println("Error attaching $this")
-            e.printStackTrace()
-        }
-    }
-
 
     fun detachAll(){
         for (child in children) {

@@ -19,9 +19,7 @@ import org.kobjects.mosaic.model.integration.IntegrationDescriptor
     var invocationId = 0
     var pixtendModel = PiXtendDriver.Model.V2S
 
-
     private fun attach() {
-
             try {
                 driver = PiXtendDriver(model.pi4J, this@PiXtendIntegration.pixtendModel)
                 error = null
@@ -30,7 +28,6 @@ import org.kobjects.mosaic.model.integration.IntegrationDescriptor
                 e.printStackTrace()
                 error = e
             }
-
     }
 
     fun syncState(driver: PiXtendDriver, invocationId: Int) {

@@ -66,7 +66,7 @@ class Model {
 
     // State collections
 
-    private var pendingUpdates = mutableListOf<(ModificationToken)->Unit>()
+    private var pendingUpdates = mutableListOf<(tag: Long)->Node>()
     private var upcomingValues: MutableMap<Node, Any?> = mutableMapOf()
     private val _values: MutableMap<Node, NodeValue> = mutableMapOf()
     val values: Map<Node, NodeValue> get() = _values
@@ -154,7 +154,6 @@ class Model {
         integrationFactories.add(spec)
     }
 
-
     fun setRunMode(value: Boolean, token: ModificationToken) {
         runMode_ = value
         settingsTag = token.tag
@@ -163,9 +162,16 @@ class Model {
     fun setInputPortValue(node: Node, value: Any?) {
         synchronized(lock) {
             upcomingValues[node] = value
+            requestRefresh()
         }
     }
 
+    fun enqueueUpdateAction(action: (tag: Long)->Node) {
+        synchronized(lock) {
+            pendingUpdates.add(action)
+            requestRefresh()
+        }
+    }
 
     fun loadData(data: String, token: ModificationToken) {
         try {
@@ -288,13 +294,6 @@ class Model {
         }
     }
 
-    /*
-    fun applyModification(
-        action: (ModificationToken) -> Unit
-    ) = this@Model.applyModification(ModificationKind.STRUCTURE, action = action)
-     */
-
-    @OptIn(ExperimentalContracts::class)
     fun applyModification(
         modificationKind: ModificationKind = ModificationKind.UNMODIFIED,
         callback: ((modificationTag: Long, anyChanged: Boolean) -> Unit)? = null,
@@ -302,7 +301,8 @@ class Model {
     ) {
         applySynchronized {
             val modificationToken = ModificationToken(modificationKind)
-            _modificationTag  = modificationToken.tag
+            val tag = modificationToken.tag
+            _modificationTag  = tag
             if (callback != null) {
                 updateListeners.add(UpdateListenerData(false, false, callback))
             }
@@ -310,7 +310,7 @@ class Model {
             pendingUpdates = mutableListOf()
             for (update in pendingUpdatesLocal) {
                 try {
-                    update(modificationToken)
+                    modificationToken.addRefresh(ModificationKind.VALUES, update(tag))
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -378,13 +378,6 @@ class Model {
         }
     }
 
-    fun enqueueModification(action: (ModificationToken) -> Unit) {
-        applySynchronized {
-            pendingUpdates.add(action)
-            requestRefresh()
-        }
-    }
-
     fun <T> applySynchronized(action: () -> T) = lock.withLock(action)
 
     data class UpdateListenerData (
@@ -424,14 +417,6 @@ class Model {
         }
     }
 
-    /** A nullable listener simplifies call sites where the listener is a var and might be null */
-    fun notifyValueChanged(listener: ValueChangeListener?) {
-        if (listener != null) {
-            enqueueModification {
-                listener.notifyValueChanged(it)
-            }
-        }
-    }
 
     companion object {
         val instance: Model by lazy { Model() }

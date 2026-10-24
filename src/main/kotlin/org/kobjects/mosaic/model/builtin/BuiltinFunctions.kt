@@ -24,7 +24,7 @@ object BuiltinFunctions {
             "pi",
             "The value of pi",
             emptyList(),
-            createFn = { PiFunction },
+            createFn = { _, _ -> PiFunction },
         ),
 
         FunctionSpec(
@@ -93,7 +93,7 @@ object BuiltinFunctions {
             ),
             emptySet(),
             0,
-        ) { FlipflopFunction.createRs() },
+        ) { _, _ -> FlipflopFunction.createRs() },
 
         FunctionSpec(
             null,
@@ -107,7 +107,7 @@ object BuiltinFunctions {
             ),
             emptySet(),
             0,
-        ) { FlipflopFunction.createSr() },
+        ) { _, _ -> FlipflopFunction.createSr() },
 
         FunctionSpec(
             null,
@@ -117,9 +117,8 @@ object BuiltinFunctions {
             """A state machine specified by the given cell range. 
                 |Rows consist of the current state, the transition condition and the new state""".trimMargin(),
             listOf(ParameterSpec("transitions", Type.RANGE, null, setOf(ParameterSpec.Modifier.REFERENCE))),
-            createFn = {
-                StateMachine.create(model, it)
-            },
+            createFn = StateMachine::create
+            ,
         ),
     )
 }

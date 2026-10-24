@@ -2,15 +2,14 @@ package org.kobjects.mosaic.model.builtin
 
 import org.kobjects.mosaic.model.sheet.Cell
 import org.kobjects.mosaic.model.sheet.CellRangeReference
-import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.expression.CellRangeExpression
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 import java.util.*
 
 class StateMachine(
-    val model: Model,
+    val owner: Node,
     val cellRange: CellRangeReference
 ) : StatefulFunctionInstance {
     private var currentState = ""
@@ -19,23 +18,17 @@ class StateMachine(
     var currentRow: Int = 0
 
     val timer = Timer()
-    var timedTransition: TimedTransition? = null
-    var host: ValueChangeListener? = null
+    var pendingTimedTransition: TimedTransition? = null
 
     val rowCount: Int = cellRange.toRow - cellRange.fromRow + 1
 
-    override fun attach(host: ValueChangeListener) {
-        this.host = host
-    }
-
     override fun detach() {
-        host = null
     }
 
     fun getValue(col: Int, row: Int): Any? {
         val cell = cellRange.sheet.getOrCreateCell(Cell.id(
             (if (col < 0) cellRange.toColumn + 1 else cellRange.fromColumn) + col, cellRange.fromRow + row))
-        return model.values[cell]?.value
+        return owner.owner.model.values[cell]?.value
     }
 
 
@@ -68,25 +61,25 @@ class StateMachine(
             if (getValue(0, currentRow).toString() == currentState) {
                 val gate = getValue(-2, currentRow)
                 if (gate == true) {
-                    timedTransition?.cancel()
-                    timedTransition = null
+                    pendingTimedTransition?.cancel()
+                    pendingTimedTransition = null
                     setCurrentState(context.tag, getValue(-1, currentRow).toString())
 
                     // Trigger a re-calculation as there might be a followup state transition
                     timer.schedule(object : TimerTask() {
                         override fun run() {
-                            Model.instance.notifyValueChanged(host)
+                            owner.owner.model.enqueueUpdateAction { owner }
                         }
                     }, 1)
                     break
                 } else if (gate is Number) {
                     val delay = gate.toLong()
                     val targetTime = System.currentTimeMillis() + delay
-                    if (targetTime < timedTransition?.targetTime ?: Long.MAX_VALUE) {
-                        timedTransition?.cancel()
+                    if (targetTime < pendingTimedTransition?.targetTime ?: Long.MAX_VALUE) {
+                        pendingTimedTransition?.cancel()
                         val newTransition = TimedTransition(
                             targetTime, getValue(-1, currentRow).toString(), currentRow)
-                        timedTransition = newTransition
+                        pendingTimedTransition = newTransition
                         timer.schedule(newTransition, delay)
                     }
                 }
@@ -107,11 +100,11 @@ class StateMachine(
         val targetRow: Int,
     ) : TimerTask() {
         override fun run() {
-            Model.instance.enqueueModification {
-                timedTransition = null
-                setCurrentState(it.tag, targetState)
+            owner.owner.model.enqueueUpdateAction { tag ->
+                pendingTimedTransition = null
+                setCurrentState(tag, targetState)
                 currentRow = targetRow
-                host?.notifyValueChanged(it)
+                owner
             }
         }
     }
@@ -119,7 +112,7 @@ class StateMachine(
 
 
     companion object {
-        fun create(model: Model, configuration: Map<String, Any?>) = StateMachine(model,
+        fun create(owner: Node, configuration: Map<String, Any?>) = StateMachine(owner,
             (configuration["transitions"] as CellRangeExpression).target)
     }
 

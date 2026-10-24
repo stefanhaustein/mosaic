@@ -1,13 +1,13 @@
 package org.kobjects.mosaic.model.builtin
 
-import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 import java.util.Timer
 import java.util.TimerTask
 
 class TimedOnOff(
+    val owner: Node,
     val delayedState: Boolean,
     val delay: Double,
 
@@ -17,11 +17,6 @@ class TimedOnOff(
     var task: TimerTask? = null
     var outputState: Boolean = false
 
-    var host: ValueChangeListener? = null
-
-    override fun attach(host: ValueChangeListener) {
-        this.host = host
-    }
 
     override fun apply(context: EvaluationContext, params: Map<String, Any?>): Any {
         val inputState = params["input"] as Boolean
@@ -32,8 +27,10 @@ class TimedOnOff(
             task?.cancel()
             task = object : TimerTask() {
                 override fun run() {
-                    outputState = delayedState
-                    Model.instance.notifyValueChanged(host)
+                    owner.owner.model.enqueueUpdateAction {
+                        outputState = delayedState
+                        owner
+                    }
                     task = null
                 }
             }
@@ -50,12 +47,12 @@ class TimedOnOff(
 
 
     companion object {
-        fun createTon(configuration: Map<String, Any?>): TimedOnOff {
-            return TimedOnOff(true, (configuration["delay"] as Number).toDouble())
+        fun createTon(node: Node, configuration: Map<String, Any?>): TimedOnOff {
+            return TimedOnOff(node, true, (configuration["delay"] as Number).toDouble())
         }
 
-        fun createToff(configuration: Map<String, Any?>): TimedOnOff {
-            return TimedOnOff(false, (configuration["delay"] as Number).toDouble())
+        fun createToff(node: Node, configuration: Map<String, Any?>): TimedOnOff {
+            return TimedOnOff(node,false, (configuration["delay"] as Number).toDouble())
         }
     }
 }

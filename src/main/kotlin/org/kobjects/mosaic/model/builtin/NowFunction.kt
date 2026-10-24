@@ -1,32 +1,26 @@
 package org.kobjects.mosaic.model.builtin
 
 import kotlinx.datetime.Clock
-import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 import java.util.Timer
 import java.util.TimerTask
 
 class NowFunction(
+    val owner: Node,
     val updateInterval: Double,
 ) : StatefulFunctionInstance {
     val timer = Timer()
     val timerId = timerCounter++
     var task: TimerTask? = null
-    var host: ValueChangeListener? = null
 
-    override fun apply(context: EvaluationContext, params: Map<String, Any?>): Any {
-        return Clock.System.now()
-    }
-
-
-    override fun attach(host: ValueChangeListener) {
+    init {
         val period = (updateInterval * 1000.0).toLong()
         if (period > 0) {
             task = object : TimerTask() {
                 override fun run() {
-                    Model.instance.notifyValueChanged(host)
+                    owner.owner.model.enqueueUpdateAction { owner }
                 }
             }
             timer.schedule(task, period, period)
@@ -35,12 +29,17 @@ class NowFunction(
     }
 
 
+    override fun apply(context: EvaluationContext, params: Map<String, Any?>): Any {
+        return Clock.System.now()
+    }
+
+
     override fun detach() {
         println("Cancelling timer $timerId!")
         //timerTask?.cancel()
         task?.cancel()
         task = null
-        host = null
+
         //timer.purge()
     }
 
@@ -48,8 +47,8 @@ class NowFunction(
     companion object {
         var timerCounter = 0
 
-        fun create(configuration: Map<String, Any?>): NowFunction {
-            return NowFunction((configuration["interval"] as Number).toDouble())
+        fun create(owner: Node, configuration: Map<String, Any?>): NowFunction {
+            return NowFunction(owner, (configuration["interval"] as Number).toDouble())
         }
 
     }

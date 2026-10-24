@@ -1,7 +1,6 @@
 package org.kobjects.mosaic.model.builtin
 
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 
 class FlipflopFunction(
@@ -9,8 +8,6 @@ class FlipflopFunction(
 ) : StatefulFunctionInstance {
 
     var q: Boolean = false
-
-    override fun attach(host: ValueChangeListener) {}
 
     override fun apply(context: EvaluationContext, params: Map<String, Any?>): Any? {
         val s = params["s"] as Boolean

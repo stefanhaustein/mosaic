@@ -1,13 +1,13 @@
 package org.kobjects.mosaic.model.builtin
 
-import org.kobjects.mosaic.model.Model
+import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.expression.EvaluationContext
-import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.model.function.StatefulFunctionInstance
 import java.util.Timer
 import java.util.TimerTask
 
 class TimedPulse(
+    val owner: Node,
     val delay: Double,
 ) : StatefulFunctionInstance {
 
@@ -16,11 +16,6 @@ class TimedPulse(
     var outputState: Boolean = false
     var armed: Boolean = true
 
-    var host: ValueChangeListener? = null
-
-    override fun attach(host: ValueChangeListener) {
-        this.host = host
-    }
 
     override fun apply(context: EvaluationContext, params: Map<String, Any?>): Any {
         val inputState = params["input"] as Boolean
@@ -33,8 +28,10 @@ class TimedPulse(
                     outputState = true
                     task = object : TimerTask() {
                         override fun run() {
-                            outputState = false
-                            Model.instance.notifyValueChanged(host)
+                            owner.owner.model.enqueueUpdateAction { _ ->
+                                outputState = false
+                                owner
+                            }
                         }
                     }
                     timer.schedule(task, (delay * 1000.0).toLong())
@@ -52,8 +49,8 @@ class TimedPulse(
 
 
     companion object {
-        fun create(configuration: Map<String, Any?>): TimedPulse {
-            return TimedPulse((configuration["delay"] as Number).toDouble())
+        fun create(owner: Node, configuration: Map<String, Any?>): TimedPulse {
+            return TimedPulse(owner, (configuration["delay"] as Number).toDouble())
         }
     }
 }

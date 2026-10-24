@@ -150,9 +150,7 @@ object TcFormulaParser : PrattParser<TcScanner, ParsingContext, Expression>(
     fun parseNodeExpression(rawFormula: String, context: ParsingContext): Expression =
         if (rawFormula.startsWith("=")) {
             try {
-                val parsed = TcFormulaParser.parseExpression(rawFormula.substring(1), context)
-                parsed.attachAll()
-                parsed
+                TcFormulaParser.parseExpression(rawFormula.substring(1), context)
             } catch (e: Exception) {
                 e.printStackTrace()
                 Literal(e)

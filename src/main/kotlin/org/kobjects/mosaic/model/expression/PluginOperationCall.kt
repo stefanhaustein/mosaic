@@ -6,7 +6,6 @@ import org.kobjects.mosaic.model.function.FunctionSpec
 import org.kobjects.mosaic.model.Node
 import org.kobjects.mosaic.model.ParameterSpec
 import org.kobjects.mosaic.model.function.StatefulFunctionInstance
-import org.kobjects.mosaic.model.ValueChangeListener
 import org.kobjects.mosaic.model.ModificationToken
 import org.kobjects.mosaic.model.Type
 
@@ -16,27 +15,17 @@ class PluginOperationCall(
     val configuration: Map<String, Any?>,
     val parameters: Map<String, Pair<Expression, Type>>
 
-): Expression(), ValueChangeListener {
+): Expression() {
 
     override val children: Collection<Expression>
         get() = parameters.values.map { it.first }
 
-    val operation = operationSpec.createFn(configuration) as FunctionInstance
-
-    override fun attach() {
-        if (operation is StatefulFunctionInstance) {
-            operation.attach(this)
-        }
-    }
+    val operation = operationSpec.createFn(owner, configuration) as FunctionInstance
 
     override fun detach() {
         if (operation is StatefulFunctionInstance) {
             operation.detach()
         }
-    }
-
-    override fun notifyValueChanged(token: ModificationToken) {
-        token.addRefresh(ModificationKind.VALUES, owner)
     }
 
     override fun eval(context: EvaluationContext): Any? {
