@@ -8,7 +8,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
-import kotlinx.html.dom.serialize
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
@@ -161,21 +160,6 @@ fun Application.module() {
             val path = call.parameters.getAll("path")!!.joinToString("/")
             //val json = Model.restValues[path]?.toJson()
             call.respondText("null", ContentType.Application.Json, HttpStatusCode.OK)
-        }
-        get("img/{name...}") {
-            val path = call.parameters.getAll("name")!!.joinToString("/")
-
-                println("Svg requested: $path")
-                val available = model.svgs.map
-                println("Available SVGs: $available")
-                val svg = available["img/$path"]
-
-            println("Found: $svg")
-
-            val parameterMap = call.request.queryParameters.entries().map { Pair(it.key, it.value.first()) }.toMap()
-            val parameterized = svg!!.parameterized(parameterMap)
-
-            call.respondText(parameterized.documentElement.serialize(), ContentType.Image.SVG)
         }
 
         /* get("/") {

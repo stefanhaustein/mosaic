@@ -21,7 +21,6 @@ import org.kobjects.mosaic.plugins.homeassistant.HomeAssistantIntegration
 import org.kobjects.mosaic.plugins.i2csensor.I2cSensorIntegration
 import org.kobjects.mosaic.plugins.pixtend.PiXtendIntegration
 import org.kobjects.mosaic.plugins.gpio.GpioIntegration
-import org.kobjects.mosaic.svg.SvgManager
 import org.kobjects.tomson.TomsonOutput
 import java.io.File
 import java.io.FileWriter
@@ -29,13 +28,11 @@ import org.kobjects.tomson.TomsonParser
 import java.util.TreeSet
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
-import kotlin.contracts.ExperimentalContracts
 
 class Model {
 
     // Structural stuff
 
-    val svgs = SvgManager(File("src/main/resources/static/img"))
     val sheets = mutableMapOf("Sheet1" to Sheet(this, "Sheet1"))
     val functions = Functions()
     val integrationFactories = IntegrationFactories()
