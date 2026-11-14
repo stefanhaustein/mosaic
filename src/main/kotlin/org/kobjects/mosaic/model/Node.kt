@@ -31,6 +31,8 @@ interface Node : Comparable<Node> {
      */
     fun calculateValue(context: EvaluationContext): NodeValue?
 
+    fun notifyValueChanged(newValue: Any?) {}
+
     fun detach()
 
     fun qualifiedId(): String

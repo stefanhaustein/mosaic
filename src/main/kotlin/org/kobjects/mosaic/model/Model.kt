@@ -160,14 +160,14 @@ class Model {
     }
 
     fun setInputPortValue(node: Node, value: Any?) {
-        synchronized(lock) {
+        applySynchronized {
             upcomingValues[node] = value
             requestRefresh()
         }
     }
 
     fun enqueueUpdateAction(action: (tag: Long)->Node) {
-        synchronized(lock) {
+        applySynchronized {
             pendingUpdates.add(action)
             requestRefresh()
         }
@@ -343,6 +343,7 @@ class Model {
             }
 
             val remainingNodes = TreeSet(modificationToken.refreshNodes)
+            remainingNodes.addAll(upcomingValues.keys)
             val evaluationContext = EvaluationContext(this, modificationTag, upcomingValues)
             upcomingValues = mutableMapOf()
 
@@ -361,6 +362,12 @@ class Model {
                     if (!newValue.contentEquals(oldValue)) {
                         _values[node] = newValue
                         anyChanged = true
+                        remainingNodes.addAll(node.outputs)
+                        try {
+                            node.notifyValueChanged(newValue.value)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
             }

@@ -36,7 +36,5 @@ abstract class ExpressionNode(
         expression = TcFormulaParser.parseNodeExpression(rawFormula, ParsingContext(this))
     }
 
-    open fun notifyValueChanged(newValue: Any?) {}
-
     override fun calculateValue(context: EvaluationContext) = NodeValue(context.tag,expression.eval(context))
 }
