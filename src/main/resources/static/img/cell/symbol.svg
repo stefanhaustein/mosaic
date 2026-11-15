@@ -4,54 +4,37 @@
 </symbol>
 
 <symbol id="lamp" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="47" fill="none" stroke-width="5" stroke="black" />
-    <line x1="17" y1="17" x2="83" y2="83" stroke="black" stroke-width="5" />
-    <line x1="17" y1="83" x2="83" y2="17" stroke="black" stroke-width="5" />
+    <circle cx="50" cy="50" r="47" fill="none" stroke-width="5" stroke="currentColor" />
+    <line x1="17" y1="17" x2="83" y2="83" stroke="currentColor" stroke-width="5" />
+    <line x1="17" y1="83" x2="83" y2="17" stroke="currentColor" stroke-width="5" />
 </symbol>
 
-<symbol id="mixer.d" viewBox="0 0 100 100">
+<symbol id="mixer" viewBox="0 0 100 100">
     <path d="M 50,50 C 0,0 0,100 50,50 C 100,0, 100,100, 50,50"
       fill="none" stroke-width="5"
-      stroke="black" />
-    <polyline points="50,100 50,50" stroke="black" stroke-width="5"/>
-</symbol>
-
-<symbol id="mixer.u" viewBox="0 0 100 100">
-    <path d="M 50,50 C 0,0 0,100 50,50 C 100,0, 100,100, 50,50"
-      fill="none" stroke-width="5"
-      stroke="black" />
-    <polyline points="50,0 50,50" stroke="black" stroke-width="5"/>
+      stroke="currentColor" />
+    <polyline points="50,100 50,50" stroke="currentColor" stroke-width="5"/>
 </symbol>
 
 <symbol id="motor" viewBox="0 0 100 100">
     <circle cx="50" cy="50" r="47"
         fill="none" stroke-width="5"
-        stroke="black" />
-    <polyline points="30,80 30,20 50,80 70,20 70,80" fill="none" stroke-linejoin="bevel" stroke="black" stroke-width="5"/>
+        stroke="currentColor" />
+    <polyline points="30,80 30,20 50,80 70,20 70,80" fill="none" stroke-linejoin="bevel" stroke="currentColor" stroke-width="5"/>
 </symbol>
 
 <symbol id="sensor" viewBox="0 0 100 100">
     <circle cx="50" cy="50" r="48"
         fill="none" stroke-width="5"
-        stroke="black" />
-    <polyline points="100,50 0,50" stroke="black" stroke-width="2"/>
+        stroke="currentColor" />
+    <polyline points="100,50 0,50" stroke="currentColor" stroke-width="2"/>
 </symbol>
 
-<symbol id="valve.h" viewBox="0 0 100 100">
+<symbol id="valve" viewBox="0 0 100 100">
     <polygon points="10,20 90,80 90,20 10,80"
          fill="none" stroke-width="5"
-         stroke="black" />
-    <polyline points="0,50 10,50" stroke="black" stroke-width="5"/>
-    <polyline points="90,50 100,50" stroke="black" stroke-width="5"/>
+         stroke="currentColor" />
+    <polyline points="0,50 10,50" stroke="currentColor" stroke-width="5"/>
+    <polyline points="90,50 100,50" stroke="currentColor" stroke-width="5"/>
 </symbol>
-
-
-<symbol id="valve.v" viewBox="0 0 100 100">
-    <polygon points="20,10 80,10 20,90 80,90"
-             fill="none" stroke-width="5"
-             stroke="black" />
-    <polyline points="50,0 50,10" stroke="black" stroke-width="5" />
-    <polyline points="50,100 50,90" stroke="black" stroke-width="5" />
-</symbol>
-
 </svg>

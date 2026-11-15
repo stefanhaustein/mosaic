@@ -1,11 +1,30 @@
-
 let imageDialog = document.getElementById("imageDialog")
+let imageDialogTabs = document.getElementById("imageDialogTabs")
 let imageDialogContent = document.getElementById("imageDialogContent")
 
 let selectedElement = null
 
+function selectTab(tabId) {
+    for (let button of imageDialogTabs.children) {
+        button.classList.toggle("active", button.dataset.tab === tabId)
+    }
+    for (let panel of imageDialogContent.children) {
+        panel.hidden = panel.id !== tabId
+    }
+}
+
+imageDialogTabs.addEventListener("click", event => {
+    let tabId = event.target.dataset.tab
+    if (tabId) {
+        selectTab(tabId)
+    }
+})
+
 imageDialogContent.addEventListener("click", event => {
-    selectElement(event.target)
+    let svg = event.target.closest("svg")
+    if (svg != null) {
+        selectElement(svg)
+    }
 })
 
 function selectElement(svg) {
@@ -22,8 +41,10 @@ function selectElement(svg) {
     }
     selectedElement = svg
     if (selectedElement != null) {
-        selectedElement.parentElement.open = true
+        selectTab(selectedElement.parentElement.id)
         selectedElement.style.backgroundColor = "#aaf"
+    } else {
+        selectTab(imageDialogContent.firstElementChild.id)
     }
 }
 

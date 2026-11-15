@@ -191,58 +191,29 @@
 
     <dialog id="imageDialog">
         <h2>Select Image</h2>
+        <div id="imageDialogTabs" class="tabs">
+            <button type="button" data-tab="imageTabLines" class="active">Lines &amp; Arrows</button>
+            <button type="button" data-tab="imageTabSymbols">Symbols</button>
+        </div>
         <div id="imageDialogContent" style="width: 400px; height:300px; overflow-y: auto">
-        <details class="symbols" open="open">
-            <summary>Lines</summary>
-            <svg><use href="img/cell/line.svg#hb" /></svg>
-            <svg><use href="img/cell/line.svg#h" /></svg>
+            <div id="imageTabLines" class="symbols">
+                <svg><use href="img/cell/line.svg#h" /></svg>
+                <svg><use href="img/cell/line.svg#bl" /></svg>
+                <svg><use href="img/cell/line.svg#arc.dl" /></svg>
+                <svg><use href="img/cell/line.svg#diagonal.dl" /></svg>
+                <svg><use href="img/cell/line.svg#hb" /></svg>
+                <svg><use href="img/cell/line.svg#hv" /></svg>
+                <svg><use href="img/cell/arrow.svg#r" /></svg>
+            </div>
 
-            <svg><use href="img/cell/line.svg#br" /></svg>
-            <svg><use href="img/cell/line.svg#bl" /></svg>
-
-            <svg><use href="img/cell/line.svg#vr" /></svg>
-            <svg><use href="img/cell/line.svg#vl" /></svg>
-
-            <svg><use href="img/cell/line.svg#v" /></svg>
-            <svg><use href="img/cell/line.svg#v" /></svg>
-
-            <svg><use href="img/cell/line.svg#tr" /></svg>
-            <svg><use href="img/cell/line.svg#tl" /></svg>
-
-            <svg><use href="img/cell/line.svg#ht" /></svg>
-            <svg><use href="img/cell/line.svg#hv" /></svg>
-
-            <svg><use href="img/cell/line.svg#arc.dr" /></svg>
-            <svg><use href="img/cell/line.svg#arc.dl" /></svg>
-            <svg><use href="img/cell/line.svg#arc.ur" /></svg>
-            <svg><use href="img/cell/line.svg#arc.ul" /></svg>
-
-            <svg><use href="img/cell/line.svg#diagonal.dr" /></svg>
-            <svg><use href="img/cell/line.svg#diagonal.dl" /></svg>
-            <svg><use href="img/cell/line.svg#diagonal.ur" /></svg>
-            <svg><use href="img/cell/line.svg#diagonal.ul" /></svg>
-        </details>
-
-        <details class="symbols">
-            <summary>Arrows</summary>
-            <svg><use href="img/cell/arrow.svg#l" /></svg>
-            <svg><use href="img/cell/arrow.svg#r" /></svg>
-            <svg><use href="img/cell/arrow.svg#u" /></svg>
-            <svg><use href="img/cell/arrow.svg#d" /></svg>
-        </details>
-
-        <details class="symbols">
-            <summary>Symbols</summary>
-            <svg><use href="img/cell/symbol.svg#box" /></svg>
-            <svg><use href="img/cell/symbol.svg#lamp" /></svg>
-            <svg><use href="img/cell/symbol.svg#motor" /></svg>
-            <svg><use href="img/cell/symbol.svg#valve.v" /></svg>
-            <svg><use href="img/cell/symbol.svg#valve.h" /></svg>
-            <svg><use href="img/cell/symbol.svg#sensor" /></svg>
-            <svg><use href="img/cell/symbol.svg#mixer.u" /></svg>
-            <svg><use href="img/cell/symbol.svg#mixer.d" /></svg>
-        </details>
-
+            <div id="imageTabSymbols" class="symbols" hidden>
+                <svg><use href="img/cell/symbol.svg#box" /></svg>
+                <svg><use href="img/cell/symbol.svg#lamp" /></svg>
+                <svg><use href="img/cell/symbol.svg#motor" /></svg>
+                <svg><use href="img/cell/symbol.svg#valve" /></svg>
+                <svg><use href="img/cell/symbol.svg#sensor" /></svg>
+                <svg><use href="img/cell/symbol.svg#mixer" /></svg>
+            </div>
         </div>
         <div class="dialogButtons">
             <button id="imageDialogOkButton">Select</button>

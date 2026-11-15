@@ -7,6 +7,10 @@
     font-weight: bold;
 }
 
+.dialogButtons {
+    margin-top: 10px;
+}
+
 .dialogButtons button,
 .dialogButton {
     float: right;
@@ -21,4 +25,31 @@
     grid-column-gap: 5px;
     grid-row-gap: 5px;
     align-items: center;
+}
+
+.tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid #ccc;
+}
+
+.tabs button {
+    background: #eee;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    padding: 4px 12px;
+    cursor: pointer;
+}
+
+.tabs button.active {
+    background: #fff;
+    font-weight: bold;
+    margin-bottom: -1px;
+    padding-bottom: 5px;
+}
+
+#imageDialogContent {
+    border: 1px solid #ccc;
+    border-top: none;
+    padding: 8px;
 }
