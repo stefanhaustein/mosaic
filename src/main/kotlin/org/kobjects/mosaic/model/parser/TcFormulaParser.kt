@@ -60,23 +60,30 @@ object TcFormulaParser : PrattParser<TcScanner, ParsingContext, Expression>(
             TcTokenType.IDENTIFIER -> {
                 val name = scanner.consume().text
                 val parameterList = if (scanner.tryConsume("(")) parseParameterList(scanner, context) else emptyMap()
-                when (name.lowercase()) {
-                    "true" -> {
+                val lowercase = name.lowercase()
+                when {
+                    lowercase == "true" -> {
                         require(parameterList.isEmpty()) {
                             "Unexpected parameter(s) for 'TRUE'"
                         }
                         Literal(true)
                     }
 
-                    "false" -> {
+                    lowercase == "false" -> {
                         require(parameterList.isEmpty()) {
-                            "Unexpected parameter(s) for 'TRUE'"
+                            "Unexpected parameter(s) for 'FALSE'"
                         }
                         Literal(false)
                     }
 
+                    lowercase == "value" && context.hasLocalValue -> {
+                        require(parameterList.isEmpty()) {
+                            "Unexpected parameter(s) for 'VALUE'"
+                        }
+                        LocalValueExpression
+                    }
+
                     else -> {
-                        val lowercase = name.lowercase()
                         val integration = context.model.integrations.integrationMap[lowercase]
                         if (integration != null) {
                             scanner.consume(".")

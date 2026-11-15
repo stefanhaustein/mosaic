@@ -5,7 +5,8 @@ import org.kobjects.mosaic.model.Model
 
 
 class ParsingContext(
-    val cell: ExpressionNode
+    val cell: ExpressionNode,
+    val hasLocalValue: Boolean = false
 ) {
     val model: Model
     get() = cell.owner.model

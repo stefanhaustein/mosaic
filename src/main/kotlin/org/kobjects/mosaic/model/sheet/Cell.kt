@@ -79,7 +79,7 @@ class Cell(
 
     override fun reparse() {
         super.reparse()
-        val parsingContext = ParsingContext(this)
+        val parsingContext = ParsingContext(this, hasLocalValue = true)
         for (style in images) {
             style.reparse(parsingContext)
         }
@@ -157,9 +157,10 @@ class Cell(
 
     override fun calculateValue(context: EvaluationContext): NodeValue {
         val value = expression.eval(context)
+        val imageContext = context.withLocalValue(value)
         val imageConditionValues = buildList {
             for (image in images) {
-                add(image.parsedCondition.eval(context))
+                add(image.parsedCondition.eval(imageContext))
             }
         }
 
